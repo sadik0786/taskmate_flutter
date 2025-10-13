@@ -1,0 +1,20 @@
+same name pass node or method
+
+const { projectName } = req.body;
+
+.input("projectName", sql.NVarChar(256), projectName)
+
+static Future<Map<String, dynamic>> addProject(String projectName) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    final res = await http.post(
+      Uri.parse("$baseUrl/admin/addProject"),
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer $token"},
+      body: jsonEncode({"projectName": projectName}),
+    );
+    return jsonDecode(res.body);
+  }
+
+only table name diffrent ok
+.query(`INSERT INTO dbo.Projecttask_mateApp (ProjectName)VALUES (@ProjectName)`)
