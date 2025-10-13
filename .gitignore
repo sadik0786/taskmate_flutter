@@ -1,52 +1,71 @@
-# Flutter/Dart
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
 .dart_tool/
-.packages
+.flutter-plugins
+.flutter-plugins-dependencies
 .pub-cache/
 .pub/
-build/
-flutter_*.png
-*.dart.js
-*.info.json
+/build/
 
-# Android
-/android/**/gradle-wrapper.jar
-/android/.gradle/
-/android/captures/
-/android/gradlew
-/android/gradlew.bat
-/android/local.properties
-/android/**/GeneratedPluginRegistrant.java
+# Symbolication related
+app.*.symbols
 
-# iOS
-/ios/**/*.mode1v3
-/ios/**/*.mode2v3
-/ios/**/*.moved-aside
-/ios/**/*.pbxuser
-/ios/**/*.perspectivev3
-/ios/**/*sync/
-/ios/**/.sconsign.dblite
-/ios/**/.tags*
-/ios/**/.vagrant/
-/ios/**/DerivedData/
-/ios/**/Icon?
-/ios/**/Pods/
-/ios/**/.symlinks/
+# Obfuscation related
+app.*.map.json
 
-# Configuration
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/app/.cxx
+
+
+
+
+# Other files
+.lock
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugins.cmake
+macos/Flutter/GeneratedPluginRegistrant.swift
+pubspec.lock
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+/linux
+/windows
+/macos
+.qodo
+/ios/build/ios/XCBuildData
+/ios/build/ios/XCBuildData
+/ios/build/ios/XCBuildData
+/ios/build/ios/XCBuildData/PIFCache
+ios/build/ios/XCBuildData/PIFCache/project/PROJECT@v11_mod=1745496766.1721072_hash=bfdfe7dc352907fc980b868725387e98plugins=1OJSG6M1FOV3XYQCBH7Z29RZ0FPR9XDE1-json
+/ios/build/ios/XCBuildData
+/ios/build/ios/XCBuildData
+android/app/build.gradle
 .env
-.env.*
-!.env.example
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Temporary files
-*.tmp
-*.temp
