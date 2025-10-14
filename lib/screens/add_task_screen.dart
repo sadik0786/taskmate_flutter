@@ -2,18 +2,23 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/screens/task_screen.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/widgets/custom_button.dart';
+
+final GlobalKey<AddTaskScreenState> addTaskKey = GlobalKey<AddTaskScreenState>();
 
 class AddTaskScreen extends StatefulWidget {
   final Map<String, dynamic>? task;
-  const AddTaskScreen({super.key, this.task});
+
+  const AddTaskScreen({super.key, this.task}); // <- super.key here
 
   @override
-  State<AddTaskScreen> createState() => _AddTaskScreenState();
+  State<AddTaskScreen> createState() => AddTaskScreenState();
 }
 
-class _AddTaskScreenState extends State<AddTaskScreen> {
+class AddTaskScreenState extends State<AddTaskScreen> {
   final _title = TextEditingController();
   final _desc = TextEditingController();
 
@@ -38,7 +43,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void initState() {
     super.initState();
     _loadProjects();
-    _loadAllSubProjects();
+    loadAllSubProjects();
     if (widget.task != null) _prefillTask();
   }
 
@@ -84,13 +89,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  Future<void> _loadAllSubProjects() async {
+  // Future<void> _loadAllSubProjects() async {
+  //   try {
+  //     final res = await ApiService.fetchSubProjects();
+  //     setState(() {
+  //       _allSubprojects.clear();
+  //       _allSubprojects.addAll(res.map((sp) => Map<String, dynamic>.from(sp)));
+  //       _filterSubprojects(); // filter based on selected project
+  //     });
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       Get.context!,
+  //     ).showSnackBar(SnackBar(content: Text("Failed to load subprojects: $e")));
+  //   }
+  // }
+
+  Future<void> loadAllSubProjects() async {
     try {
       final res = await ApiService.fetchSubProjects();
+      if (!mounted) return;
+
       setState(() {
         _allSubprojects.clear();
         _allSubprojects.addAll(res.map((sp) => Map<String, dynamic>.from(sp)));
-        _filterSubprojects(); // filter based on selected project
+        _filterSubprojects();
       });
     } catch (e) {
       ScaffoldMessenger.of(
@@ -257,6 +279,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.add, color: Colors.white),
+            onPressed: () {
+              Get.toNamed(Routes.projectScreen);
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               Get.back();
@@ -366,7 +394,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               SizedBox(height: 15.h),
               TextField(
                 controller: _desc,
-                maxLines: 1,
+                maxLines: 2,
                 decoration: _inputDecoration("Task Details", Icons.description),
               ),
               SizedBox(height: 15.h),
@@ -441,14 +469,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ],
               ),
               SizedBox(height: 24.h),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.save),
-                  label: Text("Save Task", style: TextStyle(fontSize: 18.sp)),
-                  onPressed: _save,
-                ),
-              ),
+              CustomButton(icon: Icons.save, text: "Save Task", onPressed: _save),
             ],
           ),
         ),

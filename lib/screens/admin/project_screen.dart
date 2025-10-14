@@ -4,9 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/screens/add_task_screen.dart';
 import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_text_field.dart';
 
 class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key});
@@ -17,6 +20,7 @@ class ProjectScreen extends StatefulWidget {
 
 class _ProjectScreenState extends State<ProjectScreen> {
   final _formKey = GlobalKey<FormState>();
+  final addtask = AddTaskScreen();
   final TextEditingController _name = TextEditingController();
   bool _loading = false;
   String? userName;
@@ -186,13 +190,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
               children: [
                 SizedBox(height: 10.h),
                 if (userRole == "admin") ...[
-                  TextFormField(
+                  CustomTextField(
+                    labelText: "Project Name",
+                    isRequired: true,
+                    hintText: "Enter project name",
+                    prefixIcon: Icons.library_add,
                     controller: _name,
-                    decoration: InputDecoration(
-                      labelText: "Project Name",
-                      prefixIcon: const Icon(Icons.library_add),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Project cannot be empty";
@@ -201,40 +204,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   SizedBox(height: 20.h),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _loading ? null : _addProject,
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        backgroundColor: const Color(0xff00ca9d),
-                      ),
-                      child: _loading
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 20.w,
-                                  height: 20.h,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.w,
-                                  ),
-                                ),
-                                SizedBox(width: 12.w),
-                                Text(
-                                  "Loading...",
-                                  style: TextStyle(fontSize: 16.sp, color: Colors.white),
-                                ),
-                              ],
-                            )
-                          : Text(
-                              "Add Project",
-                              style: TextStyle(fontSize: 16.sp, color: Colors.white),
-                            ),
-                    ),
-                  ),
+                  CustomButton(text: "Add Project", onPressed: _addProject, isLoading: _loading),
+
                   SizedBox(height: 20.h),
                 ],
                 Align(
@@ -249,7 +220,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
                       ),
                       OutlinedButton.icon(
-                        onPressed: _showUpdateMobileBottomSheet,
+                        onPressed: _showAddSubProjectBottomSheet,
                         style: OutlinedButton.styleFrom(
                           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                           side: BorderSide(color: Colors.grey.shade600, width: 1),
@@ -277,7 +248,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       ? Center(child: NoTasksWidget(message: "No project added!"))
                       : ListView.separated(
                           itemCount: _projects.length,
-                          separatorBuilder: (_, __) => const Divider(),
+                          separatorBuilder: (_, __) =>
+                              Divider(color: Theme.of(context).colorScheme.primary),
                           itemBuilder: (context, index) {
                             final project = _projects[index];
                             final creatorName = project["creatorName"] ?? "Unknown";
@@ -290,7 +262,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
                               dense: true,
                               minTileHeight: 10.0.h,
                               minVerticalPadding: 0,
-                              leading: const Icon(Icons.folder, color: Colors.green),
+                              leading: Icon(
+                                Icons.folder,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                               title: Text(
                                 "Project: ${project["ProjectName"].toString().toUpperCase()}",
                               ),
@@ -333,7 +308,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
       },
       decoration: InputDecoration(
         labelText: "Select Main Project*",
-        prefixIcon: const Icon(Icons.work),
+        // prefixIcon: const Icon(Icons.work),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       validator: (value) {
@@ -348,14 +323,14 @@ class _ProjectScreenState extends State<ProjectScreen> {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       ),
       buttonStyleData: ButtonStyleData(
-        padding: EdgeInsets.symmetric(horizontal: 8.w),
-        height: 24.h,
+        padding: EdgeInsets.symmetric(horizontal: 6.w),
+        height: 20.h,
         width: double.infinity,
       ),
     );
   }
 
-  void _showUpdateMobileBottomSheet() {
+  void _showAddSubProjectBottomSheet() {
     final TextEditingController subProjectText = TextEditingController();
     final formKey = GlobalKey<FormState>();
     // Reset dropdown when opening modal
@@ -382,14 +357,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 SizedBox(height: 20.h),
                 dropDownList(ctx),
                 SizedBox(height: 12.h),
-                TextFormField(
+                CustomTextField(
+                  labelText: "Sub project name",
+                  hintText: "Enter sub project name",
                   controller: subProjectText,
+                  isRequired: true,
                   keyboardType: TextInputType.text,
                   maxLength: 50,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    labelText: "Enter sub project name",
-                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Subproject is required";
@@ -398,18 +372,21 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   },
                 ),
                 SizedBox(height: 12.h),
-                ElevatedButton(
+                CustomButton(
+                  text: "Add",
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       await _saveSubProject(subProjectText);
-                      Navigator.pop(Get.context!); // close modal
+                      Get.back(result: () => AddTaskScreen(key: addTaskKey));
+                      addTaskKey.currentState?.loadAllSubProjects();
+                      Navigator.pop(Get.context!);
                     } else {
                       setState(() {
                         _selectedProject = null;
                       });
                     }
                   },
-                  child: const Text("Add"),
+                  isLoading: _loading,
                 ),
                 SizedBox(height: 30.h),
               ],

@@ -47,51 +47,6 @@ class ApiService {
     }
   }
 
-  /// ------------------- Common API Call Handler -------------------
-  static Future<Map<String, dynamic>> _handleRequest(Future<http.Response> request) async {
-    try {
-      if (!await hasInternetConnection()) {
-        return {"success": false, "error": "No internet connection. Please check your network."};
-      }
-
-      final res = await request.timeout(const Duration(seconds: 15));
-
-      final data = jsonDecode(res.body);
-
-      // Handle token expiry / unauthorized
-      if (res.statusCode == 401) {
-        await clearToken();
-        // Optional: Navigate to login screen using Get
-        Get.offAllNamed(Routes.login);
-        return {"success": false, "error": "Session expired. Please login again."};
-      }
-
-      // Bad request
-      if (res.statusCode == 400) {
-        return {"success": false, "error": data['error'] ?? "Invalid request"};
-      }
-
-      // Server error
-      if (res.statusCode >= 500) {
-        return {"success": false, "error": "Server error. Please try again later."};
-      }
-
-      // Success response
-      if (res.statusCode == 200) {
-        return data;
-      }
-
-      // Any other unknown status
-      return {"success": false, "error": "Unexpected error occurred (${res.statusCode})"};
-    } on SocketException {
-      return {"success": false, "error": "No internet connection. Please check your network."};
-    } on TimeoutException {
-      return {"success": false, "error": "Request timed out. Please try again."};
-    } catch (e) {
-      return {"success": false, "error": "Something went wrong: ${e.toString()}"};
-    }
-  }
-
   // Validate current user
   static Future<Map<String, dynamic>> getCurrentUser() async {
     final token = await getToken();

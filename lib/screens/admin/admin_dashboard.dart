@@ -79,7 +79,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
-          gradient: [Colors.deepOrange.shade600, Colors.deepOrange.shade300],
+          gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade100],
           onTap: () {
             Get.toNamed(Routes.profileScreen);
           },
@@ -90,7 +90,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Employee',
           icon: Icons.person_add,
-          gradient: [Colors.lightBlueAccent, Colors.blue],
+          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
           onTap: () {
             Get.toNamed(Routes.registerScreen);
           },
@@ -98,7 +98,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Employee',
           icon: Icons.people,
-          gradient: [Colors.greenAccent.shade400, Colors.green.shade700],
+          gradient: [Colors.greenAccent.shade400, Colors.greenAccent.shade200],
           onTap: () {
             Get.toNamed(Routes.employeeScreen);
           },
@@ -106,7 +106,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Project',
           icon: Icons.library_add,
-          gradient: [Colors.green.shade100, Colors.greenAccent],
+          gradient: [Colors.green.shade400, Colors.green.shade300],
           onTap: () {
             Get.toNamed(Routes.projectScreen);
           },
@@ -114,7 +114,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Task',
           icon: Icons.add_task,
-          gradient: [Colors.orangeAccent, Colors.deepOrange],
+          gradient: [Colors.orangeAccent.shade400, Colors.orangeAccent.shade200],
           onTap: () {
             Get.toNamed(Routes.addTaskScreen);
           },
@@ -122,7 +122,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Task Details',
           icon: Icons.task,
-          gradient: [Colors.orangeAccent, Colors.deepOrange],
+          gradient: [Colors.red.shade400, Colors.red.shade300],
           onTap: () {
             Get.toNamed(Routes.taskScreen);
           },
@@ -130,7 +130,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         // _DashboardItem(
         //   title: 'Reset Password',
         //   icon: Icons.password_sharp,
-        //   gradient: [Colors.grey.shade200, Colors.red.shade300],
+        //   gradient: [Colors.deepOrange.shade600, Colors.deepOrange.shade300],
         //   onTap: () {
         //     Get.toNamed(Routes.resetPasswordPage);
         //   },
@@ -138,7 +138,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
-          gradient: [Colors.lightBlueAccent, Colors.blue],
+          gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade100],
           onTap: () {
             Get.toNamed(Routes.profileScreen);
           },

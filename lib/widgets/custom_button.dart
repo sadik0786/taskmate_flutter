@@ -8,6 +8,9 @@ class CustomButton extends StatelessWidget {
   final Color? backgroundColor;
   final double borderRadius;
   final EdgeInsetsGeometry? padding;
+  final IconData? icon;
+  final Color? iconColor;
+  final double iconSize;
 
   const CustomButton({
     super.key,
@@ -17,12 +20,16 @@ class CustomButton extends StatelessWidget {
     this.backgroundColor,
     this.borderRadius = 12,
     this.padding,
+    this.icon,
+    this.iconColor,
+    this.iconSize = 22,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final btnColor = backgroundColor ?? theme.colorScheme.primary;
+    final textColor = theme.colorScheme.onPrimary;
 
     return SizedBox(
       width: double.infinity,
@@ -49,17 +56,27 @@ class CustomButton extends StatelessWidget {
                   SizedBox(width: 12.w),
                   Text(
                     "Loading...",
-                    style: TextStyle(fontSize: 18.sp, color: theme.colorScheme.onPrimary),
+                    style: TextStyle(fontSize: 18.sp, color: textColor),
                   ),
                 ],
               )
-            : Text(
-                text,
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onPrimary,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, color: iconColor ?? textColor, size: iconSize.sp),
+                    SizedBox(width: 8.w),
+                  ],
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                ],
               ),
       ),
     );
