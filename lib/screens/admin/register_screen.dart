@@ -8,6 +8,7 @@ import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -61,12 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (res["success"] == true && res["admins"] != null) {
         _admins = List<Map<String, dynamic>>.from(res["admins"]);
         _selectedAdminId = null;
-        // Optional: set default selected admin if list not empty
-        // if (_admins.isNotEmpty) {
-        //   _selectedAdminId = _admins.first["ID"];
-        // } else {
-        //   _selectedAdminId = null;
-        // }
       } else {
         _admins = [];
         _selectedAdminId = null;
@@ -139,9 +134,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedRoleId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please select a role")));
+      CustomSnackBar.error("Please select a role");
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(const SnackBar(content: Text("Please select a role")));
       return;
     }
 
@@ -173,12 +169,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _roles.firstWhere((r) => r["RoleId"] == _selectedRoleId)["RoleName"].toLowerCase() ==
                 'employee') &&
         _selectedAdminId == null) {
-      Get.snackbar(
-        "Error",
-        "Please select an Admin to assign the Employee",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      CustomSnackBar.error("Please select an Admin to assign the Employee");
+      // Get.snackbar(
+      //   "Error",
+      //   "Please select an Admin to assign the Employee",
+      //   backgroundColor: Colors.red,
+      //   colorText: Colors.white,
+      // );
       return;
     }
     final res = await ApiService.registerEmployee(
@@ -200,16 +197,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _loading = false);
 
     if (res["success"] == true) {
-      Get.snackbar(
-        "Employee",
-        "added successfully!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      CustomSnackBar.success("added successfully!");
+      // Get.snackbar(
+      //   "Employee",
+      //   "added successfully!",
+      //   backgroundColor: Colors.green,
+      //   colorText: Colors.white,
+      // );
       Navigator.pop(context);
     } else {
       final error = res["error"] ?? "Failed to add employee";
-      Get.snackbar("Error", "$error", backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackBar.error("$error");
+      // Get.snackbar("Error", "$error", backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 
@@ -383,7 +382,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         isRequired: false,
                         hintText: "Enter number (Optional)",
                         prefixIcon: Icons.phone,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.number,
                         controller: _mobile,
                         maxLength: 10,
                       ),

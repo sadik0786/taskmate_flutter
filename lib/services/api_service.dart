@@ -191,7 +191,7 @@ class ApiService {
 
       final data = jsonDecode(res.body);
 
-      if (res.statusCode == 200 || res.statusCode == 201) {
+      if (data["success"] == true) {
         return {"success": true, ...data};
       } else {
         return {
