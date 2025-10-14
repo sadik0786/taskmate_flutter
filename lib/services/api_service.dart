@@ -269,10 +269,6 @@ class ApiService {
   // Login
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      // ✅ Validate email domain
-      if (!email.endsWith("@5nance.com")) {
-        return {'success': false, 'error': 'Only @5nance.com emails are allowed'};
-      }
 
       final res = await http
           .post(
@@ -280,11 +276,11 @@ class ApiService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'email': email, 'password': password}),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 15));
 
       final data = jsonDecode(res.body);
 
-      if (res.statusCode == 200) {
+      if (data["success"] == true) {
         if (data['token'] != null && data['user'] != null) {
           print('TOKEN: ${data['token']}');
           await saveToken(data['token']);
@@ -292,21 +288,23 @@ class ApiService {
           final prefs = await SharedPreferences.getInstance();
           final user = data['user'];
 
-          // ✅ Save all hierarchy information
+          // Save all hierarchy information
           await prefs.setInt('userId', user['id'] ?? 0);
           await prefs.setString('name', user['name'] ?? '');
           await prefs.setString('email', user['email'] ?? '');
           await prefs.setString('mobile', user['mobile'] ?? '');
           await prefs.setInt('roleId', user['roleId'] ?? 0);
           await prefs.setString('role', (user['role'] ?? '').toString().toLowerCase());
-          // await prefs.setInt('reportingId', user['reportingId'] ?? 0);
-
           return {'success': true, 'token': data['token'], 'user': data['user']};
         } else {
           return {'success': false, 'error': data['error'] ?? 'Invalid response from server'};
         }
       } else {
-        return {'success': false, 'error': data['error'] ?? 'Login failed (${res.statusCode})'};
+        return {
+          'success': false,
+          'error': data['message'] ?? data['error'] ?? 'Login failed (${res.statusCode})',
+        };
+
       }
     } catch (e) {
       return {'success': false, 'error': 'Network error: ${e.toString()}'};

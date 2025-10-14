@@ -146,19 +146,29 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
     final now = DateTime.now();
     int tempYear = selectedYear ?? now.year;
     int tempMonth = selectedMonth ?? now.month;
+    final currentYear = now.year;
+    final currentMonth = now.month;
 
-    final result = await showDialog(
+    await showDialog(
       context: context,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text("Select Month & Year"),
-              content: SizedBox(
-                height: 250,
+            return Dialog(
+              insetPadding: const EdgeInsets.all(15),
+              child: Container(
+                width: double.infinity,
+                height: 400,
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Year Selector
+                    const Text(
+                      "Select Month & Year",
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    // Year selector
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -168,59 +178,91 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                             setDialogState(() => tempYear--);
                           },
                         ),
+                        const SizedBox(width: 12),
                         Text(
                           "$tempYear",
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
+                        const SizedBox(width: 12),
                         IconButton(
                           icon: const Icon(Icons.chevron_right),
-                          onPressed: () {
-                            setDialogState(() => tempYear++);
-                          },
+                          onPressed: tempYear < currentYear
+                              ? () => setDialogState(() => tempYear++)
+                              : null,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    // Month Selector
-                    Wrap(
-                      spacing: 8,
-                      children: List.generate(12, (index) {
-                        final month = index + 1;
-                        return ChoiceChip(
-                          label: Text(DateFormat.MMM().format(DateTime(0, month))),
-                          selected: tempMonth == month,
-                          onSelected: (_) {
-                            setDialogState(() => tempMonth = month);
+                    const SizedBox(height: 12),
+                    // Month grid
+                    Expanded(
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 12,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 6,
+                          childAspectRatio: 2.2,
+                        ),
+                        itemBuilder: (context, index) {
+                          final month = index + 1;
+                          final isFutureMonth = (tempYear == currentYear && month > currentMonth);
+
+                          return ChoiceChip(
+                            label: Text(
+                              DateFormat.MMM().format(DateTime(0, month)),
+                              style: TextStyle(
+                                color: isFutureMonth ? Colors.grey : Colors.black,
+                                fontWeight: tempMonth == month
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            selected: tempMonth == month,
+                            onSelected: isFutureMonth
+                                ? null
+                                : (_) => setDialogState(() => tempMonth = month),
+                            selectedColor: Colors.green.shade400,
+                            backgroundColor: isFutureMonth
+                                ? Colors.grey.shade300
+                                : Colors.grey.shade200,
+                          );
+                        },
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text("Cancel"),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(ctx, {"month": tempMonth, "year": tempYear});
                           },
-                        );
-                      }),
+                          child: const Text("Select"),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx, {"month": tempMonth, "year": tempYear});
-                  },
-                  child: const Text("Select"),
-                ),
-              ],
             );
           },
         );
       },
-    );
-
-    if (result != null && result is Map) {
-      setState(() {
-        selectedMonth = result["month"];
-        selectedYear = result["year"];
-        selectedFilter = "month";
-        _applyFilter();
-      });
-    }
+    ).then((result) {
+      if (result != null && result is Map) {
+        setState(() {
+          selectedMonth = result["month"];
+          selectedYear = result["year"];
+          selectedFilter = "month";
+          _applyFilter();
+        });
+      }
+    });
   }
 
   String _calculateDuration(String start, String end) {

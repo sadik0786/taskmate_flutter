@@ -13,9 +13,11 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:task_mate/widgets/custom_text_field.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -581,46 +583,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text(
                 _savedPin == null ? "Set App Lock PIN" : "Change App Lock PIN",
-                style: Theme.of(ctx).textTheme.titleMedium,
+                style: Theme.of(ctx).textTheme.titleLarge,
               ),
-              SizedBox(height: 16.h),
-              TextFormField(
+              SizedBox(height: 20.h),
+              CustomTextField(
+                labelText: "Set PIN",
+                hintText: "Enter 4-digit",
                 controller: pinController,
                 keyboardType: TextInputType.number,
-                obscureText: true,
+                isObscure: true,
                 maxLength: 4,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Enter 4-digit PIN",
-                  counterText: "",
-                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return "PIN required";
                   if (value.length != 4) return "PIN must be 4 digits";
                   return null;
                 },
               ),
-              SizedBox(height: 12.h),
-              TextFormField(
+              // SizedBox(height: 12.h),
+              CustomTextField(
+                labelText: "Set Confirm PIN",
+                hintText: "Enter 4-digit",
                 controller: confirmController,
                 keyboardType: TextInputType.number,
-                obscureText: true,
+                isObscure: true,
                 maxLength: 4,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Confirm PIN",
-                  counterText: "",
-                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return "Confirm your PIN";
                   if (value != pinController.text) return "PINs do not match";
                   return null;
                 },
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 20.h),
               ElevatedButton.icon(
-                icon: const Icon(Icons.check),
-                label: Text(_savedPin == null ? "Save PIN" : "Update PIN"),
+                // icon: Icon(Icons.check, color: ThemeClass.lightCardColor),
+                label: Text(
+                  _savedPin == null ? "Save PIN" : "Update PIN",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
                     final prefs = await SharedPreferences.getInstance();
@@ -639,6 +642,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 14.w),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
               ),
               SizedBox(height: 24.h),
             ],

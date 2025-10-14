@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _controller.forward();
 
     // Delay a little to show splash nicely
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
         _checkAuthAndNavigate();
       }
@@ -275,7 +275,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   children: List.generate(4, (i) {
                     return SizedBox(
                       width: 70.w,
-                      // height: 60.h,
                       child: TextField(
                         autofocus: i == 0,
                         controller: controllers[i],
@@ -343,6 +342,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           });
                         }
                       },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                        backgroundColor: Colors.red,
+                      ),
                       child: const Text("Unlock"),
                     ),
                   ],
@@ -354,8 +358,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         );
       },
     );
-
-    // ✅ Don't dispose here — let the framework clean up safely
     return result ?? false;
   }
 }

@@ -47,7 +47,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Employee',
           icon: Icons.person_add,
-          gradient: [Colors.lightBlueAccent, Colors.blue],
+          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
           onTap: () {
             Get.toNamed(Routes.registerScreen);
           },
@@ -55,7 +55,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Employee',
           icon: Icons.people,
-          gradient: [Colors.greenAccent.shade400, Colors.green.shade700],
+          gradient: [Colors.greenAccent.shade400, Colors.greenAccent.shade200],
           onTap: () {
             Get.toNamed(Routes.employeeScreen);
           },
@@ -63,7 +63,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Task Details',
           icon: Icons.task,
-          gradient: [Colors.orangeAccent, Colors.deepOrange],
+          gradient: [Colors.orangeAccent.shade400, Colors.orangeAccent.shade200],
           onTap: () {
             Get.toNamed(Routes.employeeTaskScreen);
           },
@@ -71,7 +71,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Reset Password',
           icon: Icons.password_sharp,
-          gradient: [Colors.grey.shade200, Colors.red.shade300],
+          gradient: [Colors.red.shade400, Colors.red.shade300],
           onTap: () {
             Get.toNamed(Routes.resetPasswordPage);
           },
@@ -79,7 +79,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
-          gradient: [Colors.lightBlueAccent, Colors.blue],
+          gradient: [Colors.deepOrange.shade600, Colors.deepOrange.shade300],
           onTap: () {
             Get.toNamed(Routes.profileScreen);
           },
@@ -164,11 +164,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       body: SafeArea(
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0x60121212), Color(0x20121212)],
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
-            ),
+            // gradient: LinearGradient(
+            //   colors: [Color(0x60121212), Color(0x20121212)],
+            //   begin: Alignment.bottomRight,
+            //   end: Alignment.topLeft,
+            // ),
           ),
           child: Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 20.h),

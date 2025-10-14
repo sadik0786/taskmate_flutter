@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   bool _loading = false;
-  bool _obscurePassword = true;
 
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
@@ -106,8 +107,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           colorText: Colors.white,
         );
       } else {
-        final error = res["error"] ?? "Login failed. Please try again.";
-        Get.snackbar("Login Failed", error, backgroundColor: Colors.red, colorText: Colors.white);
+        final errorMsg = res["error"] ?? "Unable to login. Please try again.";
+
+        Get.snackbar(
+          "Login Failed",
+          errorMsg,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
       setState(() => _loading = false);
@@ -192,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               const SizedBox(height: 10),
               // Login Card
               Card(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withOpacity(0.5),
                 elevation: 16,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
@@ -213,102 +220,30 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ),
                         ),
                         SizedBox(height: 20.h),
-
-                        // ✅ Email Field
-                        TextFormField(
-                          controller: _email,
+                        CustomTextField(
+                          labelText: "Email ID",
+                          isRequired: true,
+                          hintText: "Enter username Id",
+                          prefixIcon: Icons.email,
                           keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: "Email ID",
-                            labelStyle: TextStyle(color: Colors.white70),
-                            prefixIcon: Icon(Icons.email, color: Colors.white70),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                              borderSide: BorderSide(color: Colors.blueAccent, width: 2.w),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.05),
-                          ),
+                          controller: _email,
                           validator: _validateEmail,
                         ),
-
                         SizedBox(height: 20.h),
-
-                        // Password Field
-                        TextFormField(
+                        CustomTextField(
+                          labelText: "Password",
+                          isRequired: true,
+                          hintText: "Enter password",
+                          prefixIcon: Icons.lock,
                           controller: _password,
-                          obscureText: _obscurePassword,
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: "Password",
-                            labelStyle: TextStyle(color: Colors.white70),
-                            prefixIcon: Icon(Icons.lock, color: Colors.white70),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                color: Colors.white70,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.blueAccent, width: 2),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.05),
-                          ),
+                          isObscure: true,
                           validator: _validatePassword,
                         ),
-
+                    
                         SizedBox(height: 30.h),
 
                         //  Login Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50.h,
-                          child: ElevatedButton(
-                            onPressed: _loading ? null : _login,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 4,
-                            ),
-                            child: _loading
-                                ? SizedBox(
-                                    width: 20.w,
-                                    height: 20.h,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.w,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    "LOGIN",
-                                    style: TextStyle(
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
-                        ),
+                        CustomButton(text: "Login", onPressed: _login, isLoading: _loading),
 
                         // const SizedBox(height: 10),
                         // GestureDetector(
