@@ -11,11 +11,11 @@ class AppConstants {
   ];
   static InputBorder enabledBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(10),
-    borderSide: BorderSide(color: ThemeClass.textSecondaryLight),
+    borderSide: BorderSide(color: ThemeClass.lightBgColor),
   );
   static InputBorder focusedBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(10),
-    borderSide: BorderSide(color: ThemeClass.textSecondaryLight),
+    borderSide: BorderSide(color: ThemeClass.lightBgColor),
   );
   static InputBorder errorBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(10),

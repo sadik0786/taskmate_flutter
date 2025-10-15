@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
@@ -163,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1a1a1a),
+      backgroundColor: ThemeClass.darkBgColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(6.sp),
@@ -181,16 +182,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       SizedBox(height: 10.h),
                       Text(
                         "Task Mate",
-                        style: TextStyle(
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.5,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        // style: TextStyle(
+                        //   fontSize: 28.sp,
+                        //   fontWeight: FontWeight.bold,
+                        //   color: Colors.white,
+                        //   letterSpacing: 1.5,
+                        // ),
                       ),
                       Text(
                         "Employee Task Management",
-                        style: TextStyle(fontSize: 16, color: Colors.white70),
+                        style: Theme.of(context).textTheme.titleMedium,
+                        // style: TextStyle(fontSize: 16, color: Colors.white70),
                       ),
                     ],
                   ),
@@ -199,28 +202,31 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               const SizedBox(height: 10),
               // Login Card
               Card(
-                color: Colors.white.withOpacity(0.5),
+                margin: EdgeInsets.only(left: 10.w, right: 10.w),
+                color: ThemeClass.darkCardColor,
                 elevation: 16,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
                   side: BorderSide(color: Colors.white.withOpacity(0.1)),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(14.w),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
                         Text(
                           "Access Account",
-                          style: TextStyle(
-                            fontSize: 26.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          //  TextStyle(
+                          //   fontSize: 26.sp,
+                          //   fontWeight: FontWeight.w700,
+                          //   color: ThemeClass.textWhite,
+                          // ),
                         ),
                         SizedBox(height: 20.h),
                         CustomTextField(
+                          isEnabled: true,
                           labelText: "Email ID",
                           isRequired: true,
                           hintText: "Enter username Id",
@@ -239,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           isObscure: true,
                           validator: _validatePassword,
                         ),
-                    
+
                         SizedBox(height: 30.h),
 
                         //  Login Button

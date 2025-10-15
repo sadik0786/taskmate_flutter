@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:task_mate/core/theme.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -21,19 +22,24 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+      backgroundColor: ThemeClass.primaryGreen,
+      // backgroundColor: Color(0xff403c39),
       title: Text(
         title,
         style: Theme.of(
           context,
-        ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w700, fontSize: 18.sp),
+        ).textTheme.titleLarge!.copyWith(
+          fontWeight: FontWeight.w700,
+          fontSize: 18.sp,
+          color: Colors.white,
+        ),
       ),
       actions: [
         Text(
           "Hi, ${userName ?? ""}  ",
           style: Theme.of(
             context,
-          ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w700, fontSize: 16.sp),
+          ).textTheme.titleLarge,
         ),
         // Obx(
         //   () => IconButton(

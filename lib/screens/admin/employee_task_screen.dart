@@ -556,7 +556,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                     ),
                                   ],
                                 ),
-                                Divider(color: ThemeClass.textSecondaryLight),
+                                Divider(color: ThemeClass.lightBgColor),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -623,7 +623,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                     ),
                                   ],
                                 ),
-                                Divider(color: ThemeClass.textSecondaryLight),
+                                Divider(color: ThemeClass.lightBgColor),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [

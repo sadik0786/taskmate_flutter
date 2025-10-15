@@ -547,7 +547,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                       ),
                                     ],
                                   ),
-                                  Divider(color: ThemeClass.textSecondaryLight),
+                                  Divider(color: ThemeClass.lightBgColor),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -626,7 +626,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                       ),
                                     ],
                                   ),
-                                  Divider(color: ThemeClass.textSecondaryLight),
+                                  Divider(color: ThemeClass.lightBgColor),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [

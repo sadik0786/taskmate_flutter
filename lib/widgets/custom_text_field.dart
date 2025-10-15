@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:task_mate/core/theme.dart';
 
 class CustomTextField extends StatefulWidget {
   final String? labelText;
@@ -12,8 +13,9 @@ class CustomTextField extends StatefulWidget {
   final bool isEnabled;
   final bool isDense;
   final int? maxLength;
-  final String? pattern; // optional regex pattern
-  final bool isObscure; // password field
+  final String? pattern;
+  final bool isObscure;
+  final Color? fillColor;
 
   const CustomTextField({
     super.key,
@@ -29,6 +31,7 @@ class CustomTextField extends StatefulWidget {
     this.maxLength,
     this.pattern,
     this.isObscure = false,
+    this.fillColor = ThemeClass.darkCardColor,
   });
 
   @override
@@ -56,7 +59,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 widget.labelText!,
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400, fontSize: 15.sp),
+                ).textTheme.titleMedium,
               ),
               if (widget.isRequired)
                 Text(
@@ -73,19 +76,26 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: widget.isEnabled,
           obscureText: _obscureText,
           maxLength: widget.maxLength,
-          style: TextStyle(fontSize: 16.sp, color: widget.isEnabled ? null : Colors.grey[600]),
+          style: TextStyle(
+            fontSize: 16.sp,
+            color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+          ),
           decoration: InputDecoration(
+            fillColor: widget.fillColor,
             hintText: widget.hintText,
             isDense: widget.isDense,
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, color: widget.isEnabled ? null : Colors.grey[600])
+                ? Icon(
+                    widget.prefixIcon,
+                    color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+                  )
                 : null,
             suffixIcon: widget.isObscure
                 ? IconButton(
                     icon: Icon(
                       _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.grey[600],
+                      color: ThemeClass.textWhite,
                     ),
                     onPressed: () {
                       setState(() {

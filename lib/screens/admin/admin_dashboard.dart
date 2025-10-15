@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/custom_appbar.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -164,6 +165,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       body: SafeArea(
         child: Container(
           decoration: const BoxDecoration(
+            color: ThemeClass.darkBgColor,
             // gradient: LinearGradient(
             //   colors: [Color(0x60121212), Color(0x20121212)],
             //   begin: Alignment.bottomRight,

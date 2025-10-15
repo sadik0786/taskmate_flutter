@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:task_mate/core/theme.dart';
 
 class CustomDropdownField<T> extends StatelessWidget {
   final String? labelText; // Optional label above dropdown
@@ -80,7 +81,7 @@ class CustomDropdownField<T> extends StatelessWidget {
           hint: Text(
             hintText,
             style: TextStyle(
-              color: isEnabled == false ? Colors.grey[600] : Colors.black,
+              color: isEnabled == false ? ThemeClass.textWhite : ThemeClass.textBlack,
               fontSize: 16.sp,
             ),
           ),
@@ -89,7 +90,10 @@ class CustomDropdownField<T> extends StatelessWidget {
               value: item[valueKey] as T,
               child: Text(
                 item[labelKey].toString(),
-                style: TextStyle(color: isEnabled ? null : Colors.grey, fontSize: 16.sp),
+                style: TextStyle(
+                  color: isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+                  fontSize: 16.sp,
+                ),
               ),
             );
           }).toList(),
@@ -103,7 +107,10 @@ class CustomDropdownField<T> extends StatelessWidget {
                 return null;
               },
           decoration: InputDecoration(
-            prefixIcon: Icon(prefixIcon, color: isEnabled ? null : Colors.grey),
+            prefixIcon: Icon(
+              prefixIcon,
+              color: isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+            ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
             contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
           ),

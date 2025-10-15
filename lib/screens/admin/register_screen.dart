@@ -215,7 +215,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -236,8 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 Card(
-                  color: ThemeClass.lightCardColor,
-                  // color: Colors.blue[50],
+                  color: ThemeClass.darkCardColor,
                   child: Padding(
                     padding: EdgeInsets.all(12.w),
                     child: Row(
@@ -336,7 +335,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                       // Dropdown for Role
                       // dropDownList(context),
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 0.h),
                       CustomTextField(
                         labelText: "Employee Name",
                         isRequired: true,
