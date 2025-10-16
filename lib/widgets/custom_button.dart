@@ -5,6 +5,7 @@ class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
+  final Color? txtColor;
   final Color? backgroundColor;
   final double borderRadius;
   final EdgeInsetsGeometry? padding;
@@ -17,6 +18,7 @@ class CustomButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.isLoading = false,
+    this.txtColor,
     this.backgroundColor,
     this.borderRadius = 12,
     this.padding,
@@ -29,7 +31,7 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final btnColor = backgroundColor ?? theme.colorScheme.primary;
-    final textColor = theme.colorScheme.onPrimary;
+    final textColor = txtColor ?? theme.colorScheme.onPrimary;
 
     return SizedBox(
       width: double.infinity,

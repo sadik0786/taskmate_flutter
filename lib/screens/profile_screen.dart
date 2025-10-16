@@ -13,9 +13,11 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -295,9 +297,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: ThemeClass.primaryGreen,
         elevation: 0,
         title: Text("My Profile", style: Theme.of(context).textTheme.titleLarge),
         actions: [
@@ -313,14 +315,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? PageLoader()
           : Column(
               children: [
-                SizedBox(height: 50.h),
+                SizedBox(height: 30.h),
                 // Avatar
                 Center(
                   child: GestureDetector(
                     onTap: _uploadPhoto,
                     child: CircleAvatar(
-                      radius: 60.r,
-                      backgroundColor: Colors.blueGrey.shade300,
+                      radius: 70.r,
+                      backgroundColor: ThemeClass.primaryGreen,
                       backgroundImage: localAvatar != null
                           ? FileImage(localAvatar!)
                           : (avatarUrl != null ? NetworkImage(avatarUrl!) : null),
@@ -329,11 +331,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               userName != null && userName!.isNotEmpty
                                   ? userName![0].toUpperCase()
                                   : "?",
-                              style: TextStyle(
-                                fontSize: 50.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall!.copyWith(fontSize: 80.sp)
                             )
                           : null,
                     ),
@@ -344,9 +344,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: Card(
-                    margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    color: ThemeClass.tealGreen,
+                    margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                     elevation: 5,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.r),
+                      side: BorderSide(color: Colors.white, width: 1.2),
+                    ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                       child: Column(
@@ -361,7 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: _buildInfoItem(context, "Mobile", mobile, isMobile: true),
                               ),
                               IconButton(
-                                icon: Icon(Icons.edit, size: 25.sp, color: Colors.blueAccent),
+                                icon: Icon(Icons.edit, size: 25.sp, color: ThemeClass.textWhite),
                                 onPressed: _showUpdateMobileBottomSheet,
                               ),
                             ],
@@ -376,89 +380,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: Card(
-                    margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    color: ThemeClass.tealGreen,
+                    margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                     elevation: 5,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.r),
+                      side: BorderSide(color: Colors.white, width: 1.2),
+                    ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Light/Dark Toggle
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    _themeController.isDarkMode.value ? "Dark Mode" : "Light Mode",
-                                    style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Icon(
-                                    _themeController.isDarkMode.value
-                                        ? Icons.dark_mode
-                                        : Icons.light_mode,
-                                    color: Colors.blueAccent,
-                                  ),
-                                ],
-                              ),
-                              Switch(
-                                value: _themeController.isDarkMode.value,
-                                onChanged: (value) {
-                                  _themeController.toggleTheme();
-                                },
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20.h),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //   children: [
+                          //     Row(
+                          //       children: [
+                          //         Text(
+                          //           _themeController.isDarkMode.value ? "Dark Mode" : "Light Mode",
+                          //           style: Theme.of(context).textTheme.titleLarge,
+                          //         ),
+                          //         SizedBox(width: 8.w),
+                          //         Icon(
+                          //           _themeController.isDarkMode.value
+                          //               ? Icons.dark_mode
+                          //               : Icons.light_mode,
+                          //           color: ThemeClass.textWhite,
+                          //         ),
+                          //       ],
+                          //     ),
+                          //     Switch(
+                          //       value: _themeController.isDarkMode.value,
+                          //       onChanged: (value) {
+                          //         _themeController.toggleTheme();
+                          //       },
+                          //       activeColor: Colors.white,
+                          //       activeTrackColor: Colors.greenAccent.withOpacity(0.5),
+                          //       inactiveThumbColor: Colors.grey.shade300,
+                          //       inactiveTrackColor: Colors.grey.shade600,
+                          //       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          //     ),
+                          //   ],
+                          // ),
+                          // SizedBox(height: 20.h),
                           // Set App Lock PIN Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _showSetPinBottomSheet,
-                              icon: const Icon(Icons.lock, color: Colors.white),
-                              label: Text(
-                                _savedPin == null ? "Set App Lock PIN" : "Change App Lock PIN",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueGrey,
-                                padding: EdgeInsets.symmetric(vertical: 14.h),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
+                          CustomButton(
+                            icon: Icons.lock,
+                            text: _savedPin == null ? "Set App Lock PIN" : "Change App Lock PIN",
+                            onPressed: _showSetPinBottomSheet,
                           ),
                           SizedBox(height: 20.h),
-                          // Logout Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.redAccent,
-                                padding: EdgeInsets.symmetric(vertical: 14.h),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: _logOut,
-                              icon: const Icon(Icons.logout, color: Colors.white),
-                              label: Text(
-                                "Logout",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                          CustomButton(
+                            backgroundColor: ThemeClass.errorColor,
+                            icon: Icons.logout,
+                            text: "Logout",
+                            onPressed: _logOut,
                           ),
+                    
                         ],
                       ),
                     ),
@@ -478,6 +458,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: ThemeClass.darkBlue,
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -490,30 +471,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Update Mobile", style: Theme.of(ctx).textTheme.titleMedium),
-              SizedBox(height: 12.h),
-              TextFormField(
+              SizedBox(height: 10.h),
+              Text("Update Number", style: Theme.of(ctx).textTheme.bodySmall),
+              SizedBox(height: 20.h),
+              CustomTextField(
+                labelText: "Add Your Number",
+                isRequired: false,
+                hintText: "Enter number",
+                prefixIcon: Icons.phone,
+                keyboardType: TextInputType.number,
                 controller: controller,
-                keyboardType: TextInputType.phone,
                 maxLength: 10,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Mobile Number",
-                  prefixText: "+91 ",
-                  counterText: "",
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Mobile number is required";
-                  }
-                  if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
-                    return "Enter a valid 10-digit number";
-                  }
-                  return null;
-                },
+                fillColor: ThemeClass.darkBlue,
               ),
-              SizedBox(height: 12.h),
-              ElevatedButton(
+              // TextFormField(
+              //   controller: controller,
+              //   keyboardType: TextInputType.phone,
+              //   maxLength: 10,
+              //   decoration: const InputDecoration(
+              //     border: OutlineInputBorder(),
+              //     labelText: "Mobile Number",
+              //     prefixText: "+91 ",
+              //     counterText: "",
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.trim().isEmpty) {
+              //       return "Mobile number is required";
+              //     }
+              //     if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
+              //       return "Enter a valid 10-digit number";
+              //     }
+              //     return null;
+              //   },
+              // ),
+              SizedBox(height: 20.h),
+              CustomButton(
+                txtColor: ThemeClass.textBlack,
+                backgroundColor: ThemeClass.textWhite,
+                text: "Update",
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     final newMobile = controller.text.trim();
@@ -521,9 +516,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _updateMobile(newMobile);
                   }
                 },
-                child: const Text("Save"),
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 30.h),
             ],
           ),
         ),
@@ -568,6 +562,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: ThemeClass.darkBlue,
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -587,11 +582,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 20.h),
               CustomTextField(
                 labelText: "Set PIN",
-                hintText: "Enter 4-digit",
+                hintText: "Enter 4-digit number",
                 controller: pinController,
                 keyboardType: TextInputType.number,
                 isObscure: true,
                 maxLength: 4,
+                fillColor: ThemeClass.darkBlue,
                 validator: (value) {
                   if (value == null || value.isEmpty) return "PIN required";
                   if (value.length != 4) return "PIN must be 4 digits";
@@ -601,11 +597,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // SizedBox(height: 12.h),
               CustomTextField(
                 labelText: "Set Confirm PIN",
-                hintText: "Enter 4-digit",
+                hintText: "Enter 4-digit number",
                 controller: confirmController,
                 keyboardType: TextInputType.number,
                 isObscure: true,
                 maxLength: 4,
+                fillColor: ThemeClass.darkBlue,
                 validator: (value) {
                   if (value == null || value.isEmpty) return "Confirm your PIN";
                   if (value != pinController.text) return "PINs do not match";
@@ -613,16 +610,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               SizedBox(height: 20.h),
-              ElevatedButton.icon(
-                // icon: Icon(Icons.check, color: ThemeClass.lightCardColor),
-                label: Text(
-                  _savedPin == null ? "Save PIN" : "Update PIN",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                ),
+              CustomButton(
+                txtColor: ThemeClass.textBlack,
+                backgroundColor: ThemeClass.textWhite,
+                text: _savedPin == null ? "Save PIN" : "Update PIN",
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
                     final prefs = await SharedPreferences.getInstance();
@@ -641,12 +632,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 14.w),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                ),
               ),
+              // ElevatedButton.icon(
+              //   // icon: Icon(Icons.check, color: ThemeClass.lightCardColor),
+              //   label: Text(
+              //     _savedPin == null ? "Save PIN" : "Update PIN",
+              //     style: TextStyle(
+              //       fontSize: 16.sp,
+              //       fontWeight: FontWeight.w600,
+              //       color: Theme.of(context).colorScheme.onPrimary,
+              //     ),
+              //   ),
+              //   onPressed: () async {
+              //     if (formKey.currentState!.validate()) {
+              //       final prefs = await SharedPreferences.getInstance();
+              //       await prefs.setString("appLockPin", pinController.text);
+              //       setState(() {
+              //         _savedPin = pinController.text;
+              //       });
+              //       Navigator.pop(Get.context!);
+              //       if (!mounted) return;
+              //       ScaffoldMessenger.of(context).showSnackBar(
+              //         SnackBar(
+              //           content: Text(
+              //             _savedPin == null ? "PIN set successfully!" : "PIN updated successfully!",
+              //           ),
+              //         ),
+              //       );
+              //     }
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 14.w),
+              //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+              //     backgroundColor: Theme.of(context).colorScheme.primary,
+              //   ),
+              // ),
               SizedBox(height: 24.h),
             ],
           ),

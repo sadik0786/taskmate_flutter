@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:task_mate/core/theme.dart';
 
-class CustomDropdownField<T> extends StatelessWidget {
+class CustomDropdownField<T> extends StatefulWidget {
   final String? labelText; // Optional label above dropdown
   final bool isRequired; // Show * for required fields
   final String hintText;
@@ -34,8 +34,15 @@ class CustomDropdownField<T> extends StatelessWidget {
   });
 
   @override
+  State<CustomDropdownField<T>> createState() => _CustomDropdownFieldState<T>();
+}
+
+class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
+  bool _isDropdownOpen = false;
+  @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+
+    if (widget.isLoading) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         alignment: Alignment.center,
@@ -57,16 +64,16 @@ class CustomDropdownField<T> extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (labelText != null) ...[
+        if (widget.labelText != null) ...[
           Row(
             children: [
               Text(
-                labelText!,
+                widget.labelText!,
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400, fontSize: 15.sp),
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w400, fontSize: 15.sp),
               ),
-              if (isRequired)
+              if (widget.isRequired)
                 Text(
                   " *",
                   style: TextStyle(color: Colors.red, fontSize: 15.sp, fontWeight: FontWeight.bold),
@@ -77,47 +84,67 @@ class CustomDropdownField<T> extends StatelessWidget {
         ],
         DropdownButtonFormField2<T>(
           isExpanded: true,
-          value: value,
+          value: widget.value,
           hint: Text(
-            hintText,
+            widget.hintText,
             style: TextStyle(
-              color: isEnabled == false ? ThemeClass.textWhite : ThemeClass.textBlack,
+              color: widget.isEnabled == false ? ThemeClass.textWhite : ThemeClass.textWhite,
               fontSize: 16.sp,
             ),
           ),
-          items: items.map((item) {
+          items: widget.items.map((item) {
             return DropdownMenuItem<T>(
-              value: item[valueKey] as T,
+              value: item[widget.valueKey] as T,
               child: Text(
-                item[labelKey].toString(),
+                item[widget.labelKey].toString(),
                 style: TextStyle(
-                  color: isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+                  color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
                   fontSize: 16.sp,
                 ),
               ),
             );
           }).toList(),
-          onChanged: isEnabled ? onChanged : null,
+          onMenuStateChange: (isOpen) {
+            // 🔹 Listen for open/close events
+            setState(() => _isDropdownOpen = isOpen);
+          },
+          onChanged: widget.isEnabled ? widget.onChanged : null,
           validator:
-              validator ??
+              widget.validator ??
               (val) {
-                if (isRequired && val == null) {
-                  return "Please select ${labelText?.toLowerCase() ?? 'a value'}";
+                if (widget.isRequired && val == null) {
+                  return "Please select ${widget.labelText?.toLowerCase() ?? 'a value'}";
                 }
                 return null;
               },
           decoration: InputDecoration(
             prefixIcon: Icon(
-              prefixIcon,
-              color: isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+              widget.prefixIcon,
+              color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
             ),
+            filled: true,
+            fillColor: widget.isEnabled ? ThemeClass.textBlack : ThemeClass.textBlack,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
             contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
           ),
+          iconStyleData: IconStyleData(
+            icon: AnimatedRotation(
+              turns: _isDropdownOpen ? 0.5 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+                size: 24.sp,
+              ),
+            ),
+          ),
           dropdownStyleData: DropdownStyleData(
             maxHeight: 300.h,
-            width: MediaQuery.of(context).size.width - 40.w,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
+            width: MediaQuery.of(context).size.width - 35.w,
+            decoration: BoxDecoration(
+              color: widget.isEnabled ? ThemeClass.textBlack : ThemeClass.textBlack,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
           ),
           buttonStyleData: ButtonStyleData(
             padding: EdgeInsets.symmetric(horizontal: 8.w),

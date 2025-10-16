@@ -64,7 +64,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
               if (widget.isRequired)
                 Text(
                   " *",
-                  style: TextStyle(color: Colors.red, fontSize: 15.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: ThemeClass.errorColor,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
             ],
           ),
@@ -83,6 +87,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: InputDecoration(
             fillColor: widget.fillColor,
             hintText: widget.hintText,
+            hintStyle: TextStyle(color: ThemeClass.lightBgColor.withAlpha(80), fontSize: 14.sp),
             isDense: widget.isDense,
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             prefixIcon: widget.prefixIcon != null
@@ -106,6 +111,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 : null,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
             contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+            counterStyle: TextStyle(color: Colors.white70, fontSize: 12.sp),
           ),
           validator:
               widget.validator ??

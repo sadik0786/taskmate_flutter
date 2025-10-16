@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ThemeClass {
   // Brand Colors
   static const Color primaryGreen = Color(0xFF009372);
-  static const Color tealGreen = Color(0xFF76c8af);
+  static const Color tealGreen = Color(0x5076c8af);
   static const Color secondaryLightBlue = Color(0xFF6dcff6);
   static const Color darkBlue = Color(0xFF5588c7);
   static const Color successColor = Color(0xFF74bb44);
@@ -44,9 +44,7 @@ class ThemeClass {
       titleTextStyle: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: Colors.white),
     ),
     textTheme: TextTheme(
-      bodyLarge: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.w700, color: textWhite),
-      bodyMedium: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600, color: textWhite),
-      bodySmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w500, color: textWhite),
+      bodySmall: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600, color: textWhite),
 
       titleLarge: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: textWhite),
       titleMedium: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: textWhite),

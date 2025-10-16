@@ -237,13 +237,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 Card(
                   color: ThemeClass.darkCardColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                  elevation: 4,
+                  shadowColor: Colors.white54,
+
                   child: Padding(
                     padding: EdgeInsets.all(12.w),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.person, color: Colors.blue),
-                        SizedBox(width: 15.w),
+                        // Icon(Icons.person, color: ThemeClass.lightBgColor),
+                        // SizedBox(width: 15.w),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -251,6 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               userName?.toUpperCase() ?? 'Unknown',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
+                            SizedBox(height: 4.h),
                             Text(
                               "Logged in as: ${_currentUserRole?.toUpperCase() ?? 'Unknown'}",
                               style: Theme.of(context).textTheme.titleMedium,
@@ -261,7 +266,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   : _currentUserRole == "admin"
                                   ? "Employees"
                                   : "No permission"}",
-                              style: Theme.of(context).textTheme.titleMedium,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: Colors.grey[400],
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.italic,
+                              ),
                             ),
                           ],
                         ),
@@ -274,7 +283,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 16.h),
                       CustomDropdownField<int>(
                         isLoading: roleLoading,
                         labelText: "Select Role",
