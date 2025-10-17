@@ -11,6 +11,7 @@ import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'add_task_screen.dart';
 
 class TaskScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _TaskScreenState extends State<TaskScreen> {
   String? userName;
   bool isLoading = true;
 
-  String selectedFilter = "all"; // all, today, week, month
+  String selectedFilter = "today"; // all, today, week, month
   int? selectedMonth;
   int? selectedYear;
 
@@ -321,7 +322,7 @@ class _TaskScreenState extends State<TaskScreen> {
         : "Month";
 
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -351,40 +352,71 @@ class _TaskScreenState extends State<TaskScreen> {
                 padding: EdgeInsets.symmetric(vertical: 8.h),
                 child: Row(
                   children: [
-                    ChoiceChip(
-                      label: const Text("All"),
+                    CustomChoiceChip(
+                      label: "All",
                       selected: selectedFilter == "all",
-                      onSelected: (_) {
+                      onSelected: () {
                         setState(() => selectedFilter = "all");
                         _applyFilter();
                       },
                     ),
+                    // ChoiceChip(
+                    //   label: const Text("All"),
+                    //   selected: selectedFilter == "all",
+                    //   onSelected: (_) {
+                    //     setState(() => selectedFilter = "all");
+                    //     _applyFilter();
+                    //   },
+                    // ),
                     SizedBox(width: 8.w),
-                    ChoiceChip(
-                      label: const Text("Today"),
+                    CustomChoiceChip(
+                      label: "Today",
                       selected: selectedFilter == "today",
-                      onSelected: (_) {
+                      onSelected: () {
                         setState(() => selectedFilter = "today");
                         _applyFilter();
                       },
                     ),
+                    // ChoiceChip(
+                    //   label: const Text("Today"),
+                    //   selected: selectedFilter == "today",
+                    //   onSelected: (_) {
+                    //     setState(() => selectedFilter = "today");
+                    //     _applyFilter();
+                    //   },
+                    // ),
                     SizedBox(width: 8.w),
-                    ChoiceChip(
-                      label: const Text("Week"),
+                    CustomChoiceChip(
+                      label: "Week",
                       selected: selectedFilter == "week",
-                      onSelected: (_) {
+                      onSelected: () {
                         setState(() => selectedFilter = "week");
                         _applyFilter();
                       },
                     ),
+                    // ChoiceChip(
+                    //   label: const Text("Week"),
+                    //   selected: selectedFilter == "week",
+                    //   onSelected: (_) {
+                    //     setState(() => selectedFilter = "week");
+                    //     _applyFilter();
+                    //   },
+                    // ),
                     SizedBox(width: 8.w),
-                    ChoiceChip(
-                      label: Text(monthLabel),
+                    CustomChoiceChip(
+                      label: monthLabel,
                       selected: selectedFilter == "month",
-                      onSelected: (_) {
+                      onSelected: () {
                         _pickMonthYear();
                       },
                     ),
+                    // ChoiceChip(
+                    //   label: Text(monthLabel),
+                    //   selected: selectedFilter == "month",
+                    //   onSelected: (_) {
+                    //     _pickMonthYear();
+                    //   },
+                    // ),
                   ],
                 ),
               ),
@@ -405,6 +437,7 @@ class _TaskScreenState extends State<TaskScreen> {
                               ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt))
                               : "";
                           return Card(
+                            color: ThemeClass.tealGreen,
                             elevation: 3,
                             margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 2.w),
                             shape: RoundedRectangleBorder(
@@ -422,8 +455,13 @@ class _TaskScreenState extends State<TaskScreen> {
                                       Row(
                                         children: [
                                           Text(
-                                            "Sr.No : ${index + 1}",
-                                            style: Theme.of(context).textTheme.bodySmall,
+                                            "Task : ${index + 1},",
+                                            style: Theme.of(context).textTheme.titleMedium,
+                                          ),
+                                          SizedBox(width: 5.w),
+                                          Text(
+                                            "Mode : ${t["mode"]}",
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                         ],
                                       ),
@@ -555,42 +593,42 @@ class _TaskScreenState extends State<TaskScreen> {
                                         children: [
                                           Text(
                                             "Project : ",
-                                            style: Theme.of(context).textTheme.bodySmall,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           Text(
                                             "${t["project"] ?? ""}",
-                                            style: Theme.of(context).textTheme.labelMedium,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                         ],
                                       ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "Mode :  ",
-                                            style: Theme.of(context).textTheme.bodySmall,
-                                          ),
-                                          Text(
-                                            t["mode"] ?? "",
-                                            style: Theme.of(context).textTheme.bodySmall,
-                                          ),
-                                        ],
-                                      ),
+                                      // Row(
+                                      //   children: [
+                                      //     Text(
+                                      //       "Mode :  ",
+                                      //       style: Theme.of(context).textTheme.titleMedium,
+                                      //     ),
+                                      //     Text(
+                                      //       t["mode"] ?? "",
+                                      //       style: Theme.of(context).textTheme.titleMedium,
+                                      //     ),
+                                      //   ],
+                                      // ),
                                     ],
                                   ),
-                                  SizedBox(height: 6.h),
+                                  SizedBox(height: 3.h),
                                   Row(
                                     children: [
                                       Text(
                                         "Sub Project : ",
-                                        style: Theme.of(context).textTheme.bodySmall,
+                                        style: Theme.of(context).textTheme.titleMedium,
                                       ),
                                       Text(
                                         "${t["subProject"] ?? ""}",
-                                        style: Theme.of(context).textTheme.labelMedium,
+                                        style: Theme.of(context).textTheme.titleMedium,
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 6.h),
+                                  SizedBox(height: 3.h),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -598,17 +636,17 @@ class _TaskScreenState extends State<TaskScreen> {
                                         children: [
                                           Text(
                                             "Title :",
-                                            style: Theme.of(context).textTheme.bodySmall,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           Text(
                                             " ${t["title"] ?? ""}",
-                                            style: Theme.of(context).textTheme.labelMedium,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 6.h),
+                                  SizedBox(height: 3.h),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -616,11 +654,11 @@ class _TaskScreenState extends State<TaskScreen> {
                                         children: [
                                           Text(
                                             "Details :",
-                                            style: Theme.of(context).textTheme.bodySmall,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           Text(
                                             " ${t["description"] ?? ""}",
-                                            style: Theme.of(context).textTheme.labelMedium,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                         ],
                                       ),
@@ -634,12 +672,13 @@ class _TaskScreenState extends State<TaskScreen> {
                                         children: [
                                           Text(
                                             "$dateStr |",
-                                            style: Theme.of(context).textTheme.bodySmall,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           SizedBox(width: 4.w),
                                           Text(
                                             _calculateDuration(t["startTime"], t["endTime"]),
-                                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                            style: Theme.of(context).textTheme.titleMedium!
+                                                .copyWith(
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
@@ -649,11 +688,11 @@ class _TaskScreenState extends State<TaskScreen> {
                                         children: [
                                           Text(
                                             "Status :",
-                                            style: Theme.of(context).textTheme.bodySmall,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           Text(
                                             " ${t["status"] ?? ""}",
-                                            style: Theme.of(context).textTheme.labelMedium!
+                                            style: Theme.of(context).textTheme.titleMedium!
                                                 .copyWith(
                                                   color: t["status"] == "Working"
                                                       ? ThemeClass.warningColor

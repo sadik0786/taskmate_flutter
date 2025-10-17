@@ -135,9 +135,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (_selectedRoleId == null) {
       CustomSnackBar.error("Please select a role");
-      // ScaffoldMessenger.of(
-      //   context,
-      // ).showSnackBar(const SnackBar(content: Text("Please select a role")));
       return;
     }
 
@@ -170,12 +167,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 'employee') &&
         _selectedAdminId == null) {
       CustomSnackBar.error("Please select an Admin to assign the Employee");
-      // Get.snackbar(
-      //   "Error",
-      //   "Please select an Admin to assign the Employee",
-      //   backgroundColor: Colors.red,
-      //   colorText: Colors.white,
-      // );
       return;
     }
     final res = await ApiService.registerEmployee(
@@ -198,17 +189,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (res["success"] == true) {
       CustomSnackBar.success("added successfully!");
-      // Get.snackbar(
-      //   "Employee",
-      //   "added successfully!",
-      //   backgroundColor: Colors.green,
-      //   colorText: Colors.white,
-      // );
       Navigator.pop(context);
     } else {
       final error = res["error"] ?? "Failed to add employee";
       CustomSnackBar.error("$error");
-      // Get.snackbar("Error", "$error", backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 

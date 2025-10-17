@@ -11,13 +11,14 @@ import 'package:open_filex/open_filex.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_mate/controllers/theme_controller.dart';
+// import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final ThemeController _themeController = Get.find();
+  // final ThemeController _themeController = Get.find();
   String? avatarUrl;
   File? localAvatar;
   int? userID = 0;
@@ -101,13 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }
     } catch (e) {
-      // No internet or server error, fallback to SharedPreferences
-      Get.snackbar(
-        "Offline",
-        "Showing cached data",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
+      CustomSnackBar.warning("Offline - Showing cached data");
     }
     setState(() {
       userID = userFromServer?["ID"] ?? prefs.getInt("userId") ?? 0;
@@ -143,10 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("localAvatarPath", file.path);
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Profile photo updated")));
+      CustomSnackBar.success("Profile photo updated");
 
       // Upload to server
       final url = await ApiService.uploadAvatar(file);
@@ -158,8 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await prefs.setString("avatarUrl", url);
       }
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      CustomSnackBar.success("Error: $e");
     }
   }
 
@@ -175,20 +166,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           mobile = newMobile;
         });
-
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Mobile updated successfully")));
+        CustomSnackBar.success("Mobile updated successfully");
       } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Failed to update mobile")));
+        CustomSnackBar.error("Failed to update mobile");
       }
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      CustomSnackBar.error("Error: $e");
     }
   }
 
@@ -321,7 +304,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: GestureDetector(
                     onTap: _uploadPhoto,
                     child: CircleAvatar(
-                      radius: 70.r,
+                      radius: 60.r,
                       backgroundColor: ThemeClass.primaryGreen,
                       backgroundImage: localAvatar != null
                           ? FileImage(localAvatar!)
@@ -333,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   : "?",
                               style: Theme.of(
                                 context,
-                              ).textTheme.bodySmall!.copyWith(fontSize: 80.sp)
+                              ).textTheme.bodySmall!.copyWith(fontSize: 80.sp),
                             )
                           : null,
                     ),
@@ -365,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: _buildInfoItem(context, "Mobile", mobile, isMobile: true),
                               ),
                               IconButton(
-                                icon: Icon(Icons.edit, size: 25.sp, color: ThemeClass.textWhite),
+                                icon: Icon(Icons.edit, size: 25.sp, color: ThemeClass.warningColor),
                                 onPressed: _showUpdateMobileBottomSheet,
                               ),
                             ],
@@ -438,14 +421,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             text: "Logout",
                             onPressed: _logOut,
                           ),
-                    
                         ],
                       ),
                     ),
                   ),
                 ),
 
-                Spacer(),
+                // Spacer(),
+                SizedBox(height: 20.h),
               ],
             ),
     );

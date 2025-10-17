@@ -1,11 +1,16 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/task_screen.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/widgets/customDateField.dart';
+import 'package:task_mate/widgets/customTimeField.dart';
 import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
+import 'package:task_mate/widgets/custom_text_field.dart';
 
 final GlobalKey<AddTaskScreenState> addTaskKey = GlobalKey<AddTaskScreenState>();
 
@@ -83,9 +88,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
       });
       _filterSubprojects();
     } catch (e) {
-      ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(SnackBar(content: Text("Failed to load projects: $e")));
+      CustomSnackBar.info("Failed to load projects: $e");
     }
   }
 
@@ -115,9 +118,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
         _filterSubprojects();
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(SnackBar(content: Text("Failed to load subprojects: $e")));
+      CustomSnackBar.info("Failed to load subprojects: $e");
     }
   }
 
@@ -144,18 +145,24 @@ class AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   Future<void> _save() async {
+    if (_selectedProjectId == null) {
+      CustomSnackBar.error("Please select main project");
+      return;
+    }
+    if (_selectedSubProjectId == null) {
+      CustomSnackBar.error("Please select sub project");
+      return;
+    }
     if (_title.text.trim().isEmpty ||
         _desc.text.trim().isEmpty ||
-        _selectedProjectId == null ||
-        _selectedSubProjectId == null ||
+        // _selectedProjectId == null ||
+        // _selectedSubProjectId == null ||
         _selectedMode == null ||
         _selectedStatus == null ||
         _selectedDate == null ||
         _startTime == null ||
         _endTime == null) {
-      ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      CustomSnackBar.error("Please fill all fields");
       return;
     }
 
@@ -181,9 +188,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     final userId = await ApiService.getLoggedInUserId();
 
     if (userId == null) {
-      ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(const SnackBar(content: Text("User not logged in")));
+      CustomSnackBar.error("User not logged in");
       return;
     }
 
@@ -218,15 +223,13 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     }
 
     if (res["success"] == true) {
-      ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(const SnackBar(content: Text("Task saved successfully!")));
+      CustomSnackBar.success("Task saved successfully!");
       Navigator.pushReplacement(
         Get.context!,
         MaterialPageRoute(builder: (_) => const TaskScreen()),
       );
     } else {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("${res['error']}")));
+      CustomSnackBar.error("${res['error']}");
     }
   }
 
@@ -254,22 +257,10 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     if (picked != null) setState(() => _endTime = picked);
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Color(0xff00ca9d), width: 2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -297,175 +288,163 @@ class AddTaskScreenState extends State<AddTaskScreen> {
           padding: EdgeInsets.all(16.w),
           child: Column(
             children: [
-              SizedBox(height: 10.h),
-              DropdownButtonFormField2<int>(
-                isExpanded: true,
-                value: _selectedProjectId,
+              CustomDropdownField<int>(
+                fillColor: ThemeClass.darkBlue,
+                labelText: "Select Main Project",
+                isRequired: true,
+                hintText: "Select Main Project",
+                prefixIcon: Icons.work,
                 items: _projects
-                    .map(
-                      (p) => DropdownMenuItem<int>(
-                        value: p["ProjectId"],
-                        child: Text(p["ProjectName"] ?? ""),
-                      ),
-                    )
+                    .map((p) => {"ID": p["ProjectId"], "Name": p["ProjectName"] ?? ""})
                     .toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedProjectId,
+                isEnabled: true,
                 onChanged: _onProjectChanged,
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: "Select Project",
-                  prefixIcon: const Icon(Icons.work_outline),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                dropdownStyleData: DropdownStyleData(
-                  padding: EdgeInsets.zero,
-                  maxHeight: 300.h,
-                  width: MediaQuery.of(context).size.width - 25.w,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                buttonStyleData: ButtonStyleData(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0),
-                  height: 20.h,
-                  width: double.infinity,
-                ),
               ),
-              SizedBox(height: 15.h),
-              DropdownButtonFormField2<int>(
-                isExpanded: true,
-                value: _selectedSubProjectId,
+              SizedBox(height: 10.h),
+              CustomDropdownField<int>(
+                fillColor: ThemeClass.darkBlue,
+                labelText: _selectedProjectId == null
+                    ? "Select Project First"
+                    : "Select Sub Project",
+                isRequired: true,
+                hintText: "Select Sub Project",
+                prefixIcon: Icons.work,
                 items: _filteredSubprojects
                     .map(
-                      (sp) => DropdownMenuItem<int>(
-                        value: sp["SubProjectId"],
-                        child: Text(sp["SubProjectName"] ?? "Unknown"),
-                      ),
+                      (sp) => {"ID": sp["SubProjectId"], "Name": sp["SubProjectName"] ?? "Unknown"},
                     )
                     .toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedSubProjectId,
+                isEnabled: _selectedProjectId != null,
                 onChanged: _onSubProjectChanged,
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: _selectedProjectId == null
-                      ? "Select Project First"
-                      : "Select Sub Project",
-                  prefixIcon: const Icon(Icons.work_outline),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                dropdownStyleData: DropdownStyleData(
-                  padding: EdgeInsets.zero,
-                  maxHeight: 300.h,
-                  width: MediaQuery.of(context).size.width - 25.w,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                buttonStyleData: ButtonStyleData(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0),
-                  height: 20.h,
-                  width: double.infinity,
-                ),
               ),
-              SizedBox(height: 15.h),
-              DropdownButtonFormField2<String>(
+              SizedBox(height: 10.h),
+              CustomDropdownField<String>(
+                fillColor: ThemeClass.darkBlue,
+                labelText: "Task Type",
+                isRequired: true,
+                hintText: "Select Task Mode",
+                prefixIcon: Icons.code,
+                items: _modes.map((m) => {"ID": m, "Name": m}).toList(),
+                valueKey: "ID",
+                labelKey: "Name",
                 value: _selectedMode,
-                items: _modes
-                    .map((m) => DropdownMenuItem<String>(value: m, child: Text(m)))
-                    .toList(),
-                onChanged: (v) => setState(() => _selectedMode = v),
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: "Task Mode",
-                  prefixIcon: const Icon(Icons.code),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                dropdownStyleData: DropdownStyleData(
-                  padding: EdgeInsets.zero,
-                  maxHeight: 300.h,
-                  width: MediaQuery.of(context).size.width - 25.w,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                buttonStyleData: ButtonStyleData(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0),
-                  height: 20.h,
-                  width: double.infinity,
-                ),
+                isEnabled: true,
+                onChanged: (v) {
+                  setState(() => _selectedMode = v);
+                },
               ),
-              SizedBox(height: 15.h),
-              TextField(
+              SizedBox(height: 10.h),
+              CustomTextField(
+                labelText: "Task Title",
+                isRequired: true,
+                hintText: "Enter Task Title",
+                prefixIcon: Icons.title,
+                keyboardType: TextInputType.text,
                 controller: _title,
-                decoration: _inputDecoration("Task Title", Icons.title),
+                fillColor: ThemeClass.darkBlue,
               ),
-              SizedBox(height: 15.h),
-              TextField(
+              SizedBox(height: 10.h),
+              CustomTextField(
+                labelText: "Task Details",
+                isRequired: true,
+                hintText: "Enter Task Details",
+                prefixIcon: Icons.description,
+                keyboardType: TextInputType.text,
                 controller: _desc,
                 maxLines: 2,
-                decoration: _inputDecoration("Task Details", Icons.description),
+                fillColor: ThemeClass.darkBlue,
               ),
-              SizedBox(height: 15.h),
-              DropdownButtonFormField2<String>(
+              SizedBox(height: 10.h),
+              CustomDropdownField<String>(
+                fillColor: ThemeClass.darkBlue,
+                labelText: "Task Status",
+                isRequired: true,
+                hintText: "Select Task Status",
+                prefixIcon: Icons.check_circle_outline,
+                items: _statuses.map((s) => {"ID": s, "Name": s}).toList(),
+                valueKey: "ID",
+                labelKey: "Name",
                 value: _selectedStatus,
-                items: _statuses
-                    .map((s) => DropdownMenuItem<String>(value: s, child: Text(s)))
-                    .toList(),
+                isEnabled: true,
                 onChanged: (v) => setState(() => _selectedStatus = v),
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: "Task Status",
-                  prefixIcon: Icon(Icons.check_circle_outline),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                dropdownStyleData: DropdownStyleData(
-                  padding: EdgeInsets.zero,
-                  maxHeight: 300.h,
-                  width: MediaQuery.of(context).size.width - 25.w,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.r)),
-                ),
-                buttonStyleData: ButtonStyleData(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0),
-                  height: 20.h,
-                  width: double.infinity,
-                ),
               ),
-              SizedBox(height: 15.h),
-              GestureDetector(
+              SizedBox(height: 10.h),
+              CustomDateField(
+                selectedDate: _selectedDate,
                 onTap: _pickDate,
-                child: AbsorbPointer(
-                  child: TextField(
-                    decoration: _inputDecoration(
-                      _selectedDate == null
-                          ? "Select Date"
-                          : "${_selectedDate!.day}-${_selectedDate!.month}-${_selectedDate!.year}",
-                      Icons.calendar_today,
-                    ),
-                  ),
-                ),
+                labelText: "Select Date",
+                isRequired: true,
+                prefixIcon: Icons.calendar_today,
+                hintText: "Select Date",
+                fillColor: ThemeClass.darkBlue,
               ),
-              SizedBox(height: 15.h),
+              SizedBox(height: 10.h),
               Row(
                 children: [
-                  Expanded(
-                    child: GestureDetector(
+                  Flexible(
+                    child: CustomTimeField(
+                      fillColor: ThemeClass.darkBlue,
+                      selectedTime: _startTime,
                       onTap: _pickStartTime,
-                      child: AbsorbPointer(
-                        child: TextField(
-                          decoration: _inputDecoration(
-                            _startTime == null ? "Start Time" : _startTime!.format(context),
-                            Icons.access_time,
-                          ),
-                        ),
-                      ),
+                      labelText: "Start Time",
+                      isRequired: true,
+                      prefixIcon: Icons.access_time,
+                      hintText: "Start Time",
+                      validator: (time) {
+                        if (time == null) return "Start time is required";
+                        return null;
+                      },
                     ),
                   ),
-                  SizedBox(width: 10.h),
-                  Expanded(
-                    child: GestureDetector(
+                  SizedBox(width: 20.w),
+                  Flexible(
+                    child: CustomTimeField(
+                      fillColor: ThemeClass.darkBlue,
+                      selectedTime: _endTime,
                       onTap: _pickEndTime,
-                      child: AbsorbPointer(
-                        child: TextField(
-                          decoration: _inputDecoration(
-                            _endTime == null ? "End Time" : _endTime!.format(context),
-                            Icons.timer_off,
-                          ),
-                        ),
-                      ),
+                      labelText: "End Time",
+                      isRequired: true,
+                      prefixIcon: Icons.timer_off,
+                      hintText: "End Time",
+                      validator: (time) {
+                        if (time == null) return "End time is required";
+                        return null;
+                      },
                     ),
                   ),
+                  // Expanded(
+                  //   child: GestureDetector(
+                  //     onTap: _pickStartTime,
+                  //     child: AbsorbPointer(
+                  //       child: TextField(
+                  //         decoration: _inputDecoration(
+                  //           _startTime == null ? "Start Time" : _startTime!.format(context),
+                  //           Icons.access_time,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(width: 10.h),
+                  // Expanded(
+                  //   child: GestureDetector(
+                  //     onTap: _pickEndTime,
+                  //     child: AbsorbPointer(
+                  //       child: TextField(
+                  //         decoration: _inputDecoration(
+                  //           _endTime == null ? "End Time" : _endTime!.format(context),
+                  //           Icons.timer_off,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: 24.h),

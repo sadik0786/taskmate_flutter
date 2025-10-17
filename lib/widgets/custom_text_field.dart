@@ -16,6 +16,7 @@ class CustomTextField extends StatefulWidget {
   final String? pattern;
   final bool isObscure;
   final Color? fillColor;
+  final int? maxLines;
 
   const CustomTextField({
     super.key,
@@ -32,6 +33,7 @@ class CustomTextField extends StatefulWidget {
     this.pattern,
     this.isObscure = false,
     this.fillColor = ThemeClass.darkCardColor,
+    this.maxLines,
   });
 
   @override
@@ -80,6 +82,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: widget.isEnabled,
           obscureText: _obscureText,
           maxLength: widget.maxLength,
+          maxLines: widget.maxLines,
           style: TextStyle(
             fontSize: 16.sp,
             color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,

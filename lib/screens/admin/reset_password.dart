@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
+import 'package:task_mate/widgets/custom_text_field.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -22,9 +26,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     if (email.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter an email address")));
+      CustomSnackBar.error("Please enter an email address");
       return;
     }
 
@@ -32,27 +34,28 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     ).hasMatch(email)) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter a valid email address")));
+      CustomSnackBar.error("Please enter a valid email address");
       return;
     }
-
     setState(() => _loading = true);
     try {
       final exists = await ApiService.checkUserByEmail(email);
       if (!mounted) return;
       setState(() => _emailVerified = exists);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            exists
-                ? "Email verified. You can now set a new password."
-                : "Email not found or you don't have permission",
-          ),
-        ),
+      CustomSnackBar.error(
+        exists
+            ? "Email verified. You can now set a new password."
+            : "Email not found or you don't have permission",
       );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text(
+      //       exists
+      //           ? "Email verified. You can now set a new password."
+      //           : "Email not found or you don't have permission",
+      //     ),
+      //   ),
+      // );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
@@ -63,9 +66,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Future<void> _changePassword() async {
     if (_newPassword.text.length < 6) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Password must be at least 6 characters")));
+      CustomSnackBar.warning("Password must be at least 6 characters");
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(const SnackBar(content: Text("Password must be at least 6 characters")));
       return;
     }
 
@@ -75,14 +79,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     if (!mounted) return;
     if (res["success"] == true) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Password updated successfully")));
+      CustomSnackBar.success("Password updated successfully");
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(const SnackBar(content: Text("Password updated successfully")));
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(res["error"] ?? "Failed to update password")));
+      CustomSnackBar.error("Failed to update password");
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(SnackBar(content: Text(res["error"] ?? "Failed to update password")));
     }
   }
 
@@ -96,7 +102,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -117,17 +123,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24.w),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Header Section
               _buildHeaderSection(),
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
               // Progress Indicator
               _buildProgressIndicator(),
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
               // Content based on step
               if (!_emailVerified) _buildEmailVerificationStep(),
               if (_emailVerified) _buildPasswordResetStep(),
@@ -142,20 +148,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(Icons.lock_reset, size: 60, color: Theme.of(context).primaryColor.withOpacity(0.8)),
-        const SizedBox(height: 10),
+        Icon(Icons.lock_reset, size: 60.sp, color: Theme.of(context).primaryColor.withOpacity(0.8)),
+        SizedBox(height: 10.h),
         Text(
           "Reset Employee Password",
           style: Theme.of(
             context,
-          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700, color: Colors.grey[800]),
+          ).textTheme.titleLarge,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Text(
           "Securely reset passwords for employees under your management",
           style: Theme.of(
             context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600], height: 1.4),
+          ).textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
       ],
@@ -168,7 +174,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildProgressStep(1, "Verify Email", _emailVerified),
-        const Expanded(child: Divider(thickness: 2, color: Colors.grey)),
+        Expanded(
+          child: Divider(thickness: 2.w, color: Colors.grey),
+        ),
         _buildProgressStep(2, "Set Password", false),
       ],
     );
@@ -178,30 +186,30 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return Column(
       children: [
         Container(
-          width: 32,
-          height: 32,
+          width: 32.w,
+          height: 32.h,
           decoration: BoxDecoration(
             color: isCompleted ? Theme.of(context).primaryColor : Colors.grey[300],
             shape: BoxShape.circle,
           ),
           child: Center(
             child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                ? Icon(Icons.check, color: Colors.white, size: 18.sp)
                 : Text(
                     stepNumber.toString(),
                     style: TextStyle(
-                      color: isCompleted ? Colors.white : Colors.grey[600],
+                      color: isCompleted ? ThemeClass.primaryGreen : ThemeClass.darkBlue,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Text(
           label,
           style: TextStyle(
-            color: isCompleted ? Theme.of(context).primaryColor : Colors.grey[600],
-            fontSize: 12,
+            color: isCompleted ? ThemeClass.primaryGreen : ThemeClass.darkBlue,
+            fontSize: 12.sp,
             fontWeight: isCompleted ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -217,66 +225,57 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           "Step 1: Verify Employee Email",
           style: Theme.of(
             context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          ).textTheme.titleLarge,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Text(
           "Enter the email address of the employee whose password you want to reset",
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          style: Theme.of(context).textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
 
         // Email Field
-        TextFormField(
-          controller: _email,
-          decoration: InputDecoration(
-            labelText: "Employee Email",
-            // prefixIcon: const Icon(Icons.email_outlined),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
-            ),
-          ),
+        CustomTextField(
+          labelText: "Employee Email",
+          isRequired: true,
+          hintText: "Enter email",
+          prefixIcon: Icons.email,
           keyboardType: TextInputType.emailAddress,
+          controller: _email,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter email';
+            }
+            if (!value.endsWith('@5nance.com')) {
+              return 'Only @5nance.com emails are allowed';
+            }
+            if (!RegExp(
+              r"^[a-zA-Z][a-zA-Z0-9._-]*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$",
+            ).hasMatch(value.trim())) {
+              return "Enter a valid email address";
+            }
+            return null;
+          },
         ),
-        const SizedBox(height: 32),
+        // TextFormField(
+        //   controller: _email,
+        //   decoration: InputDecoration(
+        //     labelText: "Employee Email",
+        //     // prefixIcon: const Icon(Icons.email_outlined),
+        //     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        //     focusedBorder: OutlineInputBorder(
+        //       borderRadius: BorderRadius.circular(12),
+        //       borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+        //     ),
+        //   ),
+        //   keyboardType: TextInputType.emailAddress,
+        // ),
+        SizedBox(height: 32.h),
 
         // Verify Button
-        SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            onPressed: _loading ? null : _checkEmail,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 2,
-            ),
-            child: _loading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                  )
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.verified_user_outlined, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        "Verify Email",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
+        CustomButton(text: "Verify Email", onPressed: _checkEmail, isLoading: _loading),
+        
       ],
     );
   }
@@ -290,12 +289,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           onTap: _resetFlow,
           child: Row(
             children: [
-              Icon(Icons.arrow_back_ios_new, size: 16.sp, color: Theme.of(context).primaryColor),
+              Icon(Icons.arrow_back_ios_new, size: 16.sp, color: ThemeClass.darkBlue),
               SizedBox(width: 4.w),
               Text(
                 "Back to email verification",
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: ThemeClass.darkBlue,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -308,69 +307,54 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           "Step 2: Set New Password",
           style: Theme.of(
             context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          ).textTheme.titleMedium,
         ),
         SizedBox(height: 8.h),
         Text(
-          "Create a strong new password for ${_email.text}",
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          "Create a strong new password for",
+          style: Theme.of(context).textTheme.titleMedium,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          _email.text,
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+            color: ThemeClass.warningColor,
+            fontWeight: FontWeight.w600,
+          ),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 24.h),
 
         // New Password Field
-        TextFormField(
+        CustomTextField(
+          labelText: "Change Password",
+          isRequired: true,
+          hintText: "Enter password",
+          prefixIcon: Icons.lock,
+          keyboardType: TextInputType.text,
           controller: _newPassword,
-          decoration: InputDecoration(
-            labelText: "New Password",
-            prefixIcon: const Icon(Icons.lock_outline),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
-            ),
-          ),
+          isObscure: true,
+          // maxLength: 10,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return "Password cannot be empty";
+            }
+            if (value.length < 6) {
+              return "Password must be at least 6 characters";
+            }
+            return null;
+          },
         ),
-        SizedBox(height: 8.h),
-        Text(
-          "Password must be at least 6 characters long",
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
-        ),
+     
+      
         SizedBox(height: 32.h),
 
         // Update Button
-        SizedBox(
-          width: double.infinity,
-          height: 54.h,
-          child: ElevatedButton(
-            onPressed: _loading ? null : _changePassword,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 2,
-            ),
-            child: _loading
-                ? SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.lock_reset, size: 20.sp),
-                      SizedBox(width: 8.w),
-                      Text(
-                        "Update Password",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
+        CustomButton(
+          text: "Update Password",
+          onPressed: _changePassword,
+          isLoading: _loading,
+          icon: Icons.lock_reset,
         ),
       ],
     );

@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:io';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,6 +11,8 @@ import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:task_mate/widgets/custom_choice_chip.dart';
+import 'package:task_mate/widgets/custom_dropdown_field.dart';
 
 class EmployeeTaskScreen extends StatefulWidget {
   const EmployeeTaskScreen({super.key});
@@ -373,7 +374,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
         ? "Month (${DateFormat.MMM().format(DateTime(0, selectedMonth!))} $selectedYear)"
         : "Month";
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -404,21 +405,21 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
             if (!singleEmployeeMode)
               Padding(
                 padding: EdgeInsets.all(12.w),
-                child: DropdownButtonFormField2<String>(
-                  isExpanded: true,
-                  value: selectedEmp,
+                child: CustomDropdownField<String>(
+                  labelText: "Select Employee",
+                  isRequired: true,
+                  hintText: "Select Employee",
+                  prefixIcon: Icons.person,
                   items: [
-                    const DropdownMenuItem<String>(value: "", child: Text("All Employees")),
-                    ...employees
-                        .map(
-                          (e) => DropdownMenuItem<String>(
-                            value: e["ID"].toString(),
-                            child: Text(e["Name"]?.toString() ?? "Unknown"),
-                          ),
-                        )
-                        // ignore: unnecessary_to_list_in_spreads
-                        .toList(),
+                    {"ID": "", "Name": "All Employees"},
+                    ...employees.map(
+                      (e) => {"ID": e["ID"].toString(), "Name": e["Name"]?.toString() ?? "Unknown"},
+                    ),
                   ],
+                  valueKey: "ID",
+                  labelKey: "Name",
+                  value: selectedEmp,
+                  isEnabled: true,
                   onChanged: (id) {
                     if (id == null || id.isEmpty) {
                       setState(() {
@@ -438,29 +439,12 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                       _loadTasksByEmployee(int.parse(id));
                     }
                   },
-                  decoration: InputDecoration(
-                    isDense: true,
-                    labelText: "Select Employee",
-                    prefixIcon: const Icon(Icons.person),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please select an employee";
                     }
                     return null;
                   },
-                  dropdownStyleData: DropdownStyleData(
-                    padding: EdgeInsets.zero,
-                    maxHeight: 300.h,
-                    width: MediaQuery.of(context).size.width - 25.w,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  buttonStyleData: ButtonStyleData(
-                    padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0),
-                    height: 20.h,
-                    width: double.infinity,
-                  ),
                 ),
               ),
 
@@ -470,40 +454,71 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               child: Row(
                 children: [
-                  ChoiceChip(
-                    label: const Text("All"),
+                  CustomChoiceChip(
+                    label: "All",
                     selected: selectedFilter == "all",
-                    onSelected: (_) {
+                    onSelected: () {
                       setState(() => selectedFilter = "all");
                       _applyFilter();
                     },
                   ),
+                  // ChoiceChip(
+                  //   label: const Text("All"),
+                  //   selected: selectedFilter == "all",
+                  //   onSelected: (_) {
+                  //     setState(() => selectedFilter = "all");
+                  //     _applyFilter();
+                  //   },
+                  // ),
                   SizedBox(width: 8.w),
-                  ChoiceChip(
-                    label: const Text("Today"),
+                  CustomChoiceChip(
+                    label: "Today",
                     selected: selectedFilter == "today",
-                    onSelected: (_) {
+                    onSelected: () {
                       setState(() => selectedFilter = "today");
                       _applyFilter();
                     },
                   ),
+                  // ChoiceChip(
+                  //   label: const Text("Today"),
+                  //   selected: selectedFilter == "today",
+                  //   onSelected: (_) {
+                  //     setState(() => selectedFilter = "today");
+                  //     _applyFilter();
+                  //   },
+                  // ),
                   SizedBox(width: 8.w),
-                  ChoiceChip(
-                    label: const Text("Week"),
+                  CustomChoiceChip(
+                    label: "Week",
                     selected: selectedFilter == "week",
-                    onSelected: (_) {
+                    onSelected: () {
                       setState(() => selectedFilter = "week");
                       _applyFilter();
                     },
                   ),
+                  // ChoiceChip(
+                  //   label: const Text("Week"),
+                  //   selected: selectedFilter == "week",
+                  //   onSelected: (_) {
+                  //     setState(() => selectedFilter = "week");
+                  //     _applyFilter();
+                  //   },
+                  // ),
                   SizedBox(width: 8.w),
-                  ChoiceChip(
-                    label: Text(monthLabel),
+                  CustomChoiceChip(
+                    label: monthLabel,
                     selected: selectedFilter == "month",
-                    onSelected: (_) {
+                    onSelected: () {
                       _pickMonthYear();
                     },
                   ),
+                  // ChoiceChip(
+                  //   label: Text(monthLabel),
+                  //   selected: selectedFilter == "month",
+                  //   onSelected: (_) {
+                  //     _pickMonthYear();
+                  //   },
+                  // ),
                 ],
               ),
             ),

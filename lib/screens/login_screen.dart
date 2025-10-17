@@ -182,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       SizedBox(height: 10.h),
                       Text(
                         "Task Mate",
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        style: Theme.of(context).textTheme.bodySmall,
                         // style: TextStyle(
                         //   fontSize: 28.sp,
                         //   fontWeight: FontWeight.bold,
@@ -217,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       children: [
                         Text(
                           "Access Account",
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: Theme.of(context).textTheme.bodySmall,
                           //  TextStyle(
                           //   fontSize: 26.sp,
                           //   fontWeight: FontWeight.w700,

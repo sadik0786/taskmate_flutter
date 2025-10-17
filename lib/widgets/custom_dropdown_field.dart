@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:task_mate/core/theme.dart';
 
 class CustomDropdownField<T> extends StatefulWidget {
-  final String? labelText; // Optional label above dropdown
-  final bool isRequired; // Show * for required fields
+  final String? labelText;
+  final bool isRequired; 
   final String hintText;
   final IconData prefixIcon;
   final List<Map<String, dynamic>> items;
@@ -14,6 +14,7 @@ class CustomDropdownField<T> extends StatefulWidget {
   final T? value;
   final bool isLoading;
   final bool isEnabled;
+  final Color fillColor;
   final Function(T?)? onChanged;
   final String? Function(T?)? validator;
 
@@ -31,6 +32,7 @@ class CustomDropdownField<T> extends StatefulWidget {
     this.validator,
     this.isLoading = false,
     this.isEnabled = true,
+    this.fillColor = ThemeClass.textBlack,
   });
 
   @override
@@ -88,7 +90,9 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
           hint: Text(
             widget.hintText,
             style: TextStyle(
-              color: widget.isEnabled == false ? ThemeClass.textWhite : ThemeClass.textWhite,
+              color: widget.isEnabled == false
+                  ? ThemeClass.textWhite
+                  : ThemeClass.textWhite.withAlpha(80),
               fontSize: 16.sp,
             ),
           ),
@@ -123,7 +127,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
               color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
             ),
             filled: true,
-            fillColor: widget.isEnabled ? ThemeClass.textBlack : ThemeClass.textBlack,
+            fillColor: widget.isEnabled ? widget.fillColor : ThemeClass.textBlack,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
             contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
           ),

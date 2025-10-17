@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NoTasksWidget extends StatefulWidget {
-  final String message; // 👈 custom text
+  final String message; 
 
   const NoTasksWidget({
     super.key,
-    this.message = "No tasks found", // 👈 default value
+    this.message = "No tasks found",
   });
 
   @override
@@ -72,7 +72,7 @@ class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateM
       animation: Listenable.merge([_eyeMove, _blink]),
       builder: (context, child) {
         return Transform.scale(
-          scaleY: _blink.value, // blink effect
+          scaleY: _blink.value, 
           child: Container(
             width: 50.w,
             height: 40.h,
@@ -158,8 +158,9 @@ class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateM
               return Transform.rotate(angle: wiggle, child: child);
             },
             child: Text(
-              widget.message, // 👈 now dynamic
-              style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+              widget.message,
+              style: Theme.of(context).textTheme.titleLarge,
+              // style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold, letterSpacing: 1.2),
             ),
           ),
         ],

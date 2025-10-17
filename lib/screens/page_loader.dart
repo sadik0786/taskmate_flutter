@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:task_mate/core/theme.dart';
 
 class PageLoader extends StatefulWidget {
   const PageLoader({super.key});
@@ -29,7 +30,7 @@ class _PageLoaderState extends State<PageLoader> with SingleTickerProviderStateM
       builder: (context, _) {
         // wrap the progress with a phase shift
         final t = (_controller.value + phase) % 1.0;
-        final size = 40.0 + (t * 120.0);
+        final size = 80.0 + (t * 120.0);
         final opacity = (1.0 - t).clamp(0.0, 1.0);
 
         return Container(
@@ -38,7 +39,7 @@ class _PageLoaderState extends State<PageLoader> with SingleTickerProviderStateM
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             // ignore: deprecated_member_use
-            color: Colors.blue.withOpacity(opacity * 0.5),
+            color: ThemeClass.primaryGreen.withOpacity(opacity * 0.5),
           ),
         );
       },
@@ -55,10 +56,10 @@ class _PageLoaderState extends State<PageLoader> with SingleTickerProviderStateM
           _ripple(0.33), // second wave (phase shifted)
           _ripple(0.66), // third wave
           Container(
-            width: 50.w,
-            height: 50.h,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
-            child: Icon(Icons.access_time, color: Colors.white, size: 50.sp),
+            width: 70.w,
+            height: 70.h,
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: ThemeClass.warningColor),
+            child: Icon(Icons.access_time, color: ThemeClass.darkBlue, size: 50.sp),
           ),
         ],
       ),

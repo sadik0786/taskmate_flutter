@@ -4,11 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/add_task_screen.dart';
 import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -52,9 +55,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
       setState(() {
         userRole = "employee";
       });
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text("Failed to fetch user role: ${res['error'] ?? 'Unknown error'}")),
-      );
+      CustomSnackBar.warning("Failed to fetch user role: ${res['error'] ?? 'Unknown error'}");
+    
     }
   }
 
@@ -70,9 +72,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         _projectslist.addAll(res.map((p) => Map<String, dynamic>.from(p)));
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to load projects: $e")));
+      CustomSnackBar.error("Failed to load projects: $e");
     } finally {
       setState(() => _loadingProjects = false);
     }
@@ -87,45 +87,35 @@ class _ProjectScreenState extends State<ProjectScreen> {
     setState(() => _loading = false);
 
     if (res["success"] == true) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Project added successfully")));
+      CustomSnackBar.success("Project added successfully");
       _name.clear();
       _loadProjects();
     } else {
       final error = res["error"] ?? "Failed to add project";
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      CustomSnackBar.error(error);
     }
   }
 
   Future<void> _saveSubProject(TextEditingController subProjectText) async {
     try {
       if (_selectedProject == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Please select a main project")));
+        CustomSnackBar.error("Please select a main project");
         return;
       }
 
       if (subProjectText.text.trim().isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Please enter subproject name")));
+        CustomSnackBar.error("Please enter subproject name");
         return;
       }
 
       final userId = await ApiService.getLoggedInUserId();
       if (userId == null) {
-        ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(const SnackBar(content: Text("User not logged in")));
+        CustomSnackBar.error("User not logged in");
         return;
       }
       final projectId = int.tryParse(_selectedProject!["ProjectId"].toString());
       if (projectId == null) {
-        ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(const SnackBar(content: Text("Invalid project selected")));
+        CustomSnackBar.warning("Invalid project selected");
         return;
       }
       final subProjectName = subProjectText.text.trim();
@@ -135,9 +125,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
       );
 
       if (res["success"] == true) {
-        ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(const SnackBar(content: Text("Subproject added successfully!")));
+        CustomSnackBar.success("Subproject added successfully!");
 
         // Clear input and reset dropdown
         subProjectText.clear();
@@ -147,19 +135,17 @@ class _ProjectScreenState extends State<ProjectScreen> {
         // Refresh the list to show updated data
         _loadProjects();
       } else {
-        ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(SnackBar(content: Text("Failed to add subproject: ${res['error']}")));
+        CustomSnackBar.error("Failed to add subproject: ${res['error']}");
       }
     } catch (e) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text("Error: $e")));
+      CustomSnackBar.success("Error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -205,7 +191,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   ),
                   SizedBox(height: 20.h),
                   CustomButton(text: "Add Project", onPressed: _addProject, isLoading: _loading),
-
                   SizedBox(height: 20.h),
                 ],
                 Align(
@@ -214,27 +199,23 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Projects",
+                        "All Projects",
                         style: Theme.of(
                           context,
-                        ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
+                        ).textTheme.titleLarge,
                       ),
                       OutlinedButton.icon(
                         onPressed: _showAddSubProjectBottomSheet,
                         style: OutlinedButton.styleFrom(
                           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                          side: BorderSide(color: Colors.grey.shade600, width: 1),
+                          side: BorderSide(color: ThemeClass.warningColor, width: 1),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                           minimumSize: const Size(0, 32),
                         ),
-                        icon: Icon(Icons.add, size: 16.sp, color: Colors.black87),
+                        icon: Icon(Icons.add, size: 16.sp, color: ThemeClass.textWhite),
                         label: Text(
                           "SubProject",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
                     ],
@@ -268,12 +249,25 @@ class _ProjectScreenState extends State<ProjectScreen> {
                               ),
                               title: Text(
                                 "Project: ${project["ProjectName"].toString().toUpperCase()}",
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium!.copyWith(color: ThemeClass.textWhite),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Created by: $creatorName"),
-                                  Text("Date: $createdAt"),
+                                  Text(
+                                    "Created by: $creatorName",
+                                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                      color: ThemeClass.warningColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Date: $createdAt",
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium!.copyWith(color: ThemeClass.darkBlue),
+                                  ),
                                 ],
                               ),
                             );
@@ -333,13 +327,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
   void _showAddSubProjectBottomSheet() {
     final TextEditingController subProjectText = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    // Reset dropdown when opening modal
     setState(() {
       _selectedProject = null;
     });
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: ThemeClass.darkBlue,
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -355,7 +349,33 @@ class _ProjectScreenState extends State<ProjectScreen> {
               children: [
                 Text("Add SubProject", style: Theme.of(ctx).textTheme.titleLarge),
                 SizedBox(height: 20.h),
-                dropDownList(ctx),
+                CustomDropdownField<int>(
+                  fillColor: ThemeClass.darkBlue,
+                  // isLoading: adminLoading,
+                  labelText: "Select Main Project",
+                  isRequired: true,
+                  hintText: "Select Main Project",
+                  prefixIcon: Icons.work,
+                  items: _projectslist
+                      .map((p) => {"ID": p["ProjectId"], "Name": p["ProjectName"] ?? ""})
+                      .toList(),
+                  valueKey: "ID",
+                  labelKey: "Name",
+                  value: _selectedProject?["ProjectId"],
+                  isEnabled: true,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedProject = _projectslist.firstWhere((p) => p["ProjectId"] == value);
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Please select a project";
+                    }
+                    return null;
+                  },
+                ),
+                // dropDownList(ctx),
                 SizedBox(height: 12.h),
                 CustomTextField(
                   labelText: "Sub project name",
@@ -364,6 +384,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   isRequired: true,
                   keyboardType: TextInputType.text,
                   maxLength: 50,
+                  fillColor: ThemeClass.darkBlue,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Subproject is required";
@@ -373,7 +394,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 ),
                 SizedBox(height: 12.h),
                 CustomButton(
-                  text: "Add",
+                  txtColor: ThemeClass.textBlack,
+                  backgroundColor: ThemeClass.textWhite,
+                  text: "Add Sub Project",
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       await _saveSubProject(subProjectText);
