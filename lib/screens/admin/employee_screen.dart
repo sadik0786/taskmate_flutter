@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -84,41 +86,67 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
                 return Dismissible(
                   key: ValueKey(e["ID"]),
-                  direction: DismissDirection.endToStart, // swipe left
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    decoration: BoxDecoration(
+                  direction: DismissDirection.endToStart,
+                  background: ClipRRect(
+                    borderRadius: BorderRadius.circular(14.r),
+                    child: Container(
                       color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(10.r),
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Icon(Icons.delete, color: Colors.white),
                   ),
                   confirmDismiss: (direction) async {
                     // show delete confirmation
                     final confirm = await showDialog<bool>(
                       context: context,
-                      builder: (ctx) => AlertDialog(
-                        backgroundColor: ThemeClass.darkBlue,
-                        title: Text(
-                          "Confirm Delete",
-                          style: Theme.of(context).textTheme.bodySmall,
-                          textAlign: TextAlign.center,
-                        ),
-                        content: Text(
-                          "Are you sure you want to delete $name?",
-                          style: Theme.of(context).textTheme.titleMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                        actionsAlignment: MainAxisAlignment.center,
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+                      barrierColor: Colors.transparent,
+                      builder: (ctx) => Stack(
+                        children: [
+                          BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                            child: Container(color: Colors.black.withOpacity(0)),
                           ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                          Center(
+                            child: AlertDialog(
+                              backgroundColor: ThemeClass.darkBlue,
+                              title: Text(
+                                "Confirm Delete",
+                                style: Theme.of(context).textTheme.bodySmall,
+                                textAlign: TextAlign.center,
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Are you sure you want to delete!",
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Text(
+                                    "$name?",
+                                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                                      color: ThemeClass.warningColor,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                              actionsAlignment: MainAxisAlignment.center,
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text(
+                                    "Cancel",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
