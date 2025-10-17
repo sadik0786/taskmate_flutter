@@ -289,7 +289,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
           child: Column(
             children: [
               CustomDropdownField<int>(
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
                 labelText: "Select Main Project",
                 isRequired: true,
                 hintText: "Select Main Project",
@@ -305,7 +305,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
               ),
               SizedBox(height: 10.h),
               CustomDropdownField<int>(
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
                 labelText: _selectedProjectId == null
                     ? "Select Project First"
                     : "Select Sub Project",
@@ -325,7 +325,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
               ),
               SizedBox(height: 10.h),
               CustomDropdownField<String>(
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
                 labelText: "Task Type",
                 isRequired: true,
                 hintText: "Select Task Mode",
@@ -347,7 +347,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
                 prefixIcon: Icons.title,
                 keyboardType: TextInputType.text,
                 controller: _title,
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
               ),
               SizedBox(height: 10.h),
               CustomTextField(
@@ -358,11 +358,11 @@ class AddTaskScreenState extends State<AddTaskScreen> {
                 keyboardType: TextInputType.text,
                 controller: _desc,
                 maxLines: 2,
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
               ),
               SizedBox(height: 10.h),
               CustomDropdownField<String>(
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
                 labelText: "Task Status",
                 isRequired: true,
                 hintText: "Select Task Status",
@@ -382,14 +382,14 @@ class AddTaskScreenState extends State<AddTaskScreen> {
                 isRequired: true,
                 prefixIcon: Icons.calendar_today,
                 hintText: "Select Date",
-                fillColor: ThemeClass.darkBlue,
+                // fillColor: ThemeClass.darkBlue,
               ),
               SizedBox(height: 10.h),
               Row(
                 children: [
                   Flexible(
                     child: CustomTimeField(
-                      fillColor: ThemeClass.darkBlue,
+                      // fillColor: ThemeClass.darkBlue,
                       selectedTime: _startTime,
                       onTap: _pickStartTime,
                       labelText: "Start Time",
@@ -405,7 +405,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
                   SizedBox(width: 20.w),
                   Flexible(
                     child: CustomTimeField(
-                      fillColor: ThemeClass.darkBlue,
+                      // fillColor: ThemeClass.darkBlue,
                       selectedTime: _endTime,
                       onTap: _pickEndTime,
                       labelText: "End Time",
