@@ -42,10 +42,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       final exists = await ApiService.checkUserByEmail(email);
       if (!mounted) return;
       setState(() => _emailVerified = exists);
-      CustomSnackBar.error(
-        exists
-            ? "Email verified. You can now set a new password."
-            : "Email not found or you don't have permission",
+      exists
+          ? CustomSnackBar.success("Email verified. You can now set a new password.")
+          : CustomSnackBar.error("Email not found or you don't have permission",
       );
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(

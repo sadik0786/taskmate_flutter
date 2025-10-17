@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -55,12 +56,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     // ✅ Check internet before hitting API
     if (!await ApiService.hasInternetConnection()) {
       setState(() => _loading = false);
-      Get.snackbar(
-        "No Internet",
-        "Please check your connection",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      CustomSnackBar.info("No Internet-Please check your connection");
+      // Get.snackbar(
+      //   "No Internet",
+      //   "Please check your connection",
+      //   backgroundColor: Colors.red,
+      //   colorText: Colors.white,
+      // );
       return;
     }
 
@@ -101,30 +103,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         }
 
         // ✅ Show welcome message
-        Get.snackbar(
+        CustomSnackBar.success(
           "Welcome ${user['name'] ?? 'User'}!",
-          "Logged in as ${role.toUpperCase()}",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
         );
+        // Get.snackbar(
+        //   "Welcome ${user['name'] ?? 'User'}!",
+        //   "Logged in as ${role.toUpperCase()}",
+        //   backgroundColor: Colors.green,
+        //   colorText: Colors.white,
+        // );
       } else {
         final errorMsg = res["error"] ?? "Unable to login. Please try again.";
-
-        Get.snackbar(
-          "Login Failed",
-          errorMsg,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        CustomSnackBar.error("$errorMsg");
       }
     } catch (e) {
       setState(() => _loading = false);
-      Get.snackbar(
-        "Server Error",
-        "Unable to connect to server. Please try again later.",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      CustomSnackBar.error("Unable to connect to server. Please try again later.");
     }
   }
 
@@ -183,17 +177,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       Text(
                         "Task Mate",
                         style: Theme.of(context).textTheme.bodySmall,
-                        // style: TextStyle(
-                        //   fontSize: 28.sp,
-                        //   fontWeight: FontWeight.bold,
-                        //   color: Colors.white,
-                        //   letterSpacing: 1.5,
-                        // ),
+                      
                       ),
                       Text(
                         "Employee Task Management",
                         style: Theme.of(context).textTheme.titleMedium,
-                        // style: TextStyle(fontSize: 16, color: Colors.white70),
                       ),
                     ],
                   ),
@@ -218,11 +206,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         Text(
                           "Access Account",
                           style: Theme.of(context).textTheme.bodySmall,
-                          //  TextStyle(
-                          //   fontSize: 26.sp,
-                          //   fontWeight: FontWeight.w700,
-                          //   color: ThemeClass.textWhite,
-                          // ),
                         ),
                         SizedBox(height: 20.h),
                         CustomTextField(

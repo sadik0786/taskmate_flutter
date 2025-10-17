@@ -13,6 +13,7 @@ import 'package:task_mate/services/api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class EmployeeTaskScreen extends StatefulWidget {
   const EmployeeTaskScreen({super.key});
@@ -57,10 +58,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
       if (!mounted) return;
       setState(() => employees = data);
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to load employees: $e")));
+      CustomSnackBar.error("Failed to load employees: $e");
     }
   }
 
@@ -77,11 +75,8 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
         loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
       setState(() => loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to load tasks: $e")));
+      CustomSnackBar.error("Failed to load task: $e");
     }
   }
 
@@ -97,47 +92,36 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
         loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
       setState(() => loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to load tasks: $e")));
+      CustomSnackBar.error("Failed to load task: $e");
     }
   }
 
   void _applyFilter() {
-    if (selectedFilter == "all") {
-      setState(() => tasks = List.from(allTasks));
-      return;
-    }
-
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
     setState(() {
       tasks = allTasks.where((t) {
-        final createdAt = t["createdAt"] ?? t["CreatedAt"];
-        if (createdAt == null) return false;
-        try {
-          final taskDate = DateTime.parse(createdAt.toString());
+        final startTime = t["startTime"];
+        if (startTime == null) return false;
+        final taskDate = DateTime.parse(startTime);
 
-          switch (selectedFilter) {
-            case "today":
-              return taskDate.year == today.year &&
-                  taskDate.month == today.month &&
-                  taskDate.day == today.day;
-            case "week":
-              final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-              final endOfWeek = startOfWeek.add(const Duration(days: 6));
-              return taskDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
-                  taskDate.isBefore(endOfWeek.add(const Duration(days: 1)));
-            case "month":
-              if (selectedMonth == null || selectedYear == null) return false;
-              return taskDate.year == selectedYear && taskDate.month == selectedMonth;
-          }
-          return true;
-        } catch (e) {
-          return false;
+        switch (selectedFilter) {
+          case "today":
+            return taskDate.year == today.year &&
+                taskDate.month == today.month &&
+                taskDate.day == today.day;
+          case "week":
+            final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+            final endOfWeek = startOfWeek.add(const Duration(days: 6));
+            return taskDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
+                taskDate.isBefore(endOfWeek.add(const Duration(days: 1)));
+          case "month":
+            if (selectedMonth == null || selectedYear == null) return false;
+            return taskDate.year == selectedYear && taskDate.month == selectedMonth;
+          default:
+            return true; // all
         }
       }).toList();
     });
@@ -290,6 +274,15 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
       return "$minutes minutes";
     }
   }
+  
+  String getFormattedDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return "";
+    try {
+      return DateFormat("dd/MM/yyyy").format(DateTime.parse(dateString));
+    } catch (e) {
+      return "Invalid Date";
+    }
+  }
 
   // 🔹 Export to Excel
   Future<void> _exportToExcel() async {
@@ -303,7 +296,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
         TextCellValue("Task No"),
         TextCellValue("Project"),
         TextCellValue("Sub Project"),
-        TextCellValue("Mode"),
+        TextCellValue("Work Type"),
         TextCellValue("Title"),
         TextCellValue("Description"),
         TextCellValue("Status"),
@@ -356,15 +349,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
       final file = File("${dir.path}/$fileName");
       await file.create(recursive: true);
       await file.writeAsBytes(excel.encode()!);
-
       await OpenFilex.open(file.path);
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Excel file exported successfully!")));
+      CustomSnackBar.success("Excel file exported successfully!");
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to export: $e")));
+      CustomSnackBar.success("Failed to export: $e");
     }
   }
 
@@ -373,6 +361,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
     final monthLabel = (selectedFilter == "month" && selectedMonth != null && selectedYear != null)
         ? "Month (${DateFormat.MMM().format(DateTime(0, selectedMonth!))} $selectedYear)"
         : "Month";
+       
     return Scaffold(
       backgroundColor: ThemeClass.darkBgColor,
       appBar: AppBar(
@@ -534,11 +523,12 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
                         final t = tasks[index];
-                        final createdAt = t["createdAt"] ?? t["CreatedAt"];
+                        final createdAt = t["startTime"];
                         final dateStr = createdAt != null
-                            ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt.toString()))
+                            ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt))
                             : "";
                         return Card(
+                          color: ThemeClass.tealGreen,
                           elevation: 3,
                           margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
                           shape: RoundedRectangleBorder(
@@ -554,18 +544,18 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "Sr.No : ${index + 1}",
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                      "Task : ${index + 1}",
+                                      style: Theme.of(context).textTheme.titleMedium,
                                     ),
                                     Row(
                                       children: [
                                         Text(
                                           "Mode :  ",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                         Text(
                                           t["mode"] ?? "",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                       ],
                                     ),
@@ -579,11 +569,11 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                       children: [
                                         Text(
                                           "Project : ",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                         Text(
                                           "${t["project"] ?? ""}",
-                                          style: Theme.of(context).textTheme.labelMedium,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                       ],
                                     ),
@@ -594,11 +584,11 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                   children: [
                                     Text(
                                       "Sub Project : ",
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                      style: Theme.of(context).textTheme.titleMedium,
                                     ),
                                     Text(
                                       "${t["subProject"] ?? ""}",
-                                      style: Theme.of(context).textTheme.labelMedium,
+                                      style: Theme.of(context).textTheme.titleMedium,
                                     ),
                                   ],
                                 ),
@@ -610,11 +600,11 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                       children: [
                                         Text(
                                           "Title :",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                         Text(
                                           " ${t["title"] ?? ""}",
-                                          style: Theme.of(context).textTheme.labelMedium,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                       ],
                                     ),
@@ -628,11 +618,11 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                       children: [
                                         Text(
                                           "Details :",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                         Text(
                                           " ${t["description"] ?? ""}",
-                                          style: Theme.of(context).textTheme.labelMedium,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                       ],
                                     ),
@@ -646,12 +636,12 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                       children: [
                                         Text(
                                           "$dateStr |",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                         SizedBox(width: 4.w),
                                         Text(
                                           _calculateDuration(t["startTime"], t["endTime"]),
-                                          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
@@ -661,11 +651,11 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                       children: [
                                         Text(
                                           "Status :",
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                         Text(
                                           " ${t["status"] ?? ""}",
-                                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                             color: t["status"] == "Working"
                                                 ? ThemeClass.warningColor
                                                 : ThemeClass.successColor,

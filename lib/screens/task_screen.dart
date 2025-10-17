@@ -262,7 +262,7 @@ class _TaskScreenState extends State<TaskScreen> {
     sheetObject.appendRow([
       TextCellValue("Task No"),
       TextCellValue("Project"),
-      TextCellValue("Mode"),
+      TextCellValue("Work Type"),
       TextCellValue("Title"),
       TextCellValue("Description"),
       TextCellValue("Status"),

@@ -82,7 +82,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: widget.isEnabled,
           obscureText: _obscureText,
           maxLength: widget.maxLength,
-          maxLines: widget.maxLines,
+          maxLines: widget.isObscure ? 1 : (widget.maxLines ?? 1),
           style: TextStyle(
             fontSize: 16.sp,
             color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
