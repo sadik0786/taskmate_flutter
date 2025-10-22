@@ -110,9 +110,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       email = userFromServer?["Email"] ?? prefs.getString("email") ?? "";
       mobile = userFromServer?["Mobile"] ?? prefs.getString("mobile") ?? "";
 
-      final avatarPath = userFromServer?["ProfileImage"] ?? prefs.getString("avatarUrl");
-      if (avatarPath != null && avatarPath.isNotEmpty) {
-        avatarUrl = avatarPath;
+      final localPath = prefs.getString("localAvatarPath");
+      if (localPath != null && localPath.isNotEmpty) {
+        localAvatar = File(localPath); // show local picked photo
+        avatarUrl = null; // optional: avoid showing old network image
+      } else {
+        final avatarPath = userFromServer?["ProfileImage"] ?? prefs.getString("avatarUrl");
+        if (avatarPath != null && avatarPath.isNotEmpty) {
+          avatarUrl = avatarPath;
+        }
       }
       _isLoading = false;
     });
@@ -145,7 +151,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (url != null) {
         setState(() {
           avatarUrl = url;
-          // Do NOT clear localAvatar yet
         });
         await prefs.setString("avatarUrl", url);
       }
@@ -285,6 +290,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: ThemeClass.primaryGreen,
         elevation: 0,
         title: Text("My Profile", style: Theme.of(context).textTheme.titleLarge),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        // leading: Builder(
+        //   builder: (context) => IconButton(
+        //     icon: const Icon(Icons.menu, color: Colors.white),
+        //     onPressed: () => Scaffold.of(context).openDrawer(),
+        //   ),
+        // ),
         actions: [
           IconButton(
             icon: const Icon(Icons.home, color: Colors.white),
@@ -294,6 +311,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+      // drawer: Drawer(
+      //   child: ListView(
+      //     padding: EdgeInsets.zero,
+      //     children: [
+      //       DrawerHeader(
+      //         decoration: BoxDecoration(color: ThemeClass.primaryGreen),
+      //         child: Text(
+      //           "Menu",
+      //           style: TextStyle(color: Colors.white, fontSize: 24.sp),
+      //         ),
+      //       ),
+      //       ListTile(
+      //         leading: const Icon(Icons.settings),
+      //         title: const Text("Settings"),
+      //         onTap: () {
+      //           Navigator.pop(context);
+      //           // Get.toNamed(Routes.settingsScreen);
+      //         },
+      //       ),
+      //       ListTile(
+      //         leading: const Icon(Icons.info),
+      //         title: const Text("Info"),
+      //         onTap: () {
+      //           Navigator.pop(context);
+      //           // Get.toNamed(Routes.notificationsScreen);
+      //         },
+      //       ),
+      //       ListTile(
+      //         leading: const Icon(Icons.logout),
+      //         title: const Text("Logout"),
+      //         onTap: () {
+      //           Navigator.pop(context);
+      //           _logOut();
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // ),
       body: _isLoading
           ? PageLoader()
           : Column(
@@ -579,7 +634,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               // SizedBox(height: 12.h),
               CustomTextField(
-                labelText: "Set Confirm PIN",
+                labelText: "Confirm Set PIN",
                 hintText: "Enter 4-digit number",
                 controller: confirmController,
                 keyboardType: TextInputType.number,

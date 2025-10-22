@@ -132,6 +132,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         title: Text("Forgot Password", style: Theme.of(context).textTheme.titleLarge),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Get.back();
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.home, color: Colors.white),

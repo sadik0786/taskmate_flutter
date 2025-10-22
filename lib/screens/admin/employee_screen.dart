@@ -62,6 +62,12 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         backgroundColor: ThemeClass.primaryGreen,
         elevation: 0,
         title: Text("Employees", style: Theme.of(context).textTheme.titleLarge),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Get.back();
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.home, color: Colors.white),
@@ -119,14 +125,15 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    "Are you sure you want to delete!",
+                                    "Are you sure you want to delete?🤔",
                                     style: Theme.of(context).textTheme.titleMedium,
                                     textAlign: TextAlign.center,
                                   ),
                                   Text(
-                                    "$name?",
+                                    "👉$name",
                                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                                      color: ThemeClass.warningColor,
+                                      color: ThemeClass.textWhite,
+                                      fontSize: 18,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -136,14 +143,38 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx, false),
-                                  child: const Text(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.grey.shade300,
+                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                  ),
+                                  child: Text(
                                     "Cancel",
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(
+                                      color: ThemeClass.textBlack,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.sp,
+                                    ),
                                   ),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.redAccent,
+                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Delete",
+                                    style: TextStyle(
+                                      color: ThemeClass.textWhite,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

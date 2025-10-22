@@ -373,6 +373,12 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
               : "Task Details",
           style: Theme.of(context).textTheme.titleLarge,
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Get.back();
+          },
+        ),
         actions: [
           if (allTasks.isNotEmpty)
             IconButton(

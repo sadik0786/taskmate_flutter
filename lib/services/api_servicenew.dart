@@ -148,24 +148,24 @@ class ApiService {
     }
   }
 
-  static void _logRequest(
-    String method,
-    String url,
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-  ) {
-    print("🔹 API Request:");
-    print("   - Method: $method");
-    print("   - URL: $url");
-    if (body != null) {
-      print("   - Body: ${jsonEncode(body)}");
-    }
-    if (headers != null) {
-      final safeHeaders = Map.from(headers);
-      safeHeaders['Authorization'] = 'Bearer ***'; // Hide token in logs
-      print("   - Headers: $safeHeaders");
-    }
-  }
+  // static void _logRequest(
+  //   String method,
+  //   String url,
+  //   Map<String, dynamic>? body,
+  //   Map<String, String>? headers,
+  // ) {
+  //   print("🔹 API Request:");
+  //   print("   - Method: $method");
+  //   print("   - URL: $url");
+  //   if (body != null) {
+  //     print("   - Body: ${jsonEncode(body)}");
+  //   }
+  //   if (headers != null) {
+  //     final safeHeaders = Map.from(headers);
+  //     safeHeaders['Authorization'] = 'Bearer ***'; // Hide token in logs
+  //     print("   - Headers: $safeHeaders");
+  //   }
+  // }
 
   /// ------------------- Auth APIs -------------------
   static Future<Map<String, dynamic>> getCurrentUser() async {
