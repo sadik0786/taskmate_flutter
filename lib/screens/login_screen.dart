@@ -103,15 +103,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         }
 
         // ✅ Show welcome message
-        CustomSnackBar.success(
-          "Welcome ${user['name'] ?? 'User'}!",
+        CustomSnackBar.show(
+          message: "Welcome ${user['name'] ?? 'User'}!",
+          backgroundColor: Colors.green,
+          icon: Icons.verified_user,
         );
-        // Get.snackbar(
-        //   "Welcome ${user['name'] ?? 'User'}!",
-        //   "Logged in as ${role.toUpperCase()}",
-        //   backgroundColor: Colors.green,
-        //   colorText: Colors.white,
-        // );
       } else {
         final errorMsg = res["error"] ?? "Unable to login. Please try again.";
         CustomSnackBar.error("$errorMsg");

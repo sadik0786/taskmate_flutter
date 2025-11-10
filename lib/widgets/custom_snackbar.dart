@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 class CustomSnackBar {
   static void show({
-    required String title,
+    String? title,
     required String message,
     Color? backgroundColor,
     IconData? icon,
@@ -12,8 +12,14 @@ class CustomSnackBar {
     final isDark = Get.isDarkMode;
 
     Get.snackbar(
-      title,
+      title ?? '',
       message,
+      titleText: title == null || title.isEmpty
+          ? const SizedBox.shrink() // hides title widget
+          : Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
       snackPosition: SnackPosition.TOP,
       backgroundColor: backgroundColor ?? (isDark ? Colors.grey[800] : Colors.grey[300]),
       colorText: Colors.white,
@@ -26,7 +32,7 @@ class CustomSnackBar {
   }
 
   /// ✅ Success Snackbar (Green)
-  static void success(String message, {String title = "Success"}) {
+  static void success(String message, {String? title = "Success"}) {
     final isDark = Get.isDarkMode;
     show(
       title: title,
@@ -37,7 +43,7 @@ class CustomSnackBar {
   }
 
   /// ❌ Error Snackbar (Red)
-  static void error(String message, {String title = "Error"}) {
+  static void error(String message, {String? title = "Error"}) {
     final isDark = Get.isDarkMode;
     show(
       title: title,
@@ -48,7 +54,7 @@ class CustomSnackBar {
   }
 
   /// ⚠️ Warning Snackbar (Orange)
-  static void warning(String message, {String title = "Warning"}) {
+  static void warning(String message, {String? title = "Warning"}) {
     final isDark = Get.isDarkMode;
     show(
       title: title,
@@ -59,7 +65,7 @@ class CustomSnackBar {
   }
 
   /// ℹ️ Info Snackbar (Blue)
-  static void info(String message, {String title = "Info"}) {
+  static void info(String message, {String? title = "Info"}) {
     final isDark = Get.isDarkMode;
     show(
       title: title,

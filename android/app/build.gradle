@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.task_mate"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "28.0.13004108"
 
    compileOptions {
