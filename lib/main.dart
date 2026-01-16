@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
@@ -8,6 +9,7 @@ import 'package:task_mate/core/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
+  await dotenv.load();
   runApp(MyApp());
 }
 
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
           initialRoute: Routes.initialRoute,
           getPages: appPages(),
           builder: (context, widget) {
-            ScreenUtil.init(context, designSize: const Size(375, 812));
+            // ScreenUtil.init(context, designSize: const Size(375, 812));
             return Container(
               color: Colors.white,
               child: SafeArea(top: false, left: false, right: false, bottom: true, child: widget!),

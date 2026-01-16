@@ -3,16 +3,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
 
+final String baseUrl = dotenv.env['baseApiUrl'] ?? '';
+
 class ApiService {
-  // static const baseUrl = "http://10.0.2.2:5000/api"; // Android Emulator
   // static const baseUrl = "http://192.168.1.117:5000/api"; // office wi-fi
+  // static const baseUrl = "http://10.0.2.2:5000/api"; // Android Emulator
   // static const baseUrl = "http://10.117.30.58:5000/api"; // mobile network
-  static const baseUrl = "http://taskmateapi.5nance.com/api"; // uat server
+  // static const baseUrl = "http://taskmateapi.5nance.com/api"; // uat server
 
   /// ------------------- Token Management -------------------
   static Future<void> saveToken(String token) async {
@@ -224,7 +227,6 @@ class ApiService {
   // Login
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-
       final res = await http
           .post(
             Uri.parse('$baseUrl/auth/login'),
@@ -259,7 +261,6 @@ class ApiService {
           'success': false,
           'error': data['message'] ?? data['error'] ?? 'Login failed (${res.statusCode})',
         };
-
       }
     } catch (e) {
       return {'success': false, 'error': 'Network error: ${e.toString()}'};

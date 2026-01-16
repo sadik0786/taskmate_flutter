@@ -24,6 +24,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: ThemeClass.primaryGreen,
       // backgroundColor: Color(0xff403c39),
+      // leading: IconButton(
+      //   icon: const Icon(Icons.arrow_back, color: Colors.white),
+      //   onPressed: () {
+      //     Get.back();
+      //   },
+      // ),
       title: Text(
         title,
         style: Theme.of(

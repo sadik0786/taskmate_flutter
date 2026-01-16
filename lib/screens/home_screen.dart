@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/login_screen.dart';
 import 'package:task_mate/widgets/custom_appbar.dart';
 
@@ -87,10 +88,19 @@ class _HomeScreenState extends State<HomeScreen> {
           Get.toNamed(Routes.profileScreen);
         },
       ),
+      _DashboardItem(
+        title: 'Manage Leave',
+        icon: Icons.manage_history,
+        gradient: [Colors.orangeAccent, Colors.deepOrange],
+        onTap: () {
+          Get.toNamed(Routes.hrmsDashboard);
+        },
+      ),
+
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      // backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
       appBar: CommonAppBar(
         title: "Task Mate",
         userName: userName,
@@ -102,11 +112,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFe0f7fa), Color(0xFF80deea)],
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
-            ),
+            color: ThemeClass.darkBgColor,
+            // gradient: LinearGradient(
+            //   colors: [Color(0xFFe0f7fa), Color(0xFF80deea)],
+            //   begin: Alignment.bottomRight,
+            //   end: Alignment.topLeft,
+            // ),
           ),
           child: Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 20.h),

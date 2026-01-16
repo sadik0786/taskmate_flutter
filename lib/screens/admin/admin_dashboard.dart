@@ -85,6 +85,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Get.toNamed(Routes.profileScreen);
           },
         ),
+        _DashboardItem(
+          title: 'Manage Leave',
+          icon: Icons.manage_history,
+          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
+          onTap: () {
+            Get.toNamed(Routes.hrmsDashboard);
+          },
+        ),
       ];
     } else if (role == "admin") {
       return [

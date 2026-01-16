@@ -90,7 +90,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: InputDecoration(
             fillColor: widget.fillColor,
             hintText: widget.hintText,
-            hintStyle: TextStyle(color: ThemeClass.lightBgColor.withAlpha(80), fontSize: 14.sp),
+            hintStyle: TextStyle(color: ThemeClass.lightBgColor.withAlpha(80), fontSize: 16.sp),
             isDense: widget.isDense,
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             prefixIcon: widget.prefixIcon != null

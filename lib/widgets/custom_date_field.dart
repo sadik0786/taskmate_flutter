@@ -63,7 +63,9 @@ class CustomDateField extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: displayText,
                 hintStyle: TextStyle(
-                  color: selectedDate != null ? ThemeClass.textWhite : Colors.black87,
+                  color: selectedDate != null
+                      ? ThemeClass.textWhite
+                      : ThemeClass.textWhite.withAlpha(80),
                   fontSize: 16.sp,
                 ),
                 prefixIcon: Icon(prefixIcon, color: ThemeClass.textWhite),
