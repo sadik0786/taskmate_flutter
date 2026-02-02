@@ -12,12 +12,11 @@ class LeaveController extends GetxController {
 
   RxBool isLoading = false.obs;
   RxString userRole = "".obs;
-  // Use computed properties
-  RxInt get pendingLeave => myLeaves.where((e) => e.status == "PENDING").length.obs;
-
-  RxInt get approvedLeave => myLeaves.where((e) => e.status == "APPROVED").length.obs;
-
-  RxInt get totalApplyLeave => myLeaves.length.obs;
+  
+  // Stats counts (observable properties)
+  RxInt pendingLeave = 0.obs;
+  RxInt approvedLeave = 0.obs;
+  RxInt totalApplyLeave = 0.obs;
 
   @override
   void onInit() {
@@ -45,15 +44,19 @@ class LeaveController extends GetxController {
       isLoading.value = true;
       final data = await ApiHrmsService.fetchMyLeaves();
       myLeaves.assignAll(data);
-      // pendingLeave.value = data.where((e) => e.status == "PENDING").length;
-
-      // approvedLeave.value = data.where((e) => e.status == "APPROVED").length;
-
-      // totalApplyLeave.value = data.length;
+      _calculateMyStats();
       myLeaves.refresh();
+    } catch (e) {
+      CustomSnackBar.error("Failed to fetch leaves: $e");
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void _calculateMyStats() {
+    pendingLeave.value = myLeaves.where((e) => e.status == "PENDING").length;
+    approvedLeave.value = myLeaves.where((e) => e.status == "APPROVED").length;
+    totalApplyLeave.value = myLeaves.length;
   }
 
   // apply leave for all
@@ -83,10 +86,10 @@ class LeaveController extends GetxController {
       final data = await ApiHrmsService.fetchOtherLeaveRequest();
       otherLeavesRequest.assignAll(data);
       pendingLeave.value = data.where((e) => e.status == "PENDING").length;
-
       approvedLeave.value = data.where((e) => e.status == "APPROVED").length;
-
       totalApplyLeave.value = data.length;
+    } catch (e) {
+      CustomSnackBar.error("Failed to fetch other requests: $e");
     } finally {
       isLoading.value = false;
     }

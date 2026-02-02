@@ -6,6 +6,6 @@ class AllBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<LeaveController>(() => LeaveController());
-    // Get.lazyPut<UserController>(() => UserController());
+    Get.lazyPut<UserController>(() => UserController());
   }
 }

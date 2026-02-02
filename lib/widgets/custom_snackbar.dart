@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:task_mate/core/theme.dart';
 
 class CustomSnackBar {
   static void show({
@@ -21,12 +22,13 @@ class CustomSnackBar {
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
       snackPosition: SnackPosition.TOP,
-      backgroundColor: backgroundColor ?? (isDark ? Colors.grey[800] : Colors.grey[300]),
-      colorText: Colors.white,
+      backgroundColor:
+          backgroundColor ?? (isDark ? ThemeClass.darkCardColor : ThemeClass.lightCardColor),
+      colorText: isDark ? ThemeClass.textWhite : ThemeClass.textBlack,
       margin: const EdgeInsets.all(12),
       borderRadius: 12,
       duration: Duration(seconds: durationInSeconds),
-      icon: Icon(icon, color: Colors.white),
+      icon: Icon(icon, color: isDark ? ThemeClass.textWhite : ThemeClass.textBlack),
       shouldIconPulse: true,
     );
   }
@@ -37,7 +39,7 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? Colors.green[700] : Colors.green,
+      backgroundColor: isDark ? ThemeClass.primaryGreen : ThemeClass.successColor,
       icon: Icons.check_circle_outline,
     );
   }
@@ -48,7 +50,7 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? Colors.red[700] : Colors.red,
+      backgroundColor: isDark ? ThemeClass.errorColor : ThemeClass.errorColor,
       icon: Icons.error_outline,
     );
   }
@@ -59,7 +61,7 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? Colors.orange[700] : Colors.orange,
+      backgroundColor: isDark ? ThemeClass.warningColor : ThemeClass.warningColor,
       icon: Icons.warning_amber_rounded,
     );
   }
@@ -70,7 +72,7 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? Colors.blue[700] : Colors.blue,
+      backgroundColor: isDark ? ThemeClass.darkBlue : ThemeClass.darkBlue,
       icon: Icons.info_outline,
     );
   }

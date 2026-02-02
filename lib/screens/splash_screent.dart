@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/core/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -32,7 +33,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
-    _colorAnimation = ColorTween(begin: Colors.blueAccent, end: Colors.white).animate(_controller);
+    _colorAnimation = ColorTween(
+      begin: ThemeClass.primaryGreen,
+      end: ThemeClass.textWhite,
+    ).animate(_controller);
 
     _controller.forward();
 
@@ -59,8 +63,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         Get.snackbar(
           "No Internet",
           "Please check your connection",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          backgroundColor: ThemeClass.errorColor,
+          colorText: ThemeClass.textWhite,
         );
       }
       return;
@@ -105,8 +109,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         Get.snackbar(
           "Server Error",
           "Unable to connect to server. Please try again later.",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          backgroundColor: ThemeClass.errorColor,
+          colorText: ThemeClass.textWhite,
         );
       }
     }
@@ -146,12 +150,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.3),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.blueAccent.withOpacity(0.5), width: 2),
+                        border: Border.all(
+                          color: ThemeClass.primaryGreen.withOpacity(0.5),
+                          width: 2,
+                        ),
                       ),
                       child: Icon(
                         Icons.work_outline,
                         size: 80.sp,
-                        color: _colorAnimation.value ?? Colors.white,
+                        color: _colorAnimation.value ?? ThemeClass.textWhite,
                       ),
                     ),
                   ),
@@ -174,7 +181,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           style: TextStyle(
                             fontSize: 32.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: ThemeClass.textWhite,
                             letterSpacing: 1.5,
                           ),
                         ),
@@ -183,7 +190,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           "Employee Task Management System",
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: Colors.white70,
+                            color: ThemeClass.textWhite.withOpacity(0.7),
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -205,8 +212,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     height: 40.h,
                     child: CircularProgressIndicator(
                       strokeWidth: 3.w,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
-                      backgroundColor: Colors.white.withOpacity(0.2),
+                      valueColor: AlwaysStoppedAnimation<Color>(ThemeClass.primaryGreen),
+                      backgroundColor: ThemeClass.textWhite.withOpacity(0.2),
                     ),
                   ),
                 ),
@@ -221,7 +228,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   opacity: _fadeAnimation.value,
                   child: Text(
                     "Loading...",
-                    style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+                    style: TextStyle(color: ThemeClass.textWhite.withOpacity(0.7), fontSize: 14.sp),
                   ),
                 ),
               ),
