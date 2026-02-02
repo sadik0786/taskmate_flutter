@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
 import 'package:task_mate/model/leave_request_model.dart';
+import 'package:task_mate/model/user_request_model.dart';
+import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
 
 final String baseUrl = dotenv.env['baseApiUrl'] ?? '';
 
@@ -54,6 +56,37 @@ class ApiHrmsService {
     }
     return response;
   }
+
+  // employee register
+  // static Future<RegisterEmployeeResponse> registerUser(UserRequestModel request) async {
+  //   try {
+  //     final res = await ApiHrmsService.request(
+  //       "/hrms/add-employee",
+  //       method: "POST",
+  //       body: request.toJson(),
+  //     );
+
+  //     final decoded = jsonDecode(res.body);
+
+  //     return RegisterEmployeeResponse.fromJson(decoded);
+  //   } catch (e) {
+  //     return RegisterEmployeeResponse(success: false, message: e.toString());
+  //   }
+  // }
+
+  // get all employee
+  static Future<List<UserRequestModel>> allEmployee() async {
+    final res = await request("/hrms/all-employee");
+
+    final data = jsonDecode(res.body);
+
+    if (res.statusCode == 200 && data["success"] == true) {
+      return (data["data"] as List).map((e) => UserRequestModel.fromJson(e)).toList();
+    }
+
+    throw Exception(data["error"] ?? "Failed to fetch employee");
+  }
+
 
   // get all leaves type
   static Future<List<dynamic>> fetchAllLeaveTypes() async {
@@ -106,6 +139,30 @@ class ApiHrmsService {
       return (data["data"] as List).map((e) => LeaveRequestModel.fromJson(e)).toList();
     }
     throw Exception(data["message"] ?? "Failed to fetch leaves");
+  }
+
+  // approve / reject leave by HR or SuperAdmin
+  static Future<Map<String, dynamic>> updateLeaveStatus(
+    int leaveId,
+    String status, {
+    String? hrReason,
+  }) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {"success": false, "error": "No token found"};
+      }
+
+      final res = await ApiHrmsService.request(
+        "/hrms/update-leave-status",
+        method: "PUT",
+        body: {"leaveId": leaveId, "status": status, "hrReason": hrReason},
+      );
+
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
   }
 
   ///

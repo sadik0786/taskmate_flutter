@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:task_mate/model/leave_type_model.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
@@ -13,10 +11,13 @@ class LeaveController extends GetxController {
   RxList<LeaveRequestModel> otherLeavesRequest = <LeaveRequestModel>[].obs;
 
   RxBool isLoading = false.obs;
-  RxInt pendingLeave = 0.obs;
-  RxInt approvedLeave = 0.obs;
-  RxInt totalApplyLeave = 0.obs;
   RxString userRole = "".obs;
+  // Use computed properties
+  RxInt get pendingLeave => myLeaves.where((e) => e.status == "PENDING").length.obs;
+
+  RxInt get approvedLeave => myLeaves.where((e) => e.status == "APPROVED").length.obs;
+
+  RxInt get totalApplyLeave => myLeaves.length.obs;
 
   @override
   void onInit() {
@@ -44,11 +45,11 @@ class LeaveController extends GetxController {
       isLoading.value = true;
       final data = await ApiHrmsService.fetchMyLeaves();
       myLeaves.assignAll(data);
-      pendingLeave.value = data.where((e) => e.status == "PENDING").length;
+      // pendingLeave.value = data.where((e) => e.status == "PENDING").length;
 
-      approvedLeave.value = data.where((e) => e.status == "APPROVED").length;
+      // approvedLeave.value = data.where((e) => e.status == "APPROVED").length;
 
-      totalApplyLeave.value = data.length;
+      // totalApplyLeave.value = data.length;
       myLeaves.refresh();
     } finally {
       isLoading.value = false;
@@ -96,19 +97,14 @@ class LeaveController extends GetxController {
     try {
       isLoading.value = true;
 
-      final res = await ApiHrmsService.request(
-        "/hrms/update-leave-status",
-        method: "PUT",
-        body: {"leaveId": leaveId, "status": status, "hrReason": hrReason},
-      );
+      final res = await ApiHrmsService.updateLeaveStatus(leaveId, status, hrReason: hrReason);
 
-      final data = jsonDecode(res.body);
-
-      if (data["success"] == true) {
+      if (res["success"] == true) {
         fetchMyLeaves();
-        CustomSnackBar.success(data["message"]);
+        CustomSnackBar.success("Leave $status");
+        await getOtherLeaveRequest();
       } else {
-        throw data["message"] ?? "Update failed";
+        throw res["message"] ?? res["error"];
       }
     } catch (e) {
       CustomSnackBar.error(e.toString());

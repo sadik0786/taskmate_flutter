@@ -5,7 +5,6 @@ import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
-import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/services/hrms_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_date_field.dart';
@@ -88,7 +87,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
       CustomSnackBar.error("Invalid leave duration");
       return;
     }
-    final userId = await ApiService.getLoggedInUserId();
+    // final userId = await ApiService.getLoggedInUserId();
     final request = LeaveApplyRequestModel(
       // userId: userId!,
       leaveTypeId: selectedLeaveTypeId!,

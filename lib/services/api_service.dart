@@ -300,36 +300,6 @@ class ApiService {
 
   //
 
-  // NEW: Get Users with Hierarchy
-  static Future<Map<String, dynamic>> getUsers() async {
-    try {
-      final token = await getToken();
-      if (token == null) {
-        return {"success": false, "error": "Authentication required"};
-      }
-
-      final res = await http
-          .get(
-            Uri.parse("$baseUrl/users"),
-            headers: {"Content-Type": "application/json", "Authorization": "Bearer $token"},
-          )
-          .timeout(const Duration(seconds: 15));
-
-      final data = jsonDecode(res.body);
-
-      if (res.statusCode == 200) {
-        return data;
-      } else {
-        return {
-          "success": false,
-          "error": data['error'] ?? "Failed to fetch users (${res.statusCode})",
-        };
-      }
-    } catch (e) {
-      return {"success": false, "error": e.toString()};
-    }
-  }
-
   // NEW: Get Tasks with Hierarchy
   static Future<Map<String, dynamic>> getTasks() async {
     try {

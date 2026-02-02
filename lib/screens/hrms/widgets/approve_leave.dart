@@ -55,7 +55,6 @@ class _ApproveLeaveState extends State<ApproveLeave> {
   /// ---------------- APPROVAL CARD ----------------
   Widget _approvalCard(LeaveRequestModel leave) {
     final isHr = leaveController.userRole.value == "hr";
-    final isSuperAdmin = leaveController.userRole.value == "superadmin";
 
     // ensure default value exists
     hrApprovalMap.putIfAbsent(leave.id, () => false);
@@ -134,85 +133,6 @@ class _ApproveLeaveState extends State<ApproveLeave> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget swipeButton(LeaveRequestModel leave) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        double dragPosition = 0.0; // -1 (left) to +1 (right)
-
-        return Container(
-          width: double.infinity,
-          height: 50.h,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(30.r),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // APPROVE TEXT (Right side)
-              Positioned(
-                left: 20,
-                child: Text(
-                  "REJECT",
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              // REJECT TEXT (Left side)
-              Positioned(
-                right: 20,
-                child: Text(
-                  "APPROVE",
-                  style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              // DRAGGABLE THUMB (CENTER)
-              Align(
-                alignment: Alignment(dragPosition, 0),
-                child: GestureDetector(
-                  onHorizontalDragUpdate: (details) {
-                    setState(() {
-                      dragPosition += details.delta.dx / 150;
-                      dragPosition = dragPosition.clamp(-1.0, 1.0); // limit range
-                    });
-                  },
-                  onHorizontalDragEnd: (details) {
-                    if (dragPosition > 0.5) {
-                      print("Approved");
-                      // leaveController.approveLeave(leave.id);
-                    } else if (dragPosition < -0.5) {
-                      print("Rejected");
-                      // leaveController.rejectLeave(leave.id);
-                    }
-
-                    // Reset to center
-                    setState(() {
-                      dragPosition = 0;
-                    });
-                  },
-                  child: Container(
-                    width: 60.w,
-                    height: 40.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.r),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(Icons.swap_horiz, color: Colors.black),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -296,7 +216,7 @@ class SwipeApproveReject extends StatefulWidget {
 class _SwipeApproveRejectState extends State<SwipeApproveReject> {
   double dragPosition = 0.0; // -1 = left, 0 = center, 1 = right
   bool isCompleted = false; // to lock thumb after decision
-
+  final LeaveController leaveController = Get.find<LeaveController>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -355,8 +275,8 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                     isCompleted = true;
                   });
 
-                  print("Approved");
-                  // leaveController.approveLeave(widget.leave.id);
+                  // print("Approved");
+                  leaveController.updateLeaveStatus(widget.leave.id, "APPROVED", "");
                 } else if (dragPosition < -0.5) {
                   // REJECT
                   setState(() {
@@ -364,8 +284,12 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                     isCompleted = true;
                   });
 
-                  print("Rejected");
-                  // leaveController.rejectLeave(widget.leave.id);
+                  // print("Rejected");
+                  leaveController.updateLeaveStatus(
+                    widget.leave.id,
+                    "REJECTED",
+                    "Rejected via swipe",
+                  );
                 }
               },
               child: Container(

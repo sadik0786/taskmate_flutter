@@ -16,76 +16,68 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  final LeaveController leaveController = Get.put(LeaveController());
+  final LeaveController leaveController = Get.find<LeaveController>();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16.h),
+      child: Obx(() {
+        // Show loading for entire page
+        if (leaveController.isLoading.value) {
+          return Center(child: PageLoader());
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16.h),
 
-          // Leave Summary
-          Row(
-            children: [
-              Obx(
-                () => _summaryCard(
+            // Leave Summary
+            Row(
+              children: [
+                _summaryCard(
                   title: "Pending",
                   icon: Icons.pending_actions,
                   color: ThemeClass.warningColor,
                   value: leaveController.pendingLeave.value,
                 ),
-              ),
-              Obx(
-                () => _summaryCard(
+                _summaryCard(
                   title: "Approve",
                   icon: Icons.done_all,
                   color: ThemeClass.primaryGreen,
                   value: leaveController.approvedLeave.value,
                 ),
-              ),
-              Obx(
-                () => _summaryCard(
+                _summaryCard(
                   title: leaveController.totalApplyLeave.value > 2 ? "Apply Leaves" : "Apply Leave",
                   icon: Icons.all_inbox,
                   color: Colors.blue,
                   value: leaveController.totalApplyLeave.value,
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          SizedBox(height: 16.h),
+            SizedBox(height: 16.h),
 
-          // Leave List
-          Text("My Leave Requests", style: Theme.of(context).textTheme.titleLarge),
+            // Leave List
+            Text("My Leave Requests", style: Theme.of(context).textTheme.titleLarge),
 
-          SizedBox(height: 8.h),
+            SizedBox(height: 8.h),
 
-          Expanded(
-            child: Obx(() {
-              if (leaveController.isLoading.value) {
-                return PageLoader();
-              }
-
-              if (leaveController.myLeaves.isEmpty) {
-                return NoTasksWidget(message: "No Leaves Founds");
-              }
-
-              return ListView.builder(
-                itemCount: leaveController.myLeaves.length,
-                itemBuilder: (context, index) {
-                  final leave = leaveController.myLeaves[index];
-                  // print("hellow ${leave}");
-                  return _leaveCard(leave);
-                },
-              );
-            }),
-          ),
-        ],
-      ),
+            Expanded(
+              child: leaveController.myLeaves.isEmpty
+                  ? NoTasksWidget(message: "No Leaves Found")
+                  : ListView.builder(
+                      itemCount: leaveController.myLeaves.length,
+                      itemBuilder: (context, index) {
+                        final leave = leaveController.myLeaves[index];
+                        // print("hellow ${leave}");
+                        return _leaveCard(leave);
+                      },
+                    ),
+            ),
+          ],
+        );
+      }),
     );
   }
 

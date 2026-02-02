@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/theme.dart';
+import 'package:task_mate/screens/hrms/widgets/add_employee.dart';
+import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
 import 'package:task_mate/screens/hrms/widgets/apply_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/approve_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/dashboard.dart';
@@ -84,6 +86,8 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
             onPressed: () {
               if (role == "superadmin") {
                 Get.offAllNamed('/adminDashboard');
+              } else if (role == "hr") {
+                Get.offAllNamed('/dashboard');
               } else if (role == "employee") {
                 Get.offAllNamed('/homeScreen');
               }
@@ -97,7 +101,11 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
           children: [
             const Dashboard(),
             const ApplyLeave(),
-            if (role == "hr" || role == "superadmin") const ApproveLeave() else const SizedBox(),
+            if (role == "hr" || role == "superadmin") ...[
+              const ApproveLeave(),
+              const AddEmployee(),
+              const AllEmployee(),
+            ],
           ],
         ),
       ),
@@ -142,6 +150,22 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
                 selected: _selectedIndex == 2,
                 onTap: () {
                   _onItemTapped(2);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Add Employee'),
+                selected: _selectedIndex == 3,
+                onTap: () {
+                  _onItemTapped(3);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('All Employee'),
+                selected: _selectedIndex == 4,
+                onTap: () {
+                  _onItemTapped(4);
                   Navigator.pop(context);
                 },
               ),

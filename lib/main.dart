@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:task_mate/bindings/all_binding.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeClass.darkTheme,
           themeMode: ThemeMode.system,
           initialRoute: Routes.initialRoute,
+          initialBinding: AllBinding(),
           getPages: appPages(),
           builder: (context, widget) {
             // ScreenUtil.init(context, designSize: const Size(375, 812));

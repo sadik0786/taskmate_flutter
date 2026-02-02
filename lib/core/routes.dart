@@ -5,6 +5,8 @@ import 'package:task_mate/screens/add_task_screen.dart';
 import 'package:task_mate/screens/forgot_password.dart';
 import 'package:task_mate/screens/home_screen.dart';
 import 'package:task_mate/screens/hrms/hrms_dashboard.dart';
+import 'package:task_mate/screens/hrms/widgets/add_employee.dart';
+import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
 import 'package:task_mate/screens/hrms/widgets/apply_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/approve_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/dashboard.dart';
@@ -41,6 +43,8 @@ class Routes {
   static const String applyLeave = "/applyLeave";
   static const String dashboard = "/dashboard";
   static const String approveLeave = "/approveLeave";
+  static const String addEmployee = "/addEmployee";
+  static const String allEmployee = "/allEmployee";
 }
 
 const Duration transitionDuration = Duration(milliseconds: AppConstants.transitionDuration);
@@ -73,4 +77,6 @@ List<GetPage> appPages() => [
   _getPage(Routes.applyLeave, ApplyLeave()),
   _getPage(Routes.dashboard, Dashboard()),
   _getPage(Routes.approveLeave, ApproveLeave()),
+  _getPage(Routes.addEmployee, AddEmployee()),
+  _getPage(Routes.allEmployee, AllEmployee()),
 ];
