@@ -8,7 +8,6 @@ import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
 import 'package:task_mate/model/leave_request_model.dart';
 import 'package:task_mate/model/user_request_model.dart';
-import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
 
 final String baseUrl = dotenv.env['baseApiUrl'] ?? '';
 
@@ -124,7 +123,11 @@ class ApiHrmsService {
         body: request.toJson(),
       );
 
-      return jsonDecode(res.body);
+      final data = jsonDecode(res.body);
+      if (res.statusCode == 200 && data["success"] == true) {
+        return data;
+      }
+      throw Exception(data["message"] ?? "Failed to apply leave");
     } catch (e) {
       return {"success": false, "error": e.toString()};
     }
@@ -159,7 +162,11 @@ class ApiHrmsService {
         body: {"leaveId": leaveId, "status": status, "hrReason": hrReason},
       );
 
-      return jsonDecode(res.body);
+      final data = jsonDecode(res.body);
+      if (res.statusCode == 200 && data["success"] == true) {
+        return data;
+      }
+      throw Exception(data["message"] ?? "Failed to update status");
     } catch (e) {
       return {"success": false, "error": e.toString()};
     }
