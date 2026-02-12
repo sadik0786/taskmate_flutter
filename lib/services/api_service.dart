@@ -8,6 +8,10 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/model/auth/login_request_model.dart';
+import 'package:task_mate/model/auth/login_response_model.dart';
+import 'package:task_mate/model/auth/register_request_model.dart';
+import 'package:task_mate/model/auth/register_response_model.dart';
 
 final String baseUrl = dotenv.env['baseApiUrl'] ?? '';
 
@@ -104,6 +108,29 @@ class ApiService {
       return {"success": false, "error": e.toString()};
     }
   }
+static Future<Map<String, dynamic>> getUsersByRole(String role) async {
+    final token = await getToken();
+
+    final res = await http.get(
+      Uri.parse("$baseUrl/users/by-role?role=$role"),
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer $token"},
+    );
+
+    return jsonDecode(res.body);
+  }
+
+  static Future<Map<String, dynamic>> getUsersByRoles(List<String> roles) async {
+    final token = await getToken();
+
+    final query = roles.map((r) => "roles=$r").join("&");
+
+    final res = await http.get(
+      Uri.parse("$baseUrl/users/by-roles?$query"),
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer $token"},
+    );
+
+    return jsonDecode(res.body);
+  }
 
   static Future<Map<String, dynamic>> checkEmailExists(String email) async {
     try {
@@ -160,50 +187,29 @@ class ApiService {
   }
 
   // Register employee/admin
-  static Future<Map<String, dynamic>> registerEmployee(
-    String name,
-    String email,
-    String password,
-    int roleId, {
-    String? mobile,
-    int? reportingId,
-  }) async {
+  static Future<RegisterResponseModel> registerEmployee(RegisterRequestModel request) async {
     try {
       final token = await getToken();
       // print('TOKEN: $token');
 
-      if (token == null) return {"success": false, "error": "No token found"};
-
-      final body = {
-        "name": name,
-        "email": email,
-        "password": password,
-        "roleId": roleId,
-        if (mobile != null && mobile.isNotEmpty) "mobile": mobile,
-        if (reportingId != null) "reportingId": reportingId,
-      };
+      if (token == null) {
+        return RegisterResponseModel(success: false);
+      }
 
       final res = await http.post(
         Uri.parse("$baseUrl/auth/register"),
         headers: {"Content-Type": "application/json", "Authorization": "Bearer $token"},
-        body: jsonEncode(body),
+        body: jsonEncode(request.toJson()),
       );
 
-      // print('STATUS CODE: ${res.statusCode}'); // Add this
-      print('RESPONSE: ${res.body}');
-
       final data = jsonDecode(res.body);
+      
+      print("STATUS: ${res.statusCode}");
+      print("RESPONSE: ${res.body}");
 
-      if (data["success"] == true) {
-        return {"success": true, ...data};
-      } else {
-        return {
-          "success": false,
-          "error": data['error'] ?? "Registration failed (${res.statusCode})",
-        };
-      }
+      return RegisterResponseModel.fromJson(data);
     } catch (e) {
-      return {"success": false, "error": e.toString()};
+      return RegisterResponseModel(success: false);
     }
   }
 
@@ -225,7 +231,47 @@ class ApiService {
   }
 
   // Login
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<LoginResponseModel> login(LoginRequestModel request) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$baseUrl/auth/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(request.toJson()),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final data = jsonDecode(res.body);
+
+      // Convert response to model
+      final loginResponse = LoginResponseModel.fromJson(data);
+
+      if (loginResponse.success == true &&
+          loginResponse.token != null &&
+          loginResponse.user != null) {
+        print('TOKEN: ${loginResponse.token}');
+        await saveToken(loginResponse.token!);
+
+        final prefs = await SharedPreferences.getInstance();
+
+        // Save user data using model
+        await prefs.setInt('userId', loginResponse.user!.id ?? 0);
+        await prefs.setString('name', loginResponse.user!.name ?? '');
+        await prefs.setString('email', loginResponse.user!.email ?? '');
+        await prefs.setString('mobile', loginResponse.user!.mobile ?? '');
+        await prefs.setInt('roleId', loginResponse.user!.roleId ?? 0);
+        await prefs.setString('role', loginResponse.user!.role?.toLowerCase() ?? '');
+
+        return loginResponse;
+      } else {
+        return LoginResponseModel(success: false, message: loginResponse.message ?? "Login failed");
+      }
+    } catch (e) {
+      return LoginResponseModel(success: false, message: "Network error: ${e.toString()}");
+    }
+  }
+
+  static Future<Map<String, dynamic>> loginold(String email, String password) async {
     try {
       final res = await http
           .post(
@@ -269,23 +315,15 @@ class ApiService {
 
   // Get current logged-in user's role via profile endpoint
   static Future<String?> getCurrentUserRole() async {
-    final token = await ApiService.getToken();
-    if (token == null) return null;
     try {
-      // final token = await getToken();
-      // if (token == null) return null;
-
+    final token = await ApiService.getToken();
+      if (token == null) return null;
       final res = await http
           .get(
             Uri.parse("$baseUrl/auth/profile"),
             headers: {"Content-Type": "application/json", "Authorization": "Bearer $token"},
           )
           .timeout(const Duration(seconds: 10));
-
-      // if (res.statusCode == 200) {
-      //   final data = jsonDecode(res.body);
-      //   return (data["user"]?["roleName"] ?? data["user"]?["role"] ?? "").toString().toLowerCase();
-      // }
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
         if (data["success"] == true && data["user"] != null) {

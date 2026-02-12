@@ -2,13 +2,11 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_mate/controllers/auth/register_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
-import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -19,182 +17,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _name = TextEditingController();
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _mobile = TextEditingController();
-  final TextEditingController _password = TextEditingController();
-
-  bool _loading = false;
-
-  String? userName;
-  String? _currentUserRole;
-
-  List<Map<String, dynamic>> _roles = [];
-  int? _selectedRoleId;
-  bool roleLoading = false;
-
-  List<Map<String, dynamic>> _admins = [];
-  int? _selectedAdminId;
-  bool adminLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeData();
-  }
-
-  Future<void> _initializeData() async {
-    await _loadUserRole();
-    await _loadRoles();
-    await _loadAdmins();
-  }
-
-  Future<void> _loadAdmins() async {
-    setState(() => adminLoading = true);
-
-    final res = await ApiService.getAdmins();
-
-    if (!mounted) return;
-    setState(() {
-      adminLoading = false;
-
-      if (res["success"] == true && res["admins"] != null) {
-        _admins = List<Map<String, dynamic>>.from(res["admins"]);
-        _selectedAdminId = null;
-      } else {
-        _admins = [];
-        _selectedAdminId = null;
-      }
-    });
-  }
-
-  Future<void> _loadUserRole() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userName = prefs.getString("name") ?? "Employee";
-      _currentUserRole = prefs.getString("role")?.toLowerCase();
-    });
-  }
-
-  Future<void> _loadRoles() async {
-    setState(() => roleLoading = true);
-
-    String? loggedRole = _currentUserRole;
-    if (loggedRole == null) {
-      loggedRole = await ApiService.getCurrentUserRole();
-      if (loggedRole != null) {
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString("role", loggedRole);
-        setState(() => _currentUserRole = loggedRole);
-      }
-    }
-
-    final res = await ApiService.getRoles();
-
-    if (!mounted) return;
-    setState(() {
-      roleLoading = false;
-
-      if (res["success"] == true && res["data"] != null) {
-        _roles = List<Map<String, dynamic>>.from(res["data"]);
-
-        // Filter roles based on logged-in role
-        final roleLower = (loggedRole ?? "").toLowerCase();
-
-        if (roleLower == "superadmin") {
-          // Show only admin (or admin + employee if you want)
-          _roles = _roles.where((r) {
-            final roleName = (r["RoleName"] ?? "").toString().toLowerCase();
-            return roleName == "admin" || roleName == "employee";
-          }).toList();
-        } else if (roleLower == "admin") {
-          // Show only employee
-          _roles = _roles
-              .where((r) => (r["RoleName"] ?? "").toString().toLowerCase() == "employee")
-              .toList();
-        } else {
-          // no roles for employees
-          _roles = [];
-        }
-        // Set default selection if roles exist
-        if (_roles.isNotEmpty) {
-          _selectedRoleId = _roles.first["RoleId"];
-        } else {
-          _selectedRoleId = null;
-        }
-      } else {
-        _roles = [];
-        _selectedRoleId = null;
-      }
-    });
-  }
-
-  Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedRoleId == null) {
-      CustomSnackBar.error("Please select a role");
-      return;
-    }
-
-    setState(() => _loading = true);
-    // First check if email exists in authorized list
-    // final emailCheck = await ApiService.checkEmailExists(_email.text.trim());
-    // if (!mounted) return;
-
-    // if (emailCheck["success"] != true) {
-    //   setState(() => _loading = false);
-    //   ScaffoldMessenger.of(
-    //     context,
-    //   ).showSnackBar(SnackBar(content: Text(emailCheck["error"] ?? "Email check failed")));
-    //   return;
-    // }
-
-    // if (emailCheck["emailExists"] == false) {
-    //   setState(() => _loading = false);
-    //   Get.snackbar(
-    //     "Email not authorized",
-    //     "Please contact administrator.",
-    //     backgroundColor: Colors.red,
-    //     colorText: Colors.white,
-    //   );
-
-    //   return;
-    // }
-    if ((_currentUserRole?.toLowerCase() == 'superadmin' &&
-            _roles.firstWhere((r) => r["RoleId"] == _selectedRoleId)["RoleName"].toLowerCase() ==
-                'employee') &&
-        _selectedAdminId == null) {
-      CustomSnackBar.error("Please select an Admin to assign the Employee");
-      return;
-    }
-    final res = await ApiService.registerEmployee(
-      _name.text.trim(),
-      _email.text.trim(),
-      _password.text.trim(),
-      _selectedRoleId!,
-      mobile: _mobile.text.trim().isNotEmpty ? _mobile.text.trim() : null,
-      // reportingId: _selectedAdminId,
-      reportingId:
-          (_currentUserRole?.toLowerCase() == 'superadmin' &&
-              _roles.firstWhere((r) => r["RoleId"] == _selectedRoleId)["RoleName"].toLowerCase() ==
-                  'employee')
-          ? _selectedAdminId
-          : null,
-    );
-
-    if (!mounted) return;
-    setState(() => _loading = false);
-
-    if (res["success"] == true) {
-      CustomSnackBar.success("added successfully!");
-      Navigator.pop(context);
-    } else {
-      final error = res["error"] ?? "Failed to add employee";
-      CustomSnackBar.error("$error");
-    }
-  }
+  final RegisterController registerController = Get.put(RegisterController());
 
   @override
   Widget build(BuildContext context) {
@@ -225,122 +48,141 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: EdgeInsets.all(16.w),
             child: Column(
               children: [
-                Card(
-                  color: ThemeClass.darkCardColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                  elevation: 4,
-                  shadowColor: Colors.white54,
+                Obx(
+                  () => Card(
+                    color: ThemeClass.darkCardColor,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                    elevation: 4,
+                    shadowColor: Colors.white54,
 
-                  child: Padding(
-                    padding: EdgeInsets.all(12.w),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Icon(Icons.person, color: ThemeClass.lightBgColor),
-                        // SizedBox(width: 15.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              userName?.toUpperCase() ?? 'Unknown',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              "Logged in as: ${_currentUserRole?.toUpperCase() ?? 'Unknown'}",
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Text(
-                              "You can add: ${_currentUserRole == "superadmin"
-                                  ? "Admin / Employees"
-                                  : _currentUserRole == "admin"
-                                  ? "Employees"
-                                  : "No permission"}",
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey[400],
-                                fontWeight: FontWeight.w400,
-                                fontStyle: FontStyle.italic,
+                    child: Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Icon(Icons.person, color: ThemeClass.lightBgColor),
+                          // SizedBox(width: 15.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                registerController.userName.value.toUpperCase(),
+                                style: Theme.of(context).textTheme.titleLarge,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              SizedBox(height: 4.h),
+                              Text(
+                                "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Text(
+                                "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
+                                    ? "Hr / Accountant / Manager"
+                                    : registerController.currentUserRole.value.toLowerCase() == "hr"
+                                    ? "Employees"
+                                    : "No permission"}",
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.grey[400],
+                                  fontWeight: FontWeight.w400,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 Form(
-                  key: _formKey,
+                  key: registerController.formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(height: 16.h),
-                      CustomDropdownField<int>(
-                        isLoading: roleLoading,
-                        labelText: "Select Role",
-                        isRequired: true,
-                        hintText: "Select Role",
-                        prefixIcon: Icons.work,
-                        items: _roles,
-                        valueKey: "RoleId",
-                        labelKey: "RoleName",
-                        value: _selectedRoleId,
-                        isEnabled: true,
-                        onChanged: (value) async {
-                          setState(() {
-                            _selectedRoleId = value;
-                          });
+                      Obx(
+                        () => CustomDropdownField<int>(
+                          isLoading: registerController.roleLoading.value,
+                          labelText: "Select Role",
+                          isRequired: true,
+                          hintText: "Select Role",
+                          prefixIcon: Icons.work,
+                          items: registerController.roles,
+                          valueKey: "RoleId",
+                          labelKey: "RoleName",
+                          value: registerController.selectedRoleId.value,
+                          isEnabled: true,
+                          onChanged: (value) async {
+                            registerController.selectedRoleId.value = value;
 
-                          final selectedRole = _roles.firstWhere(
-                            (r) => r["RoleId"] == value,
-                            orElse: () => {},
-                          );
+                            final selectedRole = registerController.roles.firstWhere(
+                              (r) => r["RoleId"] == value,
+                              orElse: () => {},
+                            );
 
-                          if ((_currentUserRole ?? '').toLowerCase() == 'superadmin' &&
-                              (selectedRole["RoleName"] ?? '').toLowerCase() == 'employee') {
-                            await _loadAdmins();
-                          } else {
-                            setState(() {
-                              _admins = [];
-                              _selectedAdminId = null;
-                            });
-                          }
-                        },
+                            final selectedRoleName = (selectedRole["RoleName"] ?? "")
+                                .toString()
+                                .toLowerCase();
+
+                            final currentRole = registerController.currentUserRole.value
+                                .toLowerCase();
+
+                            if (currentRole == "hr") {
+                              if (selectedRoleName == "admin") {
+                                await registerController.loadSuperAdmins();
+                              } else if (selectedRoleName == "employee") {
+                                await registerController.loadAdminsAndSuperAdmins();
+                              }
+                            }
+                          },
+
+                        ),
                       ),
                       SizedBox(height: 10.h),
                       // select admin
-                      if ((_currentUserRole ?? '').toLowerCase() == 'superadmin' &&
-                          _roles.any(
-                            (r) =>
-                                r["RoleId"] == _selectedRoleId &&
-                                (r["RoleName"] ?? '').toLowerCase() == 'employee',
-                          )) ...[
-                        CustomDropdownField<int>(
-                          isLoading: adminLoading,
-                          labelText: "Employee Assing to",
+                      Obx(() {
+                        final currentRole = registerController.currentUserRole.value.toLowerCase();
+
+                        final selectedRole = registerController.roles.firstWhere(
+                          (r) => r["RoleId"] == registerController.selectedRoleId.value,
+                          orElse: () => {},
+                        );
+
+                        final selectedRoleName = (selectedRole["RoleName"] ?? "")
+                            .toString()
+                            .toLowerCase();
+
+                        final showAssignDropdown =
+                            currentRole == "hr" &&
+                            (selectedRoleName == "admin" || selectedRoleName == "employee");
+
+                        if (!showAssignDropdown) return const SizedBox();
+
+                        return CustomDropdownField<int>(
+                          isLoading: registerController.adminLoading.value,
+                          labelText: "Assign To",
                           isRequired: true,
-                          hintText: "Select Admin",
+                          hintText: "Select Reporting Person",
                           prefixIcon: Icons.admin_panel_settings,
-                          items: _admins,
+                          items: registerController.admins,
                           valueKey: "ID",
                           labelKey: "Name",
-                          value: _selectedAdminId,
+                          value: registerController.selectedAdminId.value,
                           isEnabled: true,
-                          onChanged: (value) async {
-                            setState(() {
-                              _selectedAdminId = value;
-                            });
+                          onChanged: (value) {
+                            registerController.selectedAdminId.value = value;
                           },
-                        ),
-                      ],
+                        );
+                      }),
+
                       // Dropdown for Role
                       // dropDownList(context),
-                      SizedBox(height: 0.h),
+                      SizedBox(height: 10.h),
                       CustomTextField(
                         labelText: "Employee Name",
                         isRequired: true,
                         hintText: "Enter name",
                         prefixIcon: Icons.person,
-                        controller: _name,
+                        controller: registerController.name,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return "Name cannot be empty";
@@ -358,7 +200,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         hintText: "Enter email",
                         prefixIcon: Icons.email,
                         keyboardType: TextInputType.emailAddress,
-                        controller: _email,
+                        controller: registerController.email,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter email';
@@ -381,7 +223,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         hintText: "Enter number (Optional)",
                         prefixIcon: Icons.phone,
                         keyboardType: TextInputType.number,
-                        controller: _mobile,
+                        controller: registerController.mobile,
                         maxLength: 10,
                       ),
                       SizedBox(height: 0.h),
@@ -391,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         hintText: "Enter password",
                         prefixIcon: Icons.lock,
                         keyboardType: TextInputType.emailAddress,
-                        controller: _password,
+                        controller: registerController.password,
                         isObscure: true,
                         maxLength: 10,
                         validator: (value) {
@@ -405,7 +247,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
                       SizedBox(height: 10.h),
-                      CustomButton(text: "Submit", onPressed: _register, isLoading: _loading),
+                      Obx(
+                        () => CustomButton(
+                          text: "Submit",
+                          onPressed: registerController.register,
+                          isLoading: registerController.loading.value,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -418,7 +266,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget dropDownList(BuildContext context) {
-    if (roleLoading) {
+    if (registerController.roleLoading.value) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         alignment: Alignment.center,
@@ -439,16 +287,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return DropdownButtonFormField2<int>(
       isExpanded: true,
-      value: _selectedRoleId,
-      items: _roles
+      value: registerController.selectedRoleId.value,
+      items: registerController.roles.value
           .map(
             (role) => DropdownMenuItem<int>(value: role["RoleId"], child: Text(role["RoleName"])),
           )
           .toList(),
       onChanged: (value) {
-        setState(() {
-          _selectedRoleId = value;
-        });
+        registerController.selectedRoleId.value = value;
       },
       decoration: InputDecoration(
         hintText: "Select Role*",

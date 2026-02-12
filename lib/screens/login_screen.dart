@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_mate/controllers/auth/login_controller.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/services/api_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
-import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,141 +13,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _password = TextEditingController();
-  bool _loading = false;
-
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
-
-    _controller.repeat(reverse: true);
-
-    _autoFillDemoCredentials();
-  }
-
-  // ✅ Auto-fill for testing
-  void _autoFillDemoCredentials() {
-    _email.text = "deepak.kadam@5nance.com";
-    _password.text = "admin\$123";
-  }
-
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _loading = true);
-
-    // ✅ Check internet before hitting API
-    if (!await ApiService.hasInternetConnection()) {
-      setState(() => _loading = false);
-      CustomSnackBar.info("No Internet-Please check your connection");
-      // Get.snackbar(
-      //   "No Internet",
-      //   "Please check your connection",
-      //   backgroundColor: Colors.red,
-      //   colorText: Colors.white,
-      // );
-      return;
-    }
-
-    try {
-      final res = await ApiService.login(_email.text.trim(), _password.text.trim());
-      if (!mounted) return;
-
-      setState(() => _loading = false);
-
-      if (res["success"] == true && res["token"] != null) {
-        final user = res["user"];
-        if (user == null) throw Exception("User data missing");
-
-        final role = (user?["role"] ?? user["RoleName"] ?? "").toString().toLowerCase();
-        final userId = user["id"] ?? user["ID"];
-
-        if (role.isEmpty || userId == null) throw Exception("Invalid user data");
-
-        // ✅ Persist session
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", res["token"]);
-        await prefs.setString("role", role);
-        await prefs.setInt("userId", userId);
-
-        // ✅ Enhanced role-based navigation
-        switch (role) {
-          case "superadmin":
-          case "admin":
-            Get.offNamed('/adminDashboard');
-            break;
-          case "employee":
-            Get.offNamed('/homeScreen');
-            break;
-          default:
-            await prefs.clear();
-            Get.offNamed('/login');
-            return;
-        }
-
-        // ✅ Show welcome message
-        CustomSnackBar.show(
-          message: "Welcome ${user['name'] ?? 'User'}!",
-          backgroundColor: Colors.green,
-          icon: Icons.verified_user,
-        );
-      } else {
-        final errorMsg = res["error"] ?? "Unable to login. Please try again.";
-        CustomSnackBar.error("$errorMsg");
-      }
-    } catch (e) {
-      setState(() => _loading = false);
-      CustomSnackBar.error("Unable to connect to server. Please try again later.");
-    }
-  }
-
-  // Email validation
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Email is required";
-    }
-    if (!value.endsWith("@5nance.com")) {
-      return "Only @5nance.com emails allowed";
-    }
-    if (!RegExp(r'^[\w-\.]+@5nance\.com$').hasMatch(value)) {
-      return "Enter a valid email address";
-    }
-    return null;
-  }
-
-  // Password validation
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Password is required";
-    }
-    if (value.length < 6) {
-      return "Password must be at least 6 characters";
-    }
-    return null;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
-  }
+class _LoginScreenState extends State<LoginScreen> {
+  final LoginController loginController = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -163,18 +28,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               SizedBox(height: 50.h),
               // Animated Logo
               SlideTransition(
-                position: _slideAnimation,
+                position: loginController.slideAnimation,
                 child: FadeTransition(
-                  opacity: _fadeAnimation,
+                  opacity: loginController.fadeAnimation,
                   child: Column(
                     children: [
                       Icon(Icons.assignment_turned_in_outlined, size: 40.sp, color: Colors.white),
                       SizedBox(height: 10.h),
-                      Text(
-                        "Task Mate",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      
-                      ),
+                      Text("Task Mate", style: Theme.of(context).textTheme.bodySmall),
                       Text(
                         "Employee Task Management",
                         style: Theme.of(context).textTheme.titleMedium,
@@ -196,13 +57,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 child: Padding(
                   padding: EdgeInsets.all(14.w),
                   child: Form(
-                    key: _formKey,
+                    key: loginController.formKey,
                     child: Column(
                       children: [
-                        Text(
-                          "Access Account",
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
+                        Text("Access Account", style: Theme.of(context).textTheme.bodySmall),
                         SizedBox(height: 20.h),
                         CustomTextField(
                           isEnabled: true,
@@ -211,8 +69,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           hintText: "Enter username Id",
                           prefixIcon: Icons.email,
                           keyboardType: TextInputType.emailAddress,
-                          controller: _email,
-                          validator: _validateEmail,
+                          controller: loginController.email.value,
+                          validator: loginController.validateEmail,
                         ),
                         SizedBox(height: 20.h),
                         CustomTextField(
@@ -220,57 +78,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           isRequired: true,
                           hintText: "Enter password",
                           prefixIcon: Icons.lock,
-                          controller: _password,
+                          controller: loginController.password.value,
                           isObscure: true,
-                          validator: _validatePassword,
+                          validator: loginController.validatePassword,
                         ),
-
                         SizedBox(height: 30.h),
-
                         //  Login Button
-                        CustomButton(text: "Login", onPressed: _login, isLoading: _loading),
-
-                        // const SizedBox(height: 10),
-                        // GestureDetector(
-                        //   onTap: () {
-                        //     Get.toNamed(Routes.forgotPasswordPage);
-                        //   },
-                        //   child: Row(
-                        //     children: [
-                        //       SizedBox(width: 8),
-                        //       Text(
-                        //         "Forgot password?",
-                        //         style: TextStyle(
-                        //           color: Theme.of(context).primaryColor,
-                        //           fontWeight: FontWeight.w500,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
+                        CustomButton(
+                          text: "Login",
+                          onPressed: loginController.login,
+                          isLoading: loginController.loading.value,
+                        ),
                         SizedBox(height: 20.h),
-
-                        // ✅ Demo Credentials Hint
-                        // Container(
-                        //   padding: EdgeInsets.all(12),
-                        //   decoration: BoxDecoration(
-                        //     color: Colors.blueAccent.withOpacity(0.1),
-                        //     borderRadius: BorderRadius.circular(8),
-                        //     border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
-                        //   ),
-                        //   child: Row(
-                        //     children: [
-                        //       Icon(Icons.info, color: Colors.blueAccent, size: 16),
-                        //       SizedBox(width: 8),
-                        //       Expanded(
-                        //         child: Text(
-                        //           "Demo credentials pre-filled for testing",
-                        //           style: TextStyle(color: Colors.blueAccent, fontSize: 12),
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),

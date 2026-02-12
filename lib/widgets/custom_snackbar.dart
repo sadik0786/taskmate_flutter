@@ -24,11 +24,11 @@ class CustomSnackBar {
       snackPosition: SnackPosition.TOP,
       backgroundColor:
           backgroundColor ?? (isDark ? ThemeClass.darkCardColor : ThemeClass.lightCardColor),
-      colorText: isDark ? ThemeClass.textWhite : ThemeClass.textBlack,
+      colorText: isDark ? ThemeClass.textWhite : ThemeClass.textWhite,
       margin: const EdgeInsets.all(12),
       borderRadius: 12,
       duration: Duration(seconds: durationInSeconds),
-      icon: Icon(icon, color: isDark ? ThemeClass.textWhite : ThemeClass.textBlack),
+      icon: Icon(icon, color: isDark ? ThemeClass.textWhite : ThemeClass.textWhite),
       shouldIconPulse: true,
     );
   }

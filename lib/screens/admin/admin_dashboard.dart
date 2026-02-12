@@ -43,6 +43,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   List<_DashboardItem> _getMenuItems() {
+    if (role == "ceo" || role == "hr") {
+      return [
+        _DashboardItem(
+          title: 'Add Employee',
+          icon: Icons.person_add,
+          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
+          onTap: () {
+            Get.toNamed(Routes.registerScreen);
+          },
+        ),
+        _DashboardItem(
+          title: 'Employee',
+          icon: Icons.people,
+          gradient: [Colors.greenAccent.shade400, Colors.greenAccent.shade200],
+          onTap: () {
+            Get.toNamed(Routes.employeeScreen);
+          },
+        ),
+        _DashboardItem(
+          title: 'My Profile',
+          icon: Icons.account_circle,
+          gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade100],
+          onTap: () {
+            Get.toNamed(Routes.profileScreen);
+          },
+        ),
+      ];
+    }
     if (role == "superadmin") {
       return [
         _DashboardItem(
@@ -174,11 +202,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         child: Container(
           decoration: const BoxDecoration(
             color: ThemeClass.darkBgColor,
-            // gradient: LinearGradient(
-            //   colors: [Color(0x60121212), Color(0x20121212)],
-            //   begin: Alignment.bottomRight,
-            //   end: Alignment.topLeft,
-            // ),
           ),
           child: Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 20.h),

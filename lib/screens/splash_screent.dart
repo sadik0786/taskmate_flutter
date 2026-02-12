@@ -93,10 +93,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       // Navigate based on role
       final role = (user["RoleName"] ?? "").toLowerCase();
       switch (role) {
-        case "superadmin":
-        case "admin":
+        case "ceo":
+        case "hr":
           Get.offNamed('/adminDashboard');
           break;
+        case "superadmin":
+        case "admin":
         case "employee":
           Get.offNamed('/homeScreen');
           break;

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/screens/hrms/widgets/add_employee.dart';
 import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
 import 'package:task_mate/screens/hrms/widgets/apply_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/approve_leave.dart';
@@ -103,7 +102,6 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
             const ApplyLeave(),
             if (role == "hr" || role == "superadmin") ...[
               const ApproveLeave(),
-              const AddEmployee(),
               const AllEmployee(),
             ],
           ],
