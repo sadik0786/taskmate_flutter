@@ -5,8 +5,8 @@ class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
-  final Color? txtColor;
   final Color? backgroundColor;
+  final Color? txtColor;
   final double borderRadius;
   final EdgeInsetsGeometry? padding;
   final IconData? icon;
@@ -18,13 +18,13 @@ class CustomButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.isLoading = false,
-    this.txtColor,
     this.backgroundColor,
+    this.txtColor,
     this.borderRadius = 12,
     this.padding,
     this.icon,
     this.iconColor,
-    this.iconSize = 22,
+    this.iconSize = 20,
   });
 
   @override
@@ -35,32 +35,26 @@ class CustomButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
+      child: FilledButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: padding ?? EdgeInsets.symmetric(vertical: 14.h),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius.r)),
+        style: FilledButton.styleFrom(
           backgroundColor: btnColor,
-          disabledBackgroundColor: btnColor.withOpacity(0.6),
+          foregroundColor: textColor,
+          disabledBackgroundColor: btnColor.withOpacity(0.5),
+          padding: padding ?? EdgeInsets.symmetric(vertical: 16.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius.r),
+          ),
+          minimumSize: Size.fromHeight(50.h),
         ),
         child: isLoading
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: CircularProgressIndicator(
-                      color: theme.colorScheme.onPrimary,
-                      strokeWidth: 2.w,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Text(
-                    "Loading...",
-                    style: TextStyle(fontSize: 18.sp, color: textColor),
-                  ),
-                ],
+            ? SizedBox(
+                width: 24.w,
+                height: 24.w,
+                child: CircularProgressIndicator(
+                  color: textColor,
+                  strokeWidth: 2.w,
+                ),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -73,9 +67,10 @@ class CustomButton extends StatelessWidget {
                   Text(
                     text,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                       color: textColor,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],

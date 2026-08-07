@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/theme.dart';
 
+import 'package:flutter/foundation.dart';
+
 class AppConstants {
-  static const int transitionDuration = 320;
-  static const Transition transition = Transition.rightToLeft;
+  static const int transitionDuration = kIsWeb ? 0 : 320;
+  static const Transition transition = kIsWeb ? Transition.noTransition : Transition.rightToLeft;
 
   static List<BoxShadow> boxShadow = [
     const BoxShadow(color: Color.fromARGB(25, 0, 0, 0), blurRadius: 3, offset: Offset(2, 2)),

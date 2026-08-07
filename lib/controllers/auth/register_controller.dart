@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/model/auth/register_request_model.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/auth_service.dart';
+import 'package:task_mate/services/user_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class RegisterController extends GetxController {
@@ -53,7 +54,7 @@ class RegisterController extends GetxController {
     adminLoading.value = true;
 
     try {
-      final res = await ApiService.getAdmins();
+      final res = await UserService.getAdmins();
 
       adminLoading.value = false;
 
@@ -83,7 +84,7 @@ class RegisterController extends GetxController {
     try {
       String? loggedRole = currentUserRole.value;
       if (loggedRole.isEmpty) {
-        loggedRole = await ApiService.getCurrentUserRole();
+        loggedRole = await UserService.getCurrentUserRole();
         if (loggedRole != null) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString("role", loggedRole);
@@ -91,7 +92,7 @@ class RegisterController extends GetxController {
         }
       }
 
-      final res = await ApiService.getRoles();
+      final res = await AuthService.getRoles();
 
       roleLoading.value = false;
 
@@ -140,7 +141,7 @@ class RegisterController extends GetxController {
     admins.clear();
 
     try {
-      final res = await ApiService.getUsersByRole("superadmin");
+      final res = await UserService.getUsersByRole("superadmin");
 
       if (res["success"] == true && res["data"] != null) {
         admins.value = List<Map<String, dynamic>>.from(res["data"]);
@@ -160,7 +161,7 @@ class RegisterController extends GetxController {
     admins.clear();
 
     try {
-      final res = await ApiService.getUsersByRoles(["admin", "superadmin"]);
+      final res = await UserService.getUsersByRoles(["admin", "superadmin"]);
 
       if (res["success"] == true && res["data"] != null) {
         admins.value = List<Map<String, dynamic>>.from(res["data"]);
@@ -211,7 +212,7 @@ class RegisterController extends GetxController {
     );
 
     // ✅ Call API
-    final response = await ApiService.registerEmployee(request);
+    final response = await AuthService.registerEmployee(request);
 
     loading.value = false;
 
@@ -224,3 +225,4 @@ class RegisterController extends GetxController {
     }
   }
 }
+

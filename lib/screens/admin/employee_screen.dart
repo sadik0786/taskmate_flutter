@@ -8,7 +8,8 @@ import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class EmployeeScreen extends StatefulWidget {
   const EmployeeScreen({super.key});
@@ -40,7 +41,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Future<void> _loadEmployees() async {
     setState(() => loading = true);
     try {
-      final data = await ApiService.fetchEmployees();
+      final data = await UserService.fetchEmployees();
       setState(() {
         employees = data;
         loading = false;
@@ -56,28 +57,17 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: ThemeClass.primaryGreen,
-        elevation: 0,
-        title: Text("Employees", style: Theme.of(context).textTheme.titleLarge),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+    return BaseLayout(
+      title: "Employees",
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.back();
+            Get.offAllNamed(Routes.adminDashboard);
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Get.offAllNamed(Routes.adminDashboard);
-            },
-          ),
-        ],
-      ),
-      body: loading
+      ],
+      child: loading
           ? const PageLoader()
           : employees.isEmpty
           ? const Center(child: NoTasksWidget(message: "No Employee added"))
@@ -111,7 +101,9 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         children: [
                           BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                            child: Container(color: Colors.black.withOpacity(0)),
+                            child: Container(
+                              color: Colors.black.withOpacity(0),
+                            ),
                           ),
                           Center(
                             child: AlertDialog(
@@ -126,15 +118,20 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 children: [
                                   Text(
                                     "Are you sure you want to delete?🤔",
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                     textAlign: TextAlign.center,
                                   ),
                                   Text(
                                     "👉$name",
-                                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                                      color: ThemeClass.textWhite,
-                                      fontSize: 18,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .copyWith(
+                                          color: ThemeClass.textWhite,
+                                          fontSize: 18,
+                                        ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -145,7 +142,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   onPressed: () => Navigator.pop(ctx, false),
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.grey.shade300,
-                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20.w,
+                                      vertical: 10.h,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.r),
                                     ),
@@ -163,7 +163,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   onPressed: () => Navigator.pop(ctx, true),
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.redAccent,
-                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20.w,
+                                      vertical: 10.h,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.r),
                                     ),
@@ -185,7 +188,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
                     if (confirm == true) {
                       // Call API to delete employee
-                      final success = await ApiService.deleteEmployee(e["ID"]);
+                      final success = await UserService.deleteEmployee(e["ID"]);
                       if (success) {
                         Get.snackbar(
                           "$name",
@@ -224,10 +227,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                       leading: CircleAvatar(
                         radius: 20.r,
                         backgroundColor: ThemeClass.primaryGreen,
-                        backgroundImage: e["ProfileImage"] != null && e["ProfileImage"].isNotEmpty
+                        backgroundImage:
+                            e["ProfileImage"] != null &&
+                                e["ProfileImage"].isNotEmpty
                             ? NetworkImage("${e["ProfileImage"]}")
                             : null,
-                        child: e["ProfileImage"] == null || e["ProfileImage"].isEmpty
+                        child:
+                            e["ProfileImage"] == null ||
+                                e["ProfileImage"].isEmpty
                             ? Text(
                                 name.isNotEmpty ? name[0].toUpperCase() : "?",
                                 style: Theme.of(context).textTheme.titleLarge,
@@ -236,8 +243,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                       ),
                       title: Row(
                         children: [
-                          Text("$name", style: Theme.of(context).textTheme.titleLarge),
-                          Text(" ($role)", style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            "$name",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Text(
+                            " ($role)",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                         ],
                       ),
                       subtitle: Column(
@@ -247,14 +260,19 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                             "Assigned to : ${e["AddedByName"] ?? "Unknown"}",
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          Text(email, style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            email,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                         ],
                       ),
                       onTap: () {
                         Get.toNamed(
                           Routes.employeeTaskScreen,
                           arguments: {
-                "empId": e["ID"], "empName": e["Name"] ?? "Employee"},
+                            "empId": e["ID"],
+                            "empName": e["Name"] ?? "Employee",
+                          },
                         );
                       },
                     ),
@@ -262,10 +280,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                 );
               },
             ),
-
     );
   }
-// list builder old
+
+  // list builder old
   // ListView.builder(
   //               padding: EdgeInsets.all(12.w),
   //               itemCount: employees.length,
@@ -347,7 +365,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   //                         );
   //                         if (confirm == true) {
   //                           // print("Deleting employee: ${e["ID"]}");
-  //                           final success = await ApiService.deleteEmployee(e["ID"]);
+  //                           final success = await UserService.deleteEmployee(e["ID"]);
   //                           // if (!success) {
   //                           //   print("Failed to delete employee ID: ${e["ID"]}");
   //                           // }

@@ -48,7 +48,9 @@ class _DashboardState extends State<Dashboard> {
                   value: leaveController.approvedLeave.value,
                 ),
                 _summaryCard(
-                  title: leaveController.totalApplyLeave.value > 2 ? "Apply Leaves" : "Apply Leave",
+                  title: leaveController.totalApplyLeave.value > 2
+                      ? "Apply Leaves"
+                      : "Apply Leave",
                   icon: Icons.all_inbox,
                   color: Colors.blue,
                   value: leaveController.totalApplyLeave.value,
@@ -59,7 +61,10 @@ class _DashboardState extends State<Dashboard> {
             SizedBox(height: 16.h),
 
             // Leave List
-            Text("My Leave Requests", style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              "My Leave Requests",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
 
             SizedBox(height: 8.h),
 
@@ -85,78 +90,114 @@ class _DashboardState extends State<Dashboard> {
     required String title,
     required int value,
     IconData icon = Icons.calendar_today,
-    Color? color,
+    required Color color,
   }) {
     return Expanded(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
-        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Icon Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(icon, size: 26.sp, color: color ?? Theme.of(context).primaryColor),
-                Text(
-                  value.toString(),
-                  style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return MouseRegion(
+            onEnter: (_) => setState(() as VoidCallback),
+            onExit: (_) => setState(() as VoidCallback),
+            child: AnimatedScale(
+              scale: 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).cardColor,
+                      Theme.of(context).cardColor,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(color: color.withOpacity(0.3), width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-
-            SizedBox(height: 8.h),
-
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w600,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(icon, size: 28.sp, color: color),
+                        ),
+                        Text(
+                          value.toString(),
+                          style: TextStyle(
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   Widget _leaveCard(LeaveRequestModel leave) {
-    Color statusColor = switch (leave.status) {
-      "APPROVED" => Colors.green,
-      "REJECTED" => Colors.red,
-      _ => Colors.orange,
-    };
+    final bool isApproved = leave.status == "APPROVED";
+    final bool isRejected = leave.status == "REJECTED";
+
+    final Color statusColor = isApproved
+        ? Colors.green
+        : isRejected
+        ? Colors.red
+        : Colors.orange;
+
+    final Color bgColor = isApproved
+        ? Colors.green.shade50
+        : isRejected
+        ? Colors.red.shade50
+        : Colors.orange.shade50;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 6.h),
-      padding: EdgeInsets.all(10.w),
+      margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: leave.status == "APPROVED"
-            ? Colors.green.shade100
-            : leave.status == "REJECTED"
-            ? Colors.red.shade100
-            : Colors.orange.shade100,
-        // color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: bgColor, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.white.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -167,36 +208,65 @@ class _DashboardState extends State<Dashboard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                spacing: 15.w,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    leave.leaveTypeName,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
+                  Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isApproved
+                          ? Icons.check_circle
+                          : isRejected
+                          ? Icons.cancel
+                          : Icons.pending,
+                      color: statusColor,
+                      size: 20.sp,
                     ),
                   ),
-                  Text(
-                    '(${leave.totalDays} days)',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  SizedBox(width: 12.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        leave.leaveTypeName,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${leave.totalDays} Days',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30.r),
+                  color: statusColor,
+                  borderRadius: BorderRadius.circular(20.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: statusColor.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Text(
                   leave.status,
                   style: TextStyle(
-                    color: statusColor,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 11.sp,
                   ),
@@ -204,22 +274,45 @@ class _DashboardState extends State<Dashboard> {
               ),
             ],
           ),
-          SizedBox(height: 5.h),
+          Padding(
+            padding: EdgeInsets.only(top: 12.h, bottom: 8.h),
+            child: Divider(color: Colors.grey.shade200, height: 1),
+          ),
           Row(
             children: [
+              Icon(Icons.date_range, size: 16.sp, color: Colors.grey.shade600),
+              SizedBox(width: 8.w),
               Text(
                 "${CommonFn.formatDate(leave.fromDate)} to ${CommonFn.formatDate(leave.toDate)}",
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13.sp),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13.sp,
+                ),
               ),
             ],
           ),
-          SizedBox(height: 5.h),
-          if (leave.reason != null && leave.reason!.isNotEmpty)
-            Text(
-              leave.reason!,
-              textAlign: TextAlign.left,
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13.sp),
+          if (leave.reason != null && leave.reason!.isNotEmpty) ...[
+            SizedBox(height: 8.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.notes, size: 16.sp, color: Colors.grey.shade600),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    leave.reason!,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13.sp,
+                    ),
+                  ),
+                ),
+              ],
             ),
+          ],
         ],
       ),
     );

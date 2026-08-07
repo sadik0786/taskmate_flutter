@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/model/auth/login_request_model.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/base_api_service.dart';
+import 'package:task_mate/services/auth_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
-class LoginController extends GetxController with GetSingleTickerProviderStateMixin {
+class LoginController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<Offset> slideAnimation;
   late Animation<double> fadeAnimation;
@@ -18,14 +20,20 @@ class LoginController extends GetxController with GetSingleTickerProviderStateMi
   @override
   void onInit() {
     super.onInit();
-    animationController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
 
-    slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: animationController, curve: Curves.easeInOut));
+    slideAnimation =
+        Tween<Offset>(begin: const Offset(0, -0.2), end: Offset.zero).animate(
+          CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
+        );
 
-    fadeAnimation = CurvedAnimation(parent: animationController, curve: Curves.easeInOut);
+    fadeAnimation = CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeInOut,
+    );
 
     animationController.repeat(reverse: true);
     _autoFillDemoCredentials();
@@ -74,7 +82,7 @@ class LoginController extends GetxController with GetSingleTickerProviderStateMi
       loading.value = true;
       if (!formKey.currentState!.validate()) return;
       // Check internet before hitting API
-      if (!await ApiService.hasInternetConnection()) {
+      if (!await BaseApiService.hasInternetConnection()) {
         loading.value = false;
         CustomSnackBar.info("No Internet-Please check your connection");
         return;
@@ -83,13 +91,15 @@ class LoginController extends GetxController with GetSingleTickerProviderStateMi
         email: email.value.text.trim(),
         password: password.value.text.trim(),
       );
-      final res = await ApiService.login(request);
+      final res = await AuthService.login(request);
       if (res.success == true && res.token != null) {
         final user = res.user;
         if (user == null) throw Exception("User data missing");
         final role = (user.role ?? user.roleId ?? "").toString().toLowerCase();
         final userId = user.id ?? user.id;
-        if (role.isEmpty || userId == null) throw Exception("Invalid user data");
+        if (role.isEmpty || userId == null) {
+          throw Exception("Invalid user data");
+        }
         // Persist session
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("token", res.token ?? "");
@@ -122,7 +132,9 @@ class LoginController extends GetxController with GetSingleTickerProviderStateMi
       }
     } catch (e) {
       loading.value = false;
-      CustomSnackBar.error("Unable to connect to server. Please try again later.");
+      CustomSnackBar.error(
+        "Unable to connect to server. Please try again later.",
+      );
     } finally {
       loading.value = false;
     }

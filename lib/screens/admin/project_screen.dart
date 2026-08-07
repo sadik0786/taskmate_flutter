@@ -8,11 +8,14 @@ import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/add_task_screen.dart';
 import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/base_api_service.dart';
+import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/services/project_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key});
@@ -42,7 +45,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Future<void> _loadUserRole() async {
-    final res = await ApiService.getCurrentUser();
+    final res = await UserService.getCurrentUser();
     // print("🔍 getCurrentUser response: $res");
 
     if (res["success"] == true && res["user"] != null) {
@@ -63,7 +66,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   Future<void> _loadProjects() async {
     setState(() => _loadingProjects = true);
     try {
-      final res = await ApiService.fetchProjects();
+      final res = await ProjectService.fetchProjects();
       if (!mounted) return;
       setState(() {
         _projects.clear();
@@ -82,7 +85,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
-    final res = await ApiService.addProject(_name.text);
+    final res = await ProjectService.addProject(_name.text);
     if (!mounted) return;
     setState(() => _loading = false);
 
@@ -108,7 +111,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         return;
       }
 
-      final userId = await ApiService.getLoggedInUserId();
+      final userId = await BaseApiService.getLoggedInUserId();
       if (userId == null) {
         CustomSnackBar.error("User not logged in");
         return;
@@ -119,7 +122,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         return;
       }
       final subProjectName = subProjectText.text.trim();
-      final res = await ApiService.addSubProject(
+      final res = await ProjectService.addSubProject(
         projectId: projectId,
         subProjectName: subProjectName,
       );
@@ -144,35 +147,21 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text(
-          userRole == "admin" ? "Manage Projects" : "Add Sub Projects",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+    return BaseLayout(
+      title: userRole == "admin" ? "Manage Projects" : "Add Sub Projects",
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.back();
+            if (userRole == "admin") {
+              Get.offAllNamed(Routes.adminDashboard);
+            } else {
+              Get.offNamed(Routes.homeScreen);
+            }
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              if (userRole == "admin") {
-                Get.offAllNamed(Routes.adminDashboard);
-              } else {
-                Get.offNamed(Routes.homeScreen);
-              }
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
+      ],
+      child: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(20.w),
           child: Form(
@@ -426,3 +415,4 @@ class _ProjectScreenState extends State<ProjectScreen> {
     );
   }
 }
+

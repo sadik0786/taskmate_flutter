@@ -8,6 +8,8 @@ import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/widgets/responsive_layout.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -21,247 +23,285 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text("Add Employee", style: Theme.of(context).textTheme.titleLarge),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+    return BaseLayout(
+      title: "Add Employee",
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.back();
+            Get.offAllNamed(Routes.adminDashboard);
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Get.offAllNamed(Routes.adminDashboard);
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              children: [
-                Obx(
-                  () => Card(
-                    color: ThemeClass.darkCardColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                    elevation: 4,
-                    shadowColor: Colors.white54,
+      ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                children: [
+                  Obx(
+                    () => Card(
+                      color: ThemeClass.darkCardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      elevation: 4,
+                      shadowColor: Colors.white54,
 
-                    child: Padding(
-                      padding: EdgeInsets.all(12.w),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Icon(Icons.person, color: ThemeClass.lightBgColor),
-                          // SizedBox(width: 15.w),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                registerController.userName.value.toUpperCase(),
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Text(
-                                "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
-                                    ? "Hr / Accountant / Manager"
-                                    : registerController.currentUserRole.value.toLowerCase() == "hr"
-                                    ? "Employees"
-                                    : "No permission"}",
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.grey[400],
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.italic,
+                      child: Padding(
+                        padding: EdgeInsets.all(12.w),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Icon(Icons.person, color: ThemeClass.lightBgColor),
+                            // SizedBox(width: 15.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  registerController.userName.value
+                                      .toUpperCase(),
+                                  style: Theme.of(context).textTheme.titleLarge,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                                SizedBox(height: 4.h),
+                                Text(
+                                  "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                Text(
+                                  "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
+                                      ? "Hr / Accountant / Manager"
+                                      : registerController.currentUserRole.value.toLowerCase() == "hr"
+                                      ? "Employees"
+                                      : "No permission"}",
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        color: Colors.grey[400],
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Form(
-                  key: registerController.formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: 16.h),
-                      Obx(
-                        () => CustomDropdownField<int>(
-                          isLoading: registerController.roleLoading.value,
-                          labelText: "Select Role",
-                          isRequired: true,
-                          hintText: "Select Role",
-                          prefixIcon: Icons.work,
-                          items: registerController.roles,
-                          valueKey: "RoleId",
-                          labelKey: "RoleName",
-                          value: registerController.selectedRoleId.value,
-                          isEnabled: true,
-                          onChanged: (value) async {
-                            registerController.selectedRoleId.value = value;
-
-                            final selectedRole = registerController.roles.firstWhere(
-                              (r) => r["RoleId"] == value,
-                              orElse: () => {},
-                            );
-
-                            final selectedRoleName = (selectedRole["RoleName"] ?? "")
-                                .toString()
-                                .toLowerCase();
-
-                            final currentRole = registerController.currentUserRole.value
-                                .toLowerCase();
-
-                            if (currentRole == "hr") {
-                              if (selectedRoleName == "admin") {
-                                await registerController.loadSuperAdmins();
-                              } else if (selectedRoleName == "employee") {
-                                await registerController.loadAdminsAndSuperAdmins();
-                              }
-                            }
-                          },
-
+                  Form(
+                    key: registerController.formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: 16.h),
+                        if (ResponsiveLayout.isDesktop(context))
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _buildRoleDropdown()),
+                              SizedBox(width: 16.w),
+                              Expanded(child: _buildAssignDropdown()),
+                            ],
+                          )
+                        else ...[
+                          _buildRoleDropdown(),
+                          SizedBox(height: 10.h),
+                          _buildAssignDropdown(),
+                        ],
+                        SizedBox(height: 10.h),
+                        if (ResponsiveLayout.isDesktop(context))
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _buildNameField()),
+                              SizedBox(width: 16.w),
+                              Expanded(child: _buildEmailField()),
+                            ],
+                          )
+                        else ...[
+                          _buildNameField(),
+                          SizedBox(height: 10.h),
+                          _buildEmailField(),
+                        ],
+                        SizedBox(height: 10.h),
+                        if (ResponsiveLayout.isDesktop(context))
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _buildMobileField()),
+                              SizedBox(width: 16.w),
+                              Expanded(child: _buildPasswordField()),
+                            ],
+                          )
+                        else ...[
+                          _buildMobileField(),
+                          SizedBox(height: 10.h),
+                          _buildPasswordField(),
+                        ],
+                        SizedBox(height: 20.h),
+                        Obx(
+                          () => CustomButton(
+                            text: "Submit",
+                            onPressed: registerController.register,
+                            isLoading: registerController.loading.value,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10.h),
-                      // select admin
-                      Obx(() {
-                        final currentRole = registerController.currentUserRole.value.toLowerCase();
-
-                        final selectedRole = registerController.roles.firstWhere(
-                          (r) => r["RoleId"] == registerController.selectedRoleId.value,
-                          orElse: () => {},
-                        );
-
-                        final selectedRoleName = (selectedRole["RoleName"] ?? "")
-                            .toString()
-                            .toLowerCase();
-
-                        final showAssignDropdown =
-                            currentRole == "hr" &&
-                            (selectedRoleName == "admin" || selectedRoleName == "employee");
-
-                        if (!showAssignDropdown) return const SizedBox();
-
-                        return CustomDropdownField<int>(
-                          isLoading: registerController.adminLoading.value,
-                          labelText: "Assign To",
-                          isRequired: true,
-                          hintText: "Select Reporting Person",
-                          prefixIcon: Icons.admin_panel_settings,
-                          items: registerController.admins,
-                          valueKey: "ID",
-                          labelKey: "Name",
-                          value: registerController.selectedAdminId.value,
-                          isEnabled: true,
-                          onChanged: (value) {
-                            registerController.selectedAdminId.value = value;
-                          },
-                        );
-                      }),
-
-                      // Dropdown for Role
-                      // dropDownList(context),
-                      SizedBox(height: 10.h),
-                      CustomTextField(
-                        labelText: "Employee Name",
-                        isRequired: true,
-                        hintText: "Enter name",
-                        prefixIcon: Icons.person,
-                        controller: registerController.name,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return "Name cannot be empty";
-                          }
-                          if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value.trim())) {
-                            return "Name must contain only letters";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomTextField(
-                        labelText: "Employee Email",
-                        isRequired: true,
-                        hintText: "Enter email",
-                        prefixIcon: Icons.email,
-                        keyboardType: TextInputType.emailAddress,
-                        controller: registerController.email,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter email';
-                          }
-                          if (!value.endsWith('@5nance.com')) {
-                            return 'Only @5nance.com emails are allowed';
-                          }
-                          if (!RegExp(
-                            r"^[a-zA-Z][a-zA-Z0-9._-]*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$",
-                          ).hasMatch(value.trim())) {
-                            return "Enter a valid email address";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomTextField(
-                        labelText: "Employee Number",
-                        isRequired: false,
-                        hintText: "Enter number (Optional)",
-                        prefixIcon: Icons.phone,
-                        keyboardType: TextInputType.number,
-                        controller: registerController.mobile,
-                        maxLength: 10,
-                      ),
-                      SizedBox(height: 0.h),
-                      CustomTextField(
-                        labelText: "Employee Password",
-                        isRequired: true,
-                        hintText: "Enter password",
-                        prefixIcon: Icons.lock,
-                        keyboardType: TextInputType.emailAddress,
-                        controller: registerController.password,
-                        isObscure: true,
-                        maxLength: 10,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return "Password cannot be empty";
-                          }
-                          if (value.length < 6) {
-                            return "Password must be at least 6 characters";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 10.h),
-                      Obx(
-                        () => CustomButton(
-                          text: "Submit",
-                          onPressed: registerController.register,
-                          isLoading: registerController.loading.value,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRoleDropdown() {
+    return Obx(
+      () => CustomDropdownField<int>(
+        isLoading: registerController.roleLoading.value,
+        labelText: "Select Role",
+        isRequired: true,
+        hintText: "Select Role",
+        prefixIcon: Icons.work,
+        items: registerController.roles,
+        valueKey: "RoleId",
+        labelKey: "RoleName",
+        value: registerController.selectedRoleId.value,
+        isEnabled: true,
+        onChanged: (value) async {
+          registerController.selectedRoleId.value = value;
+          final selectedRole = registerController.roles.firstWhere(
+            (r) => r["RoleId"] == value,
+            orElse: () => {},
+          );
+          final selectedRoleName = (selectedRole["RoleName"] ?? "")
+              .toString()
+              .toLowerCase();
+          final currentRole = registerController.currentUserRole.value
+              .toLowerCase();
+          if (currentRole == "hr") {
+            if (selectedRoleName == "admin") {
+              await registerController.loadSuperAdmins();
+            } else if (selectedRoleName == "employee") {
+              await registerController.loadAdminsAndSuperAdmins();
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildAssignDropdown() {
+    return Obx(() {
+      final currentRole = registerController.currentUserRole.value
+          .toLowerCase();
+      final selectedRole = registerController.roles.firstWhere(
+        (r) => r["RoleId"] == registerController.selectedRoleId.value,
+        orElse: () => {},
+      );
+      final selectedRoleName = (selectedRole["RoleName"] ?? "")
+          .toString()
+          .toLowerCase();
+      final showAssignDropdown =
+          currentRole == "hr" &&
+          (selectedRoleName == "admin" || selectedRoleName == "employee");
+      if (!showAssignDropdown) return const SizedBox();
+      return CustomDropdownField<int>(
+        isLoading: registerController.adminLoading.value,
+        labelText: "Assign To",
+        isRequired: true,
+        hintText: "Select Reporting Person",
+        prefixIcon: Icons.admin_panel_settings,
+        items: registerController.admins,
+        valueKey: "ID",
+        labelKey: "Name",
+        value: registerController.selectedAdminId.value,
+        isEnabled: true,
+        onChanged: (value) {
+          registerController.selectedAdminId.value = value;
+        },
+      );
+    });
+  }
+
+  Widget _buildNameField() {
+    return CustomTextField(
+      labelText: "Employee Name",
+      isRequired: true,
+      hintText: "Enter name",
+      prefixIcon: Icons.person,
+      controller: registerController.name,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return "Name cannot be empty";
+        }
+        if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value.trim())) {
+          return "Name must contain only letters";
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildEmailField() {
+    return CustomTextField(
+      labelText: "Employee Email",
+      isRequired: true,
+      hintText: "Enter email",
+      prefixIcon: Icons.email,
+      keyboardType: TextInputType.emailAddress,
+      controller: registerController.email,
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Please enter email';
+        if (!value.endsWith('@5nance.com')) {
+          return 'Only @5nance.com emails are allowed';
+        }
+        if (!RegExp(
+          r"^[a-zA-Z][a-zA-Z0-9._-]*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$",
+        ).hasMatch(value.trim())) {
+          return "Enter a valid email address";
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildMobileField() {
+    return CustomTextField(
+      labelText: "Employee Number",
+      isRequired: false,
+      hintText: "Enter number (Optional)",
+      prefixIcon: Icons.phone,
+      keyboardType: TextInputType.number,
+      controller: registerController.mobile,
+      maxLength: 10,
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return CustomTextField(
+      labelText: "Employee Password",
+      isRequired: true,
+      hintText: "Enter password",
+      prefixIcon: Icons.lock,
+      keyboardType: TextInputType.emailAddress,
+      controller: registerController.password,
+      isObscure: true,
+      maxLength: 10,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return "Password cannot be empty";
+        }
+        if (value.length < 6) return "Password must be at least 6 characters";
+        return null;
+      },
     );
   }
 
@@ -288,9 +328,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return DropdownButtonFormField2<int>(
       isExpanded: true,
       value: registerController.selectedRoleId.value,
-      items: registerController.roles.value
+      items: registerController.roles
           .map(
-            (role) => DropdownMenuItem<int>(value: role["RoleId"], child: Text(role["RoleName"])),
+            (role) => DropdownMenuItem<int>(
+              value: role["RoleId"],
+              child: Text(role["RoleName"]),
+            ),
           )
           .toList(),
       onChanged: (value) {

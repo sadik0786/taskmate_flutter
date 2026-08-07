@@ -5,8 +5,7 @@ import 'package:excel/excel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:task_mate/utils/file_download.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,11 +14,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/page_loader.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/base_api_service.dart';
+import 'package:task_mate/services/auth_service.dart';
+import 'package:task_mate/services/user_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -89,7 +91,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Map<String, dynamic>? userFromServer;
     try {
       // ✅ Try fetching latest user from server
-      userFromServer = (await ApiService.getCurrentUserRole()) as Map<String, dynamic>?;
+      userFromServer =
+          (await UserService.getCurrentUserRole()) as Map<String, dynamic>?;
       if (userFromServer != null) {
         // Update local cache for offline usage
         await prefs.setInt("userId", userFromServer["ID"]);
@@ -115,7 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         localAvatar = File(localPath); // show local picked photo
         avatarUrl = null; // optional: avoid showing old network image
       } else {
-        final avatarPath = userFromServer?["ProfileImage"] ?? prefs.getString("avatarUrl");
+        final avatarPath =
+            userFromServer?["ProfileImage"] ?? prefs.getString("avatarUrl");
         if (avatarPath != null && avatarPath.isNotEmpty) {
           avatarUrl = avatarPath;
         }
@@ -125,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logOut() async {
-    await ApiService.clearToken();
+    await BaseApiService.clearToken();
     if (!mounted) return;
     Get.offAllNamed(Routes.login);
   }
@@ -147,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       CustomSnackBar.success("Profile photo updated");
 
       // Upload to server
-      final url = await ApiService.uploadAvatar(file);
+      final url = await UserService.uploadAvatar(file);
       if (url != null) {
         setState(() {
           avatarUrl = url;
@@ -162,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _updateMobile(String newMobile) async {
     try {
       // 🔹 Call API to update mobile in DB
-      final success = await ApiService.updateMobile(newMobile);
+      final success = await AuthService.updateMobile(newMobile);
 
       if (success) {
         final prefs = await SharedPreferences.getInstance();
@@ -196,11 +200,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           pw.SizedBox(height: 20),
           pw.TableHelper.fromTextArray(
-            headers: ["No", "Project", "Mode", "Title", "Details", "Status", "Start", "End"],
+            headers: [
+              "No",
+              "Project",
+              "Mode",
+              "Title",
+              "Details",
+              "Status",
+              "Start",
+              "End",
+            ],
             data: List.generate(allTasks.length, (i) {
               final t = allTasks[i];
-              final startTime = (t["startTime"] != null && t["startTime"].isNotEmpty)
-                  ? dateFormatter.format(DateTime.parse(t["startTime"]).toLocal())
+              final startTime =
+                  (t["startTime"] != null && t["startTime"].isNotEmpty)
+                  ? dateFormatter.format(
+                      DateTime.parse(t["startTime"]).toLocal(),
+                    )
                   : "";
 
               final endTime = (t["endTime"] != null && t["endTime"].isNotEmpty)
@@ -222,11 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
 
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File("${dir.path}/${userName}_tasks.pdf");
-    await file.writeAsBytes(await pdf.save());
-
-    await OpenFilex.open(file.path);
+    await saveAndLaunchFile(await pdf.save(), "${userName}_tasks.pdf");
   }
 
   // 🔹 Export to Excel
@@ -274,83 +286,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ]);
     }
 
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File("${dir.path}/${userName}_tasks.xlsx");
-    await file.create(recursive: true);
-    await file.writeAsBytes(excel.encode()!);
-
-    await OpenFilex.open(file.path);
+    await saveAndLaunchFile(excel.encode()!, "${userName}_tasks.xlsx");
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: ThemeClass.primaryGreen,
-        elevation: 0,
-        title: Text("My Profile", style: Theme.of(context).textTheme.titleLarge),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Get.back();
+    return BaseLayout(
+      title: "My Profile",
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
+          onPressed: () async {
+            _checkAuthAndNavigate();
           },
         ),
-        // leading: Builder(
-        //   builder: (context) => IconButton(
-        //     icon: const Icon(Icons.menu, color: Colors.white),
-        //     onPressed: () => Scaffold.of(context).openDrawer(),
-        //   ),
-        // ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () async {
-              _checkAuthAndNavigate();
-            },
-          ),
-        ],
-      ),
-      // drawer: Drawer(
-      //   child: ListView(
-      //     padding: EdgeInsets.zero,
-      //     children: [
-      //       DrawerHeader(
-      //         decoration: BoxDecoration(color: ThemeClass.primaryGreen),
-      //         child: Text(
-      //           "Menu",
-      //           style: TextStyle(color: Colors.white, fontSize: 24.sp),
-      //         ),
-      //       ),
-      //       ListTile(
-      //         leading: const Icon(Icons.settings),
-      //         title: const Text("Settings"),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //           // Get.toNamed(Routes.settingsScreen);
-      //         },
-      //       ),
-      //       ListTile(
-      //         leading: const Icon(Icons.info),
-      //         title: const Text("Info"),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //           // Get.toNamed(Routes.notificationsScreen);
-      //         },
-      //       ),
-      //       ListTile(
-      //         leading: const Icon(Icons.logout),
-      //         title: const Text("Logout"),
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //           _logOut();
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // ),
-      body: _isLoading
-          ? PageLoader()
+      ],
+      child: _isLoading
+          ? const PageLoader()
           : Column(
               children: [
                 SizedBox(height: 30.h),
@@ -363,7 +315,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundColor: ThemeClass.primaryGreen,
                       backgroundImage: localAvatar != null
                           ? FileImage(localAvatar!)
-                          : (avatarUrl != null ? NetworkImage(avatarUrl!) : null),
+                          : (avatarUrl != null
+                                ? NetworkImage(avatarUrl!)
+                                : null),
                       child: (localAvatar == null && avatarUrl == null)
                           ? Text(
                               userName != null && userName!.isNotEmpty
@@ -383,14 +337,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: double.infinity,
                   child: Card(
                     color: ThemeClass.tealGreen,
-                    margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 8.h,
+                    ),
                     elevation: 5,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.r),
                       side: BorderSide(color: Colors.white, width: 1.2),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 16.h,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -400,10 +360,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: _buildInfoItem(context, "Mobile", mobile, isMobile: true),
+                                child: _buildInfoItem(
+                                  context,
+                                  "Mobile",
+                                  mobile,
+                                  isMobile: true,
+                                ),
                               ),
                               IconButton(
-                                icon: Icon(Icons.edit, size: 25.sp, color: ThemeClass.warningColor),
+                                icon: Icon(
+                                  Icons.edit,
+                                  size: 25.sp,
+                                  color: ThemeClass.warningColor,
+                                ),
                                 onPressed: _showUpdateMobileBottomSheet,
                               ),
                             ],
@@ -419,14 +388,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: double.infinity,
                   child: Card(
                     color: ThemeClass.tealGreen,
-                    margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 8.h,
+                    ),
                     elevation: 5,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.r),
                       side: BorderSide(color: Colors.white, width: 1.2),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 16.h,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -466,7 +441,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           // Set App Lock PIN Button
                           CustomButton(
                             icon: Icons.lock,
-                            text: _savedPin == null ? "Set App Lock PIN" : "Change App Lock PIN",
+                            text: _savedPin == null
+                                ? "Set App Lock PIN"
+                                : "Change App Lock PIN",
                             onPressed: _showSetPinBottomSheet,
                           ),
                           SizedBox(height: 20.h),
@@ -481,8 +458,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-
-                // Spacer(),
                 SizedBox(height: 20.h),
               ],
             ),
@@ -490,7 +465,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showUpdateMobileBottomSheet() {
-    final TextEditingController controller = TextEditingController(text: mobile);
+    final TextEditingController controller = TextEditingController(
+      text: mobile,
+    );
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -580,12 +557,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w400),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w400),
           ),
           SizedBox(height: 4.h),
           Text(
             displayValue,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -664,7 +645,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          _savedPin == null ? "PIN set successfully!" : "PIN updated successfully!",
+                          _savedPin == null
+                              ? "PIN set successfully!"
+                              : "PIN updated successfully!",
                         ),
                       ),
                     );
@@ -713,3 +696,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

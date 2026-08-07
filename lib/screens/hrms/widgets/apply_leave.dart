@@ -87,7 +87,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
       CustomSnackBar.error("Invalid leave duration");
       return;
     }
-    // final userId = await ApiService.getLoggedInUserId();
+    // final userId = await BaseApiService.getLoggedInUserId();
     final request = LeaveApplyRequestModel(
       // userId: userId!,
       leaveTypeId: selectedLeaveTypeId!,
@@ -282,3 +282,4 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     );
   }
 }
+

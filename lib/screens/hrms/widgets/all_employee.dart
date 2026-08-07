@@ -33,7 +33,6 @@ class AllEmployee extends StatelessWidget {
                       itemCount: userController.allEmployee.length,
                       itemBuilder: (context, index) {
                         final employee = userController.allEmployee[index];
-                        print("hellow ${employee}");
                         return _leaveCard(employee);
                       },
                     ),

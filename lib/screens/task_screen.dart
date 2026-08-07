@@ -1,16 +1,14 @@
-import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:task_mate/utils/file_download.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
 import 'package:intl/intl.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/task_service.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'add_task_screen.dart';
 
@@ -48,7 +46,7 @@ class _TaskScreenState extends State<TaskScreen> {
   Future<void> _loadTasks() async {
     setState(() => isLoading = true);
     try {
-      final data = await ApiService.fetchTasks();
+      final data = await TaskService.fetchTasks();
 
       // print("📊 Total tasks loaded: ${data.length}");
       setState(() {
@@ -82,13 +80,18 @@ class _TaskScreenState extends State<TaskScreen> {
                 taskDate.month == today.month &&
                 taskDate.day == today.day;
           case "week":
-            final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+            final startOfWeek = today.subtract(
+              Duration(days: today.weekday - 1),
+            );
             final endOfWeek = startOfWeek.add(const Duration(days: 6));
-            return taskDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
+            return taskDate.isAfter(
+                  startOfWeek.subtract(const Duration(days: 1)),
+                ) &&
                 taskDate.isBefore(endOfWeek.add(const Duration(days: 1)));
           case "month":
             if (selectedMonth == null || selectedYear == null) return false;
-            return taskDate.year == selectedYear && taskDate.month == selectedMonth;
+            return taskDate.year == selectedYear &&
+                taskDate.month == selectedMonth;
           default:
             return true; // all
         }
@@ -135,7 +138,10 @@ class _TaskScreenState extends State<TaskScreen> {
                         const SizedBox(width: 12),
                         Text(
                           "$tempYear",
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         IconButton(
@@ -152,21 +158,25 @@ class _TaskScreenState extends State<TaskScreen> {
                       child: GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: 12,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 6,
-                          childAspectRatio: 2.2,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 6,
+                              childAspectRatio: 2.2,
+                            ),
                         itemBuilder: (context, index) {
                           final month = index + 1;
-                          final isFutureMonth = (tempYear == currentYear && month > currentMonth);
+                          final isFutureMonth =
+                              (tempYear == currentYear && month > currentMonth);
 
                           return ChoiceChip(
                             label: Text(
                               DateFormat.MMM().format(DateTime(0, month)),
                               style: TextStyle(
-                                color: isFutureMonth ? Colors.grey : Colors.black,
+                                color: isFutureMonth
+                                    ? Colors.grey
+                                    : Colors.black,
                                 fontWeight: tempMonth == month
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -175,7 +185,8 @@ class _TaskScreenState extends State<TaskScreen> {
                             selected: tempMonth == month,
                             onSelected: isFutureMonth
                                 ? null
-                                : (_) => setDialogState(() => tempMonth = month),
+                                : (_) =>
+                                      setDialogState(() => tempMonth = month),
                             selectedColor: Colors.green.shade400,
                             backgroundColor: isFutureMonth
                                 ? Colors.grey.shade300
@@ -194,7 +205,10 @@ class _TaskScreenState extends State<TaskScreen> {
                         const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(ctx, {"month": tempMonth, "year": tempYear});
+                            Navigator.pop(ctx, {
+                              "month": tempMonth,
+                              "year": tempYear,
+                            });
                           },
                           child: const Text("Select"),
                         ),
@@ -307,419 +321,454 @@ class _TaskScreenState extends State<TaskScreen> {
       ]);
     }
 
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File("${dir.path}/${userName}_tasks.xlsx");
-    await file.create(recursive: true);
-    await file.writeAsBytes(excel.encode()!);
-
-    await OpenFilex.open(file.path);
+    await saveAndLaunchFile(excel.encode()!, "${userName}_tasks.xlsx");
   }
 
   @override
   Widget build(BuildContext context) {
-    final monthLabel = (selectedFilter == "month" && selectedMonth != null && selectedYear != null)
+    final monthLabel =
+        (selectedFilter == "month" &&
+            selectedMonth != null &&
+            selectedYear != null)
         ? "Month (${DateFormat.MMM().format(DateTime(0, selectedMonth!))} $selectedYear)"
         : "Month";
 
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text("Task Detail", style: Theme.of(context).textTheme.titleLarge),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+    return BaseLayout(
+      title: "Task Detail",
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.download, color: Colors.white),
+          tooltip: "Export to Excel",
+          onPressed: _exportToExcel,
+        ),
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Get.back();
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download, color: Colors.white),
-            tooltip: "Export to Excel",
-            onPressed: _exportToExcel,
-          ),
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.w),
-          child: Column(
-            children: [
-              SizedBox(height: 8.h),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(vertical: 8.h),
-                child: Row(
-                  children: [
-                    CustomChoiceChip(
-                      label: "All",
-                      selected: selectedFilter == "all",
-                      onSelected: () {
-                        setState(() => selectedFilter = "all");
-                        _applyFilter();
-                      },
+      ],
+      child: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Column(
+                children: [
+                  SizedBox(height: 8.h),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    child: Row(
+                      children: [
+                        CustomChoiceChip(
+                          label: "All",
+                          selected: selectedFilter == "all",
+                          onSelected: () {
+                            setState(() => selectedFilter = "all");
+                            _applyFilter();
+                          },
+                        ),
+                        SizedBox(width: 8.w),
+                        CustomChoiceChip(
+                          label: "Today",
+                          selected: selectedFilter == "today",
+                          onSelected: () {
+                            setState(() => selectedFilter = "today");
+                            _applyFilter();
+                          },
+                        ),
+                        SizedBox(width: 8.w),
+                        CustomChoiceChip(
+                          label: "Week",
+                          selected: selectedFilter == "week",
+                          onSelected: () {
+                            setState(() => selectedFilter = "week");
+                            _applyFilter();
+                          },
+                        ),
+                        SizedBox(width: 8.w),
+                        CustomChoiceChip(
+                          label: monthLabel,
+                          selected: selectedFilter == "month",
+                          onSelected: () {
+                            _pickMonthYear();
+                          },
+                        ),
+                      ],
                     ),
-                    // ChoiceChip(
-                    //   label: const Text("All"),
-                    //   selected: selectedFilter == "all",
-                    //   onSelected: (_) {
-                    //     setState(() => selectedFilter = "all");
-                    //     _applyFilter();
-                    //   },
-                    // ),
-                    SizedBox(width: 8.w),
-                    CustomChoiceChip(
-                      label: "Today",
-                      selected: selectedFilter == "today",
-                      onSelected: () {
-                        setState(() => selectedFilter = "today");
-                        _applyFilter();
-                      },
-                    ),
-                    // ChoiceChip(
-                    //   label: const Text("Today"),
-                    //   selected: selectedFilter == "today",
-                    //   onSelected: (_) {
-                    //     setState(() => selectedFilter = "today");
-                    //     _applyFilter();
-                    //   },
-                    // ),
-                    SizedBox(width: 8.w),
-                    CustomChoiceChip(
-                      label: "Week",
-                      selected: selectedFilter == "week",
-                      onSelected: () {
-                        setState(() => selectedFilter = "week");
-                        _applyFilter();
-                      },
-                    ),
-                    // ChoiceChip(
-                    //   label: const Text("Week"),
-                    //   selected: selectedFilter == "week",
-                    //   onSelected: (_) {
-                    //     setState(() => selectedFilter = "week");
-                    //     _applyFilter();
-                    //   },
-                    // ),
-                    SizedBox(width: 8.w),
-                    CustomChoiceChip(
-                      label: monthLabel,
-                      selected: selectedFilter == "month",
-                      onSelected: () {
-                        _pickMonthYear();
-                      },
-                    ),
-                    // ChoiceChip(
-                    //   label: Text(monthLabel),
-                    //   selected: selectedFilter == "month",
-                    //   onSelected: (_) {
-                    //     _pickMonthYear();
-                    //   },
-                    // ),
-                  ],
-                ),
-              ),
-              Divider(),
-              Expanded(
-                child: isLoading
-                    ? PageLoader()
-                    : tasks.isEmpty
-                    ? NoTasksWidget()
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: tasks.length,
-                        itemBuilder: (context, index) {
-                          final t = tasks[index];
-                          // print("Task $index: $t");
-                          final createdAt = t["startTime"];
-                          final dateStr = createdAt != null
-                              ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt))
-                              : "";
-                          return Card(
-                            color: ThemeClass.tealGreen,
-                            elevation: 3,
-                            margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 2.w),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: Colors.grey.shade100),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(12.0.w),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
+                  Divider(),
+                  Expanded(
+                    child: isLoading
+                        ? PageLoader()
+                        : tasks.isEmpty
+                        ? NoTasksWidget()
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: tasks.length,
+                            itemBuilder: (context, index) {
+                              final t = tasks[index];
+                              final createdAt = t["startTime"];
+                              final dateStr = createdAt != null
+                                  ? DateFormat(
+                                      "dd/MM/yyyy",
+                                    ).format(DateTime.parse(createdAt))
+                                  : "";
+                              return Card(
+                                elevation: 0,
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 6.h,
+                                  horizontal: 2.w,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  side: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outlineVariant,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0.w),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Task : ${index + 1},",
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Task : ${index + 1},",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                              SizedBox(width: 5.w),
+                                              Text(
+                                                "Mode : ${t["mode"]}",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                            ],
                                           ),
-                                          SizedBox(width: 5.w),
-                                          Text(
-                                            "Mode : ${t["mode"]}",
-                                            style: Theme.of(context).textTheme.titleMedium,
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () async {
-                                              await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => AddTaskScreen(task: t),
-                                                ),
-                                              );
-                                              _loadTasks();
-                                            },
-                                            child: Icon(
-                                              Icons.edit,
-                                              size: 20.sp,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                          SizedBox(width: 30.w),
-                                          GestureDetector(
-                                            child: Icon(
-                                              Icons.delete,
-                                              size: 20.sp,
-                                              color: Colors.red,
-                                            ),
-                                            onTap: () async {
-                                              final confirm = await showDialog<bool>(
-                                                context: context,
-                                                builder: (ctx) => AlertDialog(
-                                                  title: const Text(
-                                                    "Delete Task",
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  content: const Text(
-                                                    "Are you sure you want to delete this task?",
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () => Navigator.pop(ctx, false),
-                                                      child: const Text("Cancel"),
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          AddTaskScreen(
+                                                            task: t,
+                                                          ),
                                                     ),
-                                                    TextButton(
-                                                      onPressed: () => Navigator.pop(ctx, true),
-                                                      child: const Text(
-                                                        "Delete",
-                                                        style: TextStyle(color: Colors.red),
+                                                  );
+                                                  _loadTasks();
+                                                },
+                                                child: Icon(
+                                                  Icons.edit,
+                                                  size: 20.sp,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              SizedBox(width: 30.w),
+                                              GestureDetector(
+                                                child: Icon(
+                                                  Icons.delete,
+                                                  size: 20.sp,
+                                                  color: Colors.red,
+                                                ),
+                                                onTap: () async {
+                                                  final confirm = await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (ctx) => AlertDialog(
+                                                      title: const Text(
+                                                        "Delete Task",
+                                                        textAlign:
+                                                            TextAlign.center,
                                                       ),
+                                                      content: const Text(
+                                                        "Are you sure you want to delete this task?",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                ctx,
+                                                                false,
+                                                              ),
+                                                          child: const Text(
+                                                            "Cancel",
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                ctx,
+                                                                true,
+                                                              ),
+                                                          child: const Text(
+                                                            "Delete",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
-                                              );
-
-                                              if (confirm == true) {
-                                                final taskId = t["id"] is int
-                                                    ? t["id"] as int
-                                                    : int.tryParse(t["id"].toString());
-
-                                                if (taskId == null) {
-                                                  Get.snackbar(
-                                                    "Error",
-                                                    "Invalid task ID",
-                                                    backgroundColor: Colors.red,
-                                                    colorText: Colors.white,
-                                                  );
-                                                  return;
-                                                }
-
-                                                // Show loading
-                                                Get.dialog(
-                                                  const Center(child: CircularProgressIndicator()),
-                                                  barrierDismissible: false,
-                                                );
-
-                                                try {
-                                                  final result = await ApiService.deleteTask(
-                                                    taskId,
                                                   );
 
-                                                  Get.back();
+                                                  if (confirm == true) {
+                                                    final taskId =
+                                                        t["id"] is int
+                                                        ? t["id"] as int
+                                                        : int.tryParse(
+                                                            t["id"].toString(),
+                                                          );
 
-                                                  if (result["success"] == true) {
-                                                    setState(() {
-                                                      tasks.removeAt(index);
-                                                    });
+                                                    if (taskId == null) {
+                                                      Get.snackbar(
+                                                        "Error",
+                                                        "Invalid task ID",
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        colorText: Colors.white,
+                                                      );
+                                                      return;
+                                                    }
 
-                                                    Get.snackbar(
-                                                      "Success",
-                                                      "Task deleted successfully",
-                                                      backgroundColor: Colors.green,
-                                                      colorText: Colors.white,
-                                                      snackPosition: SnackPosition.BOTTOM,
+                                                    // Show loading
+                                                    Get.dialog(
+                                                      const Center(
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      ),
+                                                      barrierDismissible: false,
                                                     );
-                                                    _loadTasks();
-                                                  } else {
-                                                    Get.snackbar(
-                                                      "Error",
-                                                      result["error"] ?? "Failed to delete task",
-                                                      backgroundColor: Colors.red,
-                                                      colorText: Colors.white,
-                                                      snackPosition: SnackPosition.BOTTOM,
-                                                    );
+
+                                                    try {
+                                                      final result =
+                                                          await TaskService.deleteTask(
+                                                            taskId,
+                                                          );
+
+                                                      Get.back();
+
+                                                      if (result["success"] ==
+                                                          true) {
+                                                        setState(() {
+                                                          tasks.removeAt(index);
+                                                        });
+
+                                                        Get.snackbar(
+                                                          "Success",
+                                                          "Task deleted successfully",
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                          colorText:
+                                                              Colors.white,
+                                                          snackPosition:
+                                                              SnackPosition
+                                                                  .BOTTOM,
+                                                        );
+                                                        _loadTasks();
+                                                      } else {
+                                                        Get.snackbar(
+                                                          "Error",
+                                                          result["error"] ??
+                                                              "Failed to delete task",
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          colorText:
+                                                              Colors.white,
+                                                          snackPosition:
+                                                              SnackPosition
+                                                                  .BOTTOM,
+                                                        );
+                                                      }
+                                                    } catch (e) {
+                                                      Get.back();
+                                                      Get.snackbar(
+                                                        "Error",
+                                                        "Network error: ${e.toString()}",
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        colorText: Colors.white,
+                                                        snackPosition:
+                                                            SnackPosition
+                                                                .BOTTOM,
+                                                      );
+                                                    }
                                                   }
-                                                } catch (e) {
-                                                  Get.back();
-                                                  Get.snackbar(
-                                                    "Error",
-                                                    "Network error: ${e.toString()}",
-                                                    backgroundColor: Colors.red,
-                                                    colorText: Colors.white,
-                                                    snackPosition: SnackPosition.BOTTOM,
-                                                  );
-                                                }
-                                              }
-                                            },
+                                                },
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  Divider(color: ThemeClass.lightBgColor),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                      Divider(height: 24.h),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Project : ",
-                                            style: Theme.of(context).textTheme.titleMedium,
-                                          ),
-                                          Text(
-                                            "${t["project"] ?? ""}",
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Project : ",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                              Text(
+                                                "${t["project"] ?? ""}",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                      // Row(
-                                      //   children: [
-                                      //     Text(
-                                      //       "Mode :  ",
-                                      //       style: Theme.of(context).textTheme.titleMedium,
-                                      //     ),
-                                      //     Text(
-                                      //       t["mode"] ?? "",
-                                      //       style: Theme.of(context).textTheme.titleMedium,
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 3.h),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "Sub Project : ",
-                                        style: Theme.of(context).textTheme.titleMedium,
-                                      ),
-                                      Text(
-                                        "${t["subProject"] ?? ""}",
-                                        style: Theme.of(context).textTheme.titleMedium,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 3.h),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                      SizedBox(height: 4.h),
                                       Row(
                                         children: [
                                           Text(
-                                            "Title :",
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                            "Sub Project : ",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
                                           ),
                                           Text(
-                                            " ${t["title"] ?? ""}",
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                            "${t["subProject"] ?? ""}",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 3.h),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                      SizedBox(height: 4.h),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Details :",
-                                            style: Theme.of(context).textTheme.titleMedium,
-                                          ),
-                                          Text(
-                                            " ${t["description"] ?? ""}",
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Title :",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                              Text(
+                                                " ${t["title"] ?? ""}",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  Divider(color: ThemeClass.lightBgColor),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                      SizedBox(height: 4.h),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "$dateStr |",
-                                            style: Theme.of(context).textTheme.titleMedium,
-                                          ),
-                                          SizedBox(width: 4.w),
-                                          Text(
-                                            _calculateDuration(t["startTime"], t["endTime"]),
-                                            style: Theme.of(context).textTheme.titleMedium!
-                                                .copyWith(
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Details :",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                              Text(
+                                                " ${t["description"] ?? ""}",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
+                                      Divider(height: 24.h),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Status :",
-                                            style: Theme.of(context).textTheme.titleMedium,
-                                          ),
-                                          Text(
-                                            " ${t["status"] ?? ""}",
-                                            style: Theme.of(context).textTheme.titleMedium!
-                                                .copyWith(
-                                                  color: t["status"] == "Working"
-                                                      ? ThemeClass.warningColor
-                                                      : ThemeClass.successColor,
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "$dateStr |",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                              SizedBox(width: 4.w),
+                                              Text(
+                                                _calculateDuration(
+                                                  t["startTime"],
+                                                  t["endTime"],
                                                 ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Status :",
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+                                              ),
+                                              Text(
+                                                " ${t["status"] ?? ""}",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .copyWith(
+                                                      color:
+                                                          t["status"] ==
+                                                              "Working"
+                                                          ? Colors.orange
+                                                          : Colors.green,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+

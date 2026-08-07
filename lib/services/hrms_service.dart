@@ -9,7 +9,7 @@ import 'package:task_mate/model/leave_apply_request_model.dart';
 import 'package:task_mate/model/leave_request_model.dart';
 import 'package:task_mate/model/user_request_model.dart';
 
-final String baseUrl = dotenv.env['baseApiUrl'] ?? '';
+String get baseUrl => dotenv.env['baseApiUrl'] ?? '';
 
 class ApiHrmsService {
   static Future<String?> getToken() async {
@@ -34,10 +34,18 @@ class ApiHrmsService {
       final uri = Uri.parse("$baseUrl$endpoint");
       switch (method) {
         case "POST":
-          response = await http.post(uri, headers: headers, body: jsonEncode(body));
+          response = await http.post(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          );
           break;
         case "PUT":
-          response = await http.put(uri, headers: headers, body: jsonEncode(body));
+          response = await http.put(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          );
           break;
         case "DELETE":
           response = await http.delete(uri, headers: headers);
@@ -80,12 +88,13 @@ class ApiHrmsService {
     final data = jsonDecode(res.body);
 
     if (res.statusCode == 200 && data["success"] == true) {
-      return (data["data"] as List).map((e) => UserRequestModel.fromJson(e)).toList();
+      return (data["data"] as List)
+          .map((e) => UserRequestModel.fromJson(e))
+          .toList();
     }
 
     throw Exception(data["error"] ?? "Failed to fetch employee");
   }
-
 
   // get all leaves type
   static Future<List<dynamic>> fetchAllLeaveTypes() async {
@@ -104,13 +113,17 @@ class ApiHrmsService {
     final data = jsonDecode(res.body);
 
     if (res.statusCode == 200 && data["success"] == true) {
-      return (data["data"] as List).map((e) => LeaveRequestModel.fromJson(e)).toList();
+      return (data["data"] as List)
+          .map((e) => LeaveRequestModel.fromJson(e))
+          .toList();
     }
     throw Exception(data["error"] ?? "Failed to fetch leaves");
   }
 
   // apply leave request
-  static Future<Map<String, dynamic>> applyLeave(LeaveApplyRequestModel request) async {
+  static Future<Map<String, dynamic>> applyLeave(
+    LeaveApplyRequestModel request,
+  ) async {
     try {
       final token = await getToken();
       if (token == null) {
@@ -139,7 +152,9 @@ class ApiHrmsService {
     final data = jsonDecode(res.body);
 
     if (res.statusCode == 200 && data["success"] == true) {
-      return (data["data"] as List).map((e) => LeaveRequestModel.fromJson(e)).toList();
+      return (data["data"] as List)
+          .map((e) => LeaveRequestModel.fromJson(e))
+          .toList();
     }
     throw Exception(data["message"] ?? "Failed to fetch leaves");
   }

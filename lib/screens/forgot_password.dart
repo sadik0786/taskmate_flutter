@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/auth_service.dart';
 import 'package:get/get.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -35,7 +35,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
     setState(() => _loading = true);
     try {
-      final res = await ApiService.forgotPasswordRequest(_email.text.trim());
+      final res = await AuthService.forgotPasswordRequest(_email.text.trim());
       setState(() {
         _loading = false;
         _emailVerified = res["success"] == true;
@@ -65,7 +65,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     setState(() => _loading = true);
     try {
-      final res = await ApiService.resetPasswordSelf(_email.text.trim(), _newPassword.text);
+      final res = await AuthService.resetPasswordSelf(_email.text.trim(), _newPassword.text);
       setState(() => _loading = false);
 
       if (!mounted) return;
@@ -145,10 +145,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(24.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Header Section
             _buildHeaderSection(),
@@ -159,7 +163,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             // Content based on step
             if (!_emailVerified) _buildEmailVerificationStep(),
             if (_emailVerified) _buildPasswordResetStep(),
-          ],
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -517,3 +524,4 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 }
+

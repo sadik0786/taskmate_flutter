@@ -3,11 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/screens/login_screen.dart';
-import 'package:task_mate/widgets/custom_appbar.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,8 +14,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ThemeController _themeController = Get.find();
   String? userName;
+  String? role;
+
   @override
   void initState() {
     super.initState();
@@ -30,18 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       userName = prefs.getString("name") ?? "Employee";
+      role = prefs.getString("role")?.toLowerCase() ?? "employee";
     });
   }
 
   Future<void> _loadTasks() async {
-    // await ApiService.fetchTasks();
-  }
-
-  Future<void> _logOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+    // await TaskService.fetchTasks();
   }
 
   @override
@@ -67,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Add Project',
         icon: Icons.library_add,
-        gradient: [Colors.green.shade100, Colors.greenAccent],
+        gradient: [Colors.green.shade400, Colors.green.shade600],
         onTap: () {
           Get.toNamed(Routes.projectScreen);
         },
@@ -75,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Change Password',
         icon: Icons.password,
-        gradient: [Colors.greenAccent.shade400, Colors.green.shade700],
+        gradient: [Colors.redAccent, Colors.red.shade700],
         onTap: () {
           Get.toNamed(Routes.forgotPasswordPage);
         },
@@ -83,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'My Profile',
         icon: Icons.manage_accounts,
-        gradient: [Colors.lightBlueAccent, Colors.blue],
+        gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade400],
         onTap: () {
           Get.toNamed(Routes.profileScreen);
         },
@@ -91,43 +83,38 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Manage Leave',
         icon: Icons.manage_history,
-        gradient: [Colors.orangeAccent, Colors.deepOrange],
+        gradient: [Colors.tealAccent.shade400, Colors.teal.shade400],
         onTap: () {
           Get.toNamed(Routes.hrmsDashboard);
         },
       ),
-
     ];
 
-    return Scaffold(
-      // backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
-      appBar: CommonAppBar(
-        title: "Task Mate",
-        userName: userName,
-        onLogout: _logOut,
-        isDarkMode: _themeController.isDarkMode,
-        onToggleTheme: _themeController.toggleTheme,
-      ),
-
-      body: SafeArea(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: ThemeClass.darkBgColor,
-            // gradient: LinearGradient(
-            //   colors: [Color(0xFFe0f7fa), Color(0xFF80deea)],
-            //   begin: Alignment.bottomRight,
-            //   end: Alignment.topLeft,
-            // ),
-          ),
-          child: Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 20.h),
-            child: GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 20.h,
-              crossAxisSpacing: 50.w,
-              children: items.map((item) => _GlassCard(item: item)).toList(),
-            ),
-          ),
+    return BaseLayout(
+      title: "Task Mate",
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            int crossAxisCount = 2;
+            if (constraints.maxWidth >= 1024) {
+              crossAxisCount = 4; // Desktop
+            } else if (constraints.maxWidth >= 600) {
+              crossAxisCount = 3; // Tablet
+            }
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 24.h,
+                crossAxisSpacing: 24.w,
+                childAspectRatio: 1.15,
+              ),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                return _ModernCard(item: items[index]);
+              },
+            );
+          },
         ),
       ),
     );
@@ -148,60 +135,112 @@ class _DashboardItem {
   });
 }
 
-class _GlassCard extends StatefulWidget {
+class _ModernCard extends StatefulWidget {
   final _DashboardItem item;
 
-  const _GlassCard({required this.item});
+  const _ModernCard({required this.item});
 
   @override
-  State<_GlassCard> createState() => _GlassCardState();
+  State<_ModernCard> createState() => _ModernCardState();
 }
 
-class _GlassCardState extends State<_GlassCard> with SingleTickerProviderStateMixin {
-  double _scale = 1.0;
+class _ModernCardState extends State<_ModernCard>
+    with SingleTickerProviderStateMixin {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _scale = 0.95),
-      onTapUp: (_) {
-        setState(() => _scale = 1.0);
-        widget.item.onTap();
-      },
-      onTapCancel: () => setState(() => _scale = 1.0),
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: widget.item.gradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: widget.item.gradient.last.withValues(alpha: 0.4),
-                blurRadius: 12.r,
-                offset: const Offset(0, 6),
+    final theme = Theme.of(context);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.item.onTap,
+        child: AnimatedScale(
+          scale: _isHovered ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutBack,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: _isHovered
+                    ? widget.item.gradient
+                    : [theme.colorScheme.surface, theme.colorScheme.surface],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: _isHovered
+                    ? Colors.transparent
+                    : theme.colorScheme.outlineVariant.withOpacity(0.3),
+                width: 1,
+              ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: widget.item.gradient[0].withOpacity(0.4),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: theme.colorScheme.shadow.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            child: Stack(
               children: [
-                Icon(widget.item.icon, size: 40.sp, color: Colors.white),
-                SizedBox(height: 10.h),
-                Text(
-                  widget.item.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                if (_isHovered)
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Icon(
+                      widget.item.icon,
+                      size: 100.sp,
+                      color: Colors.white.withOpacity(0.2),
+                    ),
+                  ),
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: _isHovered
+                              ? Colors.white.withOpacity(0.2)
+                              : widget.item.gradient[0].withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          widget.item.icon,
+                          size: 36.sp,
+                          color: _isHovered
+                              ? Colors.white
+                              : widget.item.gradient[0],
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      Text(
+                        widget.item.title,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18.sp,
+                          color: _isHovered
+                              ? Colors.white
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -212,3 +251,4 @@ class _GlassCardState extends State<_GlassCard> with SingleTickerProviderStateMi
     );
   }
 }
+

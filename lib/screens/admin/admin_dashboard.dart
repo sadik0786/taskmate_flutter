@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/widgets/custom_appbar.dart';
+import 'package:task_mate/widgets/base_layout.dart';
+
+import 'package:task_mate/screens/page_loader.dart';
+import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/services/task_service.dart';
+import 'package:task_mate/services/project_service.dart';
+import 'package:task_mate/widgets/responsive_layout.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -15,16 +19,46 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  final ThemeController _themeController = Get.find();
-
   String? userName;
   String? role;
-  bool isDarkMode = false;
+
+  int totalEmployees = 0;
+  int totalProjects = 0;
+  int totalTasks = 0;
+  bool isLoadingSummary = true;
 
   @override
   void initState() {
     super.initState();
     _loadUser();
+  }
+
+  Future<void> _loadSummaryData() async {
+    try {
+      final employees = await UserService.fetchEmployees();
+      final projects = await ProjectService.fetchProjects();
+      List tasks = [];
+      try {
+        tasks = await TaskService.fetchAllAdminTasks();
+      } catch (e) {
+        // Not all admins have access to all admin tasks
+      }
+
+      if (mounted) {
+        setState(() {
+          totalEmployees = employees.length;
+          totalProjects = projects.length;
+          totalTasks = tasks.length;
+          isLoadingSummary = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoadingSummary = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadUser() async {
@@ -33,13 +67,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       userName = prefs.getString("name") ?? "Employee";
       role = prefs.getString("role")?.toLowerCase() ?? "employee";
     });
-  }
-
-  Future<void> _logOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (!mounted) return;
-    Get.offNamed(Routes.login);
+    _loadSummaryData();
   }
 
   List<_DashboardItem> _getMenuItems() {
@@ -48,7 +76,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Employee',
           icon: Icons.person_add,
-          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
+          gradient: [
+            Colors.lightBlueAccent.shade400,
+            Colors.lightBlueAccent.shade200,
+          ],
           onTap: () {
             Get.toNamed(Routes.registerScreen);
           },
@@ -64,7 +95,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
-          gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade100],
+          gradient: [
+            Colors.purpleAccent.shade200,
+            Colors.purpleAccent.shade100,
+          ],
           onTap: () {
             Get.toNamed(Routes.profileScreen);
           },
@@ -76,7 +110,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Employee',
           icon: Icons.person_add,
-          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
+          gradient: [
+            Colors.lightBlueAccent.shade400,
+            Colors.lightBlueAccent.shade200,
+          ],
           onTap: () {
             Get.toNamed(Routes.registerScreen);
           },
@@ -92,7 +129,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Task Details',
           icon: Icons.task,
-          gradient: [Colors.orangeAccent.shade400, Colors.orangeAccent.shade200],
+          gradient: [
+            Colors.orangeAccent.shade400,
+            Colors.orangeAccent.shade200,
+          ],
           onTap: () {
             Get.toNamed(Routes.employeeTaskScreen);
           },
@@ -108,7 +148,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
-          gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade100],
+          gradient: [
+            Colors.purpleAccent.shade200,
+            Colors.purpleAccent.shade100,
+          ],
           onTap: () {
             Get.toNamed(Routes.profileScreen);
           },
@@ -116,7 +159,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Manage Leave',
           icon: Icons.manage_history,
-          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
+          gradient: [
+            Colors.lightBlueAccent.shade400,
+            Colors.lightBlueAccent.shade200,
+          ],
           onTap: () {
             Get.toNamed(Routes.hrmsDashboard);
           },
@@ -127,7 +173,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Employee',
           icon: Icons.person_add,
-          gradient: [Colors.lightBlueAccent.shade400, Colors.lightBlueAccent.shade200],
+          gradient: [
+            Colors.lightBlueAccent.shade400,
+            Colors.lightBlueAccent.shade200,
+          ],
           onTap: () {
             Get.toNamed(Routes.registerScreen);
           },
@@ -151,7 +200,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'Add Task',
           icon: Icons.add_task,
-          gradient: [Colors.orangeAccent.shade400, Colors.orangeAccent.shade200],
+          gradient: [
+            Colors.orangeAccent.shade400,
+            Colors.orangeAccent.shade200,
+          ],
           onTap: () {
             Get.toNamed(Routes.addTaskScreen);
           },
@@ -175,7 +227,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
-          gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade100],
+          gradient: [
+            Colors.purpleAccent.shade200,
+            Colors.purpleAccent.shade100,
+          ],
           onTap: () {
             Get.toNamed(Routes.profileScreen);
           },
@@ -186,33 +241,197 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
+  Widget _summaryCard({
+    required String title,
+    required int value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() {}),
+          onExit: (_) => setState(() {}),
+          child: AnimatedScale(
+            scale: 1.0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutBack,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: EdgeInsets.symmetric(horizontal: 6.w, vertical: 8.h),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 20.h),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).cardColor,
+                    Theme.of(context).cardColor,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(color: color.withOpacity(0.3), width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: EdgeInsets.all(10.w),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(icon, size: 32.sp, color: color),
+                      ),
+                      Text(
+                        value.toString(),
+                        style: TextStyle(
+                          fontSize: 32.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final items = _getMenuItems();
 
-    return Scaffold(
-      appBar: CommonAppBar(
-        title: "Task Mate",
-        userName: userName,
-        onLogout: _logOut,
-        isDarkMode: _themeController.isDarkMode,
-        onToggleTheme: _themeController.toggleTheme,
-      ),
-      body: SafeArea(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: ThemeClass.darkBgColor,
-          ),
-          child: Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 20.h),
-            child: GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 20.h,
-              crossAxisSpacing: 30.w,
-              children: items.map((item) => _GlassCard(item: item)).toList(),
-            ),
-          ),
-        ),
+    return BaseLayout(
+      title: "Task Mate",
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+        child: isLoadingSummary
+            ? const Center(child: PageLoader())
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Dashboard Overview",
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16.h),
+                    if (ResponsiveLayout.isDesktop(context) ||
+                        ResponsiveLayout.isTablet(context))
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _summaryCard(
+                              title: "Total Employees",
+                              value: totalEmployees,
+                              icon: Icons.people,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
+                          Expanded(
+                            child: _summaryCard(
+                              title: "Total Projects",
+                              value: totalProjects,
+                              icon: Icons.library_books,
+                              color: Colors.greenAccent.shade700,
+                            ),
+                          ),
+                          Expanded(
+                            child: _summaryCard(
+                              title: "Total Tasks",
+                              value: totalTasks,
+                              icon: Icons.task_alt,
+                              color: Colors.orangeAccent.shade700,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Column(
+                        children: [
+                          _summaryCard(
+                            title: "Total Employees",
+                            value: totalEmployees,
+                            icon: Icons.people,
+                            color: Colors.blueAccent,
+                          ),
+                          _summaryCard(
+                            title: "Total Projects",
+                            value: totalProjects,
+                            icon: Icons.library_books,
+                            color: Colors.greenAccent.shade700,
+                          ),
+                          _summaryCard(
+                            title: "Total Tasks",
+                            value: totalTasks,
+                            icon: Icons.task_alt,
+                            color: Colors.orangeAccent.shade700,
+                          ),
+                        ],
+                      ),
+                    SizedBox(height: 32.h),
+                    Text(
+                      "Quick Actions",
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16.h),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount = 2;
+                        if (constraints.maxWidth >= 1024) {
+                          crossAxisCount = 4; // Desktop
+                        } else if (constraints.maxWidth >= 600) {
+                          crossAxisCount = 3; // Tablet
+                        }
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                mainAxisSpacing: 24.h,
+                                crossAxisSpacing: 24.w,
+                                childAspectRatio: 1.15,
+                              ),
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            return _ModernCard(item: items[index]);
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -232,60 +451,112 @@ class _DashboardItem {
   });
 }
 
-class _GlassCard extends StatefulWidget {
+class _ModernCard extends StatefulWidget {
   final _DashboardItem item;
 
-  const _GlassCard({required this.item});
+  const _ModernCard({required this.item});
 
   @override
-  State<_GlassCard> createState() => _GlassCardState();
+  State<_ModernCard> createState() => _ModernCardState();
 }
 
-class _GlassCardState extends State<_GlassCard> with SingleTickerProviderStateMixin {
-  double _scale = 1.0;
+class _ModernCardState extends State<_ModernCard>
+    with SingleTickerProviderStateMixin {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _scale = 0.95),
-      onTapUp: (_) {
-        setState(() => _scale = 1.0);
-        widget.item.onTap();
-      },
-      onTapCancel: () => setState(() => _scale = 1.0),
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: widget.item.gradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20.r),
-            boxShadow: [
-              BoxShadow(
-                color: widget.item.gradient.last.withValues(alpha: 0.4),
-                blurRadius: 12.r,
-                offset: Offset(0, 6.h),
+    final theme = Theme.of(context);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.item.onTap,
+        child: AnimatedScale(
+          scale: _isHovered ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutBack,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: _isHovered
+                    ? widget.item.gradient
+                    : [theme.colorScheme.surface, theme.colorScheme.surface],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: _isHovered
+                    ? Colors.transparent
+                    : theme.colorScheme.outlineVariant.withOpacity(0.3),
+                width: 1,
+              ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: widget.item.gradient[0].withOpacity(0.4),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: theme.colorScheme.shadow.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            child: Stack(
               children: [
-                Icon(widget.item.icon, size: 50.sp, color: Colors.white),
-                SizedBox(height: 14.h),
-                Text(
-                  widget.item.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
+                if (_isHovered)
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Icon(
+                      widget.item.icon,
+                      size: 100.sp,
+                      color: Colors.white.withOpacity(0.2),
+                    ),
+                  ),
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: _isHovered
+                              ? Colors.white.withOpacity(0.2)
+                              : widget.item.gradient[0].withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          widget.item.icon,
+                          size: 36.sp,
+                          color: _isHovered
+                              ? Colors.white
+                              : widget.item.gradient[0],
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      Text(
+                        widget.item.title,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18.sp,
+                          color: _isHovered
+                              ? Colors.white
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -296,3 +567,4 @@ class _GlassCardState extends State<_GlassCard> with SingleTickerProviderStateMi
     );
   }
 }
+

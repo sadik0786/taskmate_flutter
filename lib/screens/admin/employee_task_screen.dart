@@ -1,18 +1,18 @@
 // ignore_for_file: deprecated_member_use
-import 'dart:io';
+
 import 'package:excel/excel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:task_mate/utils/file_download.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/no_data.dart';
 import 'package:task_mate/screens/page_loader.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/services/task_service.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class EmployeeTaskScreen extends StatefulWidget {
@@ -53,7 +53,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
 
   Future<void> _loadEmployees() async {
     try {
-      final data = await ApiService.fetchEmployees();
+      final data = await UserService.fetchEmployees();
 
       if (!mounted) return;
       setState(() => employees = data);
@@ -65,7 +65,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
   Future<void> _loadTasksByEmployee(int empId) async {
     setState(() => loading = true);
     try {
-      final data = await ApiService.fetchTasksByEmployee(empId);
+      final data = await TaskService.fetchTasksByEmployee(empId);
       if (!mounted) return;
       setState(() {
         allTasks = data;
@@ -83,7 +83,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
   Future<void> _loadAllTasksByEmployee() async {
     setState(() => loading = true);
     try {
-      final data = await ApiService.fetchAllTasksByEmployee();
+      final data = await TaskService.fetchAllTasksByEmployee();
       if (!mounted) return;
       setState(() {
         allTasks = data;
@@ -343,13 +343,9 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
         ]);
       }
 
-      final dir = await getApplicationDocumentsDirectory();
       final fileName =
           "${selectedEmpName ?? 'All'}_tasks_${DateTime.now().millisecondsSinceEpoch}.xlsx";
-      final file = File("${dir.path}/$fileName");
-      await file.create(recursive: true);
-      await file.writeAsBytes(excel.encode()!);
-      await OpenFilex.open(file.path);
+      await saveAndLaunchFile(excel.encode()!, fileName);
       CustomSnackBar.success("Excel file exported successfully!");
     } catch (e) {
       CustomSnackBar.success("Failed to export: $e");
@@ -362,325 +358,285 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
         ? "Month (${DateFormat.MMM().format(DateTime(0, selectedMonth!))} $selectedYear)"
         : "Month";
        
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text(
-          selectedEmpName != null && selectedEmpName!.isNotEmpty
-              ? "Tasks - $selectedEmpName"
-              : "Task Details",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+    return BaseLayout(
+      title: selectedEmpName != null && selectedEmpName!.isNotEmpty
+          ? "Tasks - $selectedEmpName"
+          : "Task Details",
+      customActions: [
+        if (allTasks.isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.download, color: Colors.white),
+            tooltip: "Export to Excel",
+            onPressed: _exportToExcel,
+          ),
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Get.back();
           },
         ),
-        actions: [
-          if (allTasks.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.download, color: Colors.white),
-              tooltip: "Export to Excel",
-              onPressed: _exportToExcel,
-            ),
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (!singleEmployeeMode)
-              Padding(
-                padding: EdgeInsets.all(12.w),
-                child: CustomDropdownField<String>(
-                  labelText: "Select Employee",
-                  isRequired: true,
-                  hintText: "Select Employee",
-                  prefixIcon: Icons.person,
-                  items: [
-                    {"ID": "", "Name": "All Employees"},
-                    ...employees.map(
-                      (e) => {"ID": e["ID"].toString(), "Name": e["Name"]?.toString() ?? "Unknown"},
-                    ),
-                  ],
-                  valueKey: "ID",
-                  labelKey: "Name",
-                  value: selectedEmp,
-                  isEnabled: true,
-                  onChanged: (id) {
-                    if (id == null || id.isEmpty) {
-                      setState(() {
-                        selectedEmp = null;
-                        selectedEmpName = null;
-                      });
-                      _loadAllTasksByEmployee();
-                    } else {
-                      final emp = employees.firstWhere(
-                        (e) => e["ID"].toString() == id,
-                        orElse: () => {},
-                      );
-                      setState(() {
-                        selectedEmp = id;
-                        selectedEmpName = emp["Name"]?.toString() ?? "";
-                      });
-                      _loadTasksByEmployee(int.parse(id));
-                    }
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please select an employee";
-                    }
-                    return null;
-                  },
-                ),
-              ),
-
-            // 🔹 Filter Chips
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-              child: Row(
-                children: [
-                  CustomChoiceChip(
-                    label: "All",
-                    selected: selectedFilter == "all",
-                    onSelected: () {
-                      setState(() => selectedFilter = "all");
-                      _applyFilter();
-                    },
-                  ),
-                  // ChoiceChip(
-                  //   label: const Text("All"),
-                  //   selected: selectedFilter == "all",
-                  //   onSelected: (_) {
-                  //     setState(() => selectedFilter = "all");
-                  //     _applyFilter();
-                  //   },
-                  // ),
-                  SizedBox(width: 8.w),
-                  CustomChoiceChip(
-                    label: "Today",
-                    selected: selectedFilter == "today",
-                    onSelected: () {
-                      setState(() => selectedFilter = "today");
-                      _applyFilter();
-                    },
-                  ),
-                  // ChoiceChip(
-                  //   label: const Text("Today"),
-                  //   selected: selectedFilter == "today",
-                  //   onSelected: (_) {
-                  //     setState(() => selectedFilter = "today");
-                  //     _applyFilter();
-                  //   },
-                  // ),
-                  SizedBox(width: 8.w),
-                  CustomChoiceChip(
-                    label: "Week",
-                    selected: selectedFilter == "week",
-                    onSelected: () {
-                      setState(() => selectedFilter = "week");
-                      _applyFilter();
-                    },
-                  ),
-                  // ChoiceChip(
-                  //   label: const Text("Week"),
-                  //   selected: selectedFilter == "week",
-                  //   onSelected: (_) {
-                  //     setState(() => selectedFilter = "week");
-                  //     _applyFilter();
-                  //   },
-                  // ),
-                  SizedBox(width: 8.w),
-                  CustomChoiceChip(
-                    label: monthLabel,
-                    selected: selectedFilter == "month",
-                    onSelected: () {
-                      _pickMonthYear();
-                    },
-                  ),
-                  // ChoiceChip(
-                  //   label: Text(monthLabel),
-                  //   selected: selectedFilter == "month",
-                  //   onSelected: (_) {
-                  //     _pickMonthYear();
-                  //   },
-                  // ),
-                ],
-              ),
-            ),
-
-            // Task Table
-            Expanded(
-              child: loading
-                  ? const PageLoader()
-                  : tasks.isEmpty
-                  ? const NoTasksWidget()
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: tasks.length,
-                      itemBuilder: (context, index) {
-                        final t = tasks[index];
-                        final createdAt = t["startTime"];
-                        final dateStr = createdAt != null
-                            ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt))
-                            : "";
-                        return Card(
-                          color: ThemeClass.tealGreen,
-                          elevation: 3,
-                          margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            side: BorderSide(color: Colors.grey.shade100),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(12.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Task : ${index + 1}",
-                                      style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Mode :  ",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        Text(
-                                          t["mode"] ?? "",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Divider(color: ThemeClass.lightBgColor),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Project : ",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        Text(
-                                          "${t["project"] ?? ""}",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 6.h),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Sub Project : ",
-                                      style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                    Text(
-                                      "${t["subProject"] ?? ""}",
-                                      style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 6.h),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Title :",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        Text(
-                                          " ${t["title"] ?? ""}",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 6.h),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Details :",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        Text(
-                                          " ${t["description"] ?? ""}",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Divider(color: ThemeClass.lightBgColor),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "$dateStr |",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        SizedBox(width: 4.w),
-                                        Text(
-                                          _calculateDuration(t["startTime"], t["endTime"]),
-                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Status :",
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        Text(
-                                          " ${t["status"] ?? ""}",
-                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                            color: t["status"] == "Working"
-                                                ? ThemeClass.warningColor
-                                                : ThemeClass.successColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+      ],
+      child: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Column(
+              children: [
+                if (!singleEmployeeMode)
+                  Padding(
+                    padding: EdgeInsets.all(12.w),
+                    child: CustomDropdownField<String>(
+                      labelText: "Select Employee",
+                      isRequired: true,
+                      hintText: "Select Employee",
+                      prefixIcon: Icons.person,
+                      items: [
+                        {"ID": "", "Name": "All Employees"},
+                        ...employees.map(
+                          (e) => {"ID": e["ID"].toString(), "Name": e["Name"]?.toString() ?? "Unknown"},
+                        ),
+                      ],
+                      valueKey: "ID",
+                      labelKey: "Name",
+                      value: selectedEmp,
+                      isEnabled: true,
+                      onChanged: (id) {
+                        if (id == null || id.isEmpty) {
+                          setState(() {
+                            selectedEmp = null;
+                            selectedEmpName = null;
+                          });
+                          _loadAllTasksByEmployee();
+                        } else {
+                          final emp = employees.firstWhere(
+                            (e) => e["ID"].toString() == id,
+                            orElse: () => {},
+                          );
+                          setState(() {
+                            selectedEmp = id;
+                            selectedEmpName = emp["Name"]?.toString() ?? "";
+                          });
+                          _loadTasksByEmployee(int.parse(id));
+                        }
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please select an employee";
+                        }
+                        return null;
                       },
                     ),
+                  ),
+
+                // 🔹 Filter Chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  child: Row(
+                    children: [
+                      CustomChoiceChip(
+                        label: "All",
+                        selected: selectedFilter == "all",
+                        onSelected: () {
+                          setState(() => selectedFilter = "all");
+                          _applyFilter();
+                        },
+                      ),
+                      SizedBox(width: 8.w),
+                      CustomChoiceChip(
+                        label: "Today",
+                        selected: selectedFilter == "today",
+                        onSelected: () {
+                          setState(() => selectedFilter = "today");
+                          _applyFilter();
+                        },
+                      ),
+                      SizedBox(width: 8.w),
+                      CustomChoiceChip(
+                        label: "Week",
+                        selected: selectedFilter == "week",
+                        onSelected: () {
+                          setState(() => selectedFilter = "week");
+                          _applyFilter();
+                        },
+                      ),
+                      SizedBox(width: 8.w),
+                      CustomChoiceChip(
+                        label: monthLabel,
+                        selected: selectedFilter == "month",
+                        onSelected: () {
+                          _pickMonthYear();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(),
+                // Task Table
+                Expanded(
+                  child: loading
+                      ? const PageLoader()
+                      : tasks.isEmpty
+                      ? const NoTasksWidget()
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: tasks.length,
+                          itemBuilder: (context, index) {
+                            final t = tasks[index];
+                            final createdAt = t["startTime"];
+                            final dateStr = createdAt != null
+                                ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt))
+                                : "";
+                            return Card(
+                              elevation: 0,
+                              margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.r),
+                                side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(16.w),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Task : ${index + 1}",
+                                          style: Theme.of(context).textTheme.titleMedium,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Mode :  ",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                            Text(
+                                              t["mode"] ?? "",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Divider(height: 24.h),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Project : ",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                            Text(
+                                              "${t["project"] ?? ""}",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Sub Project : ",
+                                          style: Theme.of(context).textTheme.titleMedium,
+                                        ),
+                                        Text(
+                                          "${t["subProject"] ?? ""}",
+                                          style: Theme.of(context).textTheme.titleMedium,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Title :",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                            Text(
+                                              " ${t["title"] ?? ""}",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Details :",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                            Text(
+                                              " ${t["description"] ?? ""}",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Divider(height: 24.h),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "$dateStr |",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Text(
+                                              _calculateDuration(t["startTime"], t["endTime"]),
+                                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Status :",
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                            Text(
+                                              " ${t["status"] ?? ""}",
+                                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                                color: t["status"] == "Working"
+                                                    ? Colors.orange
+                                                    : Colors.green,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
+

@@ -3,10 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/auth_service.dart';
+import 'package:task_mate/services/user_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -39,7 +41,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
     setState(() => _loading = true);
     try {
-      final exists = await ApiService.checkUserByEmail(email);
+      final exists = await UserService.checkUserByEmail(email);
       if (!mounted) return;
       setState(() => _emailVerified = exists);
       exists
@@ -73,7 +75,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
 
     setState(() => _loading = true);
-    final res = await ApiService.changePassword(_email.text.trim(), _newPassword.text);
+    final res = await AuthService.changePassword(_email.text.trim(), _newPassword.text);
     setState(() => _loading = false);
 
     if (!mounted) return;
@@ -100,28 +102,23 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text("Reset Password", style: Theme.of(context).textTheme.titleLarge),
-        leading: IconButton(
+    return BaseLayout(
+      title: "Reset Password",
+      customActions: [
+        IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Get.back();
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Get.offAllNamed(Routes.adminDashboard);
-            },
-          ),
-        ],
-      ),
-      body: Padding(
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Get.offAllNamed(Routes.adminDashboard);
+          },
+        ),
+      ],
+      child: Padding(
         padding: EdgeInsets.all(24.w),
         child: SingleChildScrollView(
           child: Column(
@@ -359,3 +356,4 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     );
   }
 }
+

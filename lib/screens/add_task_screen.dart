@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/task_screen.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/base_api_service.dart';
+import 'package:task_mate/services/task_service.dart';
+import 'package:task_mate/services/project_service.dart';
 import 'package:task_mate/widgets/custom_date_field.dart';
 import 'package:task_mate/widgets/custom_time_field.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
-final GlobalKey<AddTaskScreenState> addTaskKey = GlobalKey<AddTaskScreenState>();
+final GlobalKey<AddTaskScreenState> addTaskKey =
+    GlobalKey<AddTaskScreenState>();
 
 class AddTaskScreen extends StatefulWidget {
   final Map<String, dynamic>? task;
@@ -62,13 +65,17 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     _selectedStatus = task["status"];
 
     if (task["startTime"] != null && task["startTime"].toString().isNotEmpty) {
-      final startDT = DateTime.parse(task["startTime"]).toLocal(); // convert to local
+      final startDT = DateTime.parse(
+        task["startTime"],
+      ).toLocal(); // convert to local
       _selectedDate = DateTime(startDT.year, startDT.month, startDT.day);
       _startTime = TimeOfDay(hour: startDT.hour, minute: startDT.minute);
     }
 
     if (task["endTime"] != null && task["endTime"].toString().isNotEmpty) {
-      final endDT = DateTime.parse(task["endTime"]).toLocal(); // convert to local
+      final endDT = DateTime.parse(
+        task["endTime"],
+      ).toLocal(); // convert to local
       _endTime = TimeOfDay(hour: endDT.hour, minute: endDT.minute);
     }
 
@@ -81,7 +88,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
 
   Future<void> _loadProjects() async {
     try {
-      final res = await ApiService.fetchProjects();
+      final res = await ProjectService.fetchProjects();
       setState(() {
         _projects.clear();
         _projects.addAll(res.map((p) => Map<String, dynamic>.from(p)));
@@ -94,7 +101,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
 
   // Future<void> _loadAllSubProjects() async {
   //   try {
-  //     final res = await ApiService.fetchSubProjects();
+  //     final res = await ProjectService.fetchSubProjects();
   //     setState(() {
   //       _allSubprojects.clear();
   //       _allSubprojects.addAll(res.map((sp) => Map<String, dynamic>.from(sp)));
@@ -109,7 +116,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
 
   Future<void> loadAllSubProjects() async {
     try {
-      final res = await ApiService.fetchSubProjects();
+      final res = await ProjectService.fetchSubProjects();
       if (!mounted) return;
 
       setState(() {
@@ -185,7 +192,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     final startDateTimeUTC = startDateTimeLocal.toUtc();
     final endDateTimeUTC = endDateTimeLocal.toUtc();
 
-    final userId = await ApiService.getLoggedInUserId();
+    final userId = await BaseApiService.getLoggedInUserId();
 
     if (userId == null) {
       CustomSnackBar.error("User not logged in");
@@ -195,7 +202,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     Map<String, dynamic> res;
     if (widget.task == null) {
       // Add new task
-      res = await ApiService.createTask(
+      res = await TaskService.createTask(
         projectId: _selectedProjectId!,
         subProjectId: _selectedSubProjectId!,
         title: _title.text.trim(),
@@ -209,7 +216,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     } else {
       // Update existing task
       final taskId = int.tryParse(widget.task!["id"].toString());
-      res = await ApiService.updateTask(
+      res = await TaskService.updateTask(
         taskId: taskId!,
         projectId: _selectedProjectId!,
         subProjectId: _selectedSubProjectId!,
@@ -253,206 +260,181 @@ class AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   Future<void> _pickEndTime() async {
-    final picked = await showTimePicker(context: context, initialTime: _endTime ?? TimeOfDay.now());
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _endTime ?? TimeOfDay.now(),
+    );
     if (picked != null) setState(() => _endTime = picked);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text(
-          widget.task == null ? "Add Task" : "Edit Task",
-          style: Theme.of(context).textTheme.titleLarge,
+    return BaseLayout(
+      title: widget.task == null ? "Add Task" : "Edit Task",
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.add, color: Colors.white),
+          onPressed: () {
+            Get.toNamed(Routes.projectScreen);
+          },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              Get.toNamed(Routes.projectScreen);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            children: [
-              CustomDropdownField<int>(
-                // fillColor: ThemeClass.darkBlue,
-                labelText: "Select Main Project",
-                isRequired: true,
-                hintText: "Select Main Project",
-                prefixIcon: Icons.work,
-                items: _projects
-                    .map((p) => {"ID": p["ProjectId"], "Name": p["ProjectName"] ?? ""})
-                    .toList(),
-                valueKey: "ID",
-                labelKey: "Name",
-                value: _selectedProjectId,
-                isEnabled: true,
-                onChanged: _onProjectChanged,
-              ),
-              SizedBox(height: 10.h),
-              CustomDropdownField<int>(
-                // fillColor: ThemeClass.darkBlue,
-                labelText: _selectedProjectId == null
-                    ? "Select Project First"
-                    : "Select Sub Project",
-                isRequired: true,
-                hintText: "Select Sub Project",
-                prefixIcon: Icons.work,
-                items: _filteredSubprojects
-                    .map(
-                      (sp) => {"ID": sp["SubProjectId"], "Name": sp["SubProjectName"] ?? "Unknown"},
-                    )
-                    .toList(),
-                valueKey: "ID",
-                labelKey: "Name",
-                value: _selectedSubProjectId,
-                isEnabled: _selectedProjectId != null,
-                onChanged: _onSubProjectChanged,
-              ),
-              SizedBox(height: 10.h),
-              CustomDropdownField<String>(
-                // fillColor: ThemeClass.darkBlue,
-                labelText: "Task Type",
-                isRequired: true,
-                hintText: "Select Task Mode",
-                prefixIcon: Icons.code,
-                items: _modes.map((m) => {"ID": m, "Name": m}).toList(),
-                valueKey: "ID",
-                labelKey: "Name",
-                value: _selectedMode,
-                isEnabled: true,
-                onChanged: (v) {
-                  setState(() => _selectedMode = v);
-                },
-              ),
-              SizedBox(height: 10.h),
-              CustomTextField(
-                labelText: "Task Title",
-                isRequired: true,
-                hintText: "Enter Task Title",
-                prefixIcon: Icons.title,
-                keyboardType: TextInputType.text,
-                controller: _title,
-                // fillColor: ThemeClass.darkBlue,
-              ),
-              SizedBox(height: 10.h),
-              CustomTextField(
-                labelText: "Task Details",
-                isRequired: true,
-                hintText: "Enter Task Details",
-                prefixIcon: Icons.description,
-                keyboardType: TextInputType.text,
-                controller: _desc,
-                maxLines: 2,
-                // fillColor: ThemeClass.darkBlue,
-              ),
-              SizedBox(height: 10.h),
-              CustomDropdownField<String>(
-                // fillColor: ThemeClass.darkBlue,
-                labelText: "Task Status",
-                isRequired: true,
-                hintText: "Select Task Status",
-                prefixIcon: Icons.check_circle_outline,
-                items: _statuses.map((s) => {"ID": s, "Name": s}).toList(),
-                valueKey: "ID",
-                labelKey: "Name",
-                value: _selectedStatus,
-                isEnabled: true,
-                onChanged: (v) => setState(() => _selectedStatus = v),
-              ),
-              SizedBox(height: 10.h),
-              CustomDateField(
-                selectedDate: _selectedDate,
-                onTap: _pickDate,
-                labelText: "Select Date",
-                isRequired: true,
-                prefixIcon: Icons.calendar_today,
-                hintText: "Select Date",
-                // fillColor: ThemeClass.darkBlue,
-              ),
-              SizedBox(height: 10.h),
-              Row(
-                children: [
-                  Flexible(
-                    child: CustomTimeField(
-                      // fillColor: ThemeClass.darkBlue,
-                      selectedTime: _startTime,
-                      onTap: _pickStartTime,
-                      labelText: "Start Time",
-                      isRequired: true,
-                      prefixIcon: Icons.access_time,
-                      hintText: "Start Time",
-                      validator: (time) {
-                        if (time == null) return "Start time is required";
-                        return null;
-                      },
-                    ),
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+      ],
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          children: [
+            CustomDropdownField<int>(
+              // fillColor: ThemeClass.darkBlue,
+              labelText: "Select Main Project",
+              isRequired: true,
+              hintText: "Select Main Project",
+              prefixIcon: Icons.work,
+              items: _projects
+                  .map(
+                    (p) => {
+                      "ID": p["ProjectId"],
+                      "Name": p["ProjectName"] ?? "",
+                    },
+                  )
+                  .toList(),
+              valueKey: "ID",
+              labelKey: "Name",
+              value: _selectedProjectId,
+              isEnabled: true,
+              onChanged: _onProjectChanged,
+            ),
+            SizedBox(height: 10.h),
+            CustomDropdownField<int>(
+              // fillColor: ThemeClass.darkBlue,
+              labelText: _selectedProjectId == null
+                  ? "Select Project First"
+                  : "Select Sub Project",
+              isRequired: true,
+              hintText: "Select Sub Project",
+              prefixIcon: Icons.work,
+              items: _filteredSubprojects
+                  .map(
+                    (sp) => {
+                      "ID": sp["SubProjectId"],
+                      "Name": sp["SubProjectName"] ?? "Unknown",
+                    },
+                  )
+                  .toList(),
+              valueKey: "ID",
+              labelKey: "Name",
+              value: _selectedSubProjectId,
+              isEnabled: _selectedProjectId != null,
+              onChanged: _onSubProjectChanged,
+            ),
+            SizedBox(height: 10.h),
+            CustomDropdownField<String>(
+              // fillColor: ThemeClass.darkBlue,
+              labelText: "Task Type",
+              isRequired: true,
+              hintText: "Select Task Mode",
+              prefixIcon: Icons.code,
+              items: _modes.map((m) => {"ID": m, "Name": m}).toList(),
+              valueKey: "ID",
+              labelKey: "Name",
+              value: _selectedMode,
+              isEnabled: true,
+              onChanged: (v) {
+                setState(() => _selectedMode = v);
+              },
+            ),
+            SizedBox(height: 10.h),
+            CustomTextField(
+              labelText: "Task Title",
+              isRequired: true,
+              hintText: "Enter Task Title",
+              prefixIcon: Icons.title,
+              keyboardType: TextInputType.text,
+              controller: _title,
+              // fillColor: ThemeClass.darkBlue,
+            ),
+            SizedBox(height: 10.h),
+            CustomTextField(
+              labelText: "Task Details",
+              isRequired: true,
+              hintText: "Enter Task Details",
+              prefixIcon: Icons.description,
+              keyboardType: TextInputType.text,
+              controller: _desc,
+              maxLines: 2,
+              // fillColor: ThemeClass.darkBlue,
+            ),
+            SizedBox(height: 10.h),
+            CustomDropdownField<String>(
+              // fillColor: ThemeClass.darkBlue,
+              labelText: "Task Status",
+              isRequired: true,
+              hintText: "Select Task Status",
+              prefixIcon: Icons.check_circle_outline,
+              items: _statuses.map((s) => {"ID": s, "Name": s}).toList(),
+              valueKey: "ID",
+              labelKey: "Name",
+              value: _selectedStatus,
+              isEnabled: true,
+              onChanged: (v) => setState(() => _selectedStatus = v),
+            ),
+            SizedBox(height: 10.h),
+            CustomDateField(
+              selectedDate: _selectedDate,
+              onTap: _pickDate,
+              labelText: "Select Date",
+              isRequired: true,
+              prefixIcon: Icons.calendar_today,
+              hintText: "Select Date",
+              // fillColor: ThemeClass.darkBlue,
+            ),
+            SizedBox(height: 10.h),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTimeField(
+                    // fillColor: ThemeClass.darkBlue,
+                    selectedTime: _startTime,
+                    onTap: _pickStartTime,
+                    labelText: "Start Time",
+                    isRequired: true,
+                    prefixIcon: Icons.access_time,
+                    hintText: "Start Time",
+                    validator: (time) {
+                      if (time == null) return "Start time is required";
+                      return null;
+                    },
                   ),
-                  SizedBox(width: 20.w),
-                  Flexible(
-                    child: CustomTimeField(
-                      // fillColor: ThemeClass.darkBlue,
-                      selectedTime: _endTime,
-                      onTap: _pickEndTime,
-                      labelText: "End Time",
-                      isRequired: true,
-                      prefixIcon: Icons.timer_off,
-                      hintText: "End Time",
-                      validator: (time) {
-                        if (time == null) return "End time is required";
-                        return null;
-                      },
-                    ),
+                ),
+                SizedBox(width: 20.w),
+                Flexible(
+                  child: CustomTimeField(
+                    // fillColor: ThemeClass.darkBlue,
+                    selectedTime: _endTime,
+                    onTap: _pickEndTime,
+                    labelText: "End Time",
+                    isRequired: true,
+                    prefixIcon: Icons.timer_off,
+                    hintText: "End Time",
+                    validator: (time) {
+                      if (time == null) return "End time is required";
+                      return null;
+                    },
                   ),
-                  // Expanded(
-                  //   child: GestureDetector(
-                  //     onTap: _pickStartTime,
-                  //     child: AbsorbPointer(
-                  //       child: TextField(
-                  //         decoration: _inputDecoration(
-                  //           _startTime == null ? "Start Time" : _startTime!.format(context),
-                  //           Icons.access_time,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // SizedBox(width: 10.h),
-                  // Expanded(
-                  //   child: GestureDetector(
-                  //     onTap: _pickEndTime,
-                  //     child: AbsorbPointer(
-                  //       child: TextField(
-                  //         decoration: _inputDecoration(
-                  //           _endTime == null ? "End Time" : _endTime!.format(context),
-                  //           Icons.timer_off,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
-              ),
-              SizedBox(height: 24.h),
-              CustomButton(icon: Icons.save, text: "Save Task", onPressed: _save),
-            ],
-          ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            CustomButton(icon: Icons.save, text: "Save Task", onPressed: _save),
+          ],
         ),
       ),
     );
   }
 }
+

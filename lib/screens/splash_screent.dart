@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_mate/services/api_service.dart';
+import 'package:task_mate/services/base_api_service.dart';
+import 'package:task_mate/services/user_service.dart';
 import 'package:task_mate/core/theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -58,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       return;
     }
     // Check internet first
-    if (!await ApiService.hasInternetConnection()) {
+    if (!await BaseApiService.hasInternetConnection()) {
       if (mounted) {
         Get.snackbar(
           "No Internet",
@@ -71,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     }
     try {
       // Validate user exists on server
-      final res = await ApiService.getCurrentUser();
+      final res = await UserService.getCurrentUser();
 
       if (res["success"] != true || res["user"] == null) {
         await prefs.clear();
@@ -370,3 +371,4 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return result ?? false;
   }
 }
+

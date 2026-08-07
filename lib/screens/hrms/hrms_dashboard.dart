@@ -8,6 +8,9 @@ import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
 import 'package:task_mate/screens/hrms/widgets/apply_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/approve_leave.dart';
 import 'package:task_mate/screens/hrms/widgets/dashboard.dart';
+import 'package:task_mate/controllers/theme_controller.dart';
+import 'package:task_mate/widgets/responsive_layout.dart';
+import 'package:task_mate/widgets/custom_appbar.dart';
 
 class HrmsDashboard extends StatefulWidget {
   const HrmsDashboard({super.key});
@@ -63,114 +66,155 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final bool isDesktop = ResponsiveLayout.isDesktop(context);
+    final customActions = [
+      IconButton(
+        icon: const Icon(Icons.home, color: Colors.white),
+        onPressed: () {
+          if (role == "superadmin") {
+            Get.offAllNamed('/adminDashboard');
+          } else if (role == "hr") {
+            Get.offAllNamed('/dashboard');
+          } else if (role == "employee") {
+            Get.offAllNamed('/homeScreen');
+          }
+        },
+      ),
+    ];
+
+    final desktopAppBar = DesktopAppBar(
+      title: "Dashboard - $userName",
+      userName: userName,
+      onLogout: () {},
+      isDarkMode: Get.find<ThemeController>().isDarkMode,
+      onToggleTheme: Get.find<ThemeController>().toggleTheme,
+      customActions: customActions,
+    );
+
+    final mobileAppBar = MobileAppBar(
+      title: "Dashboard - $userName",
+      userName: userName,
+      onLogout: () {},
+      isDarkMode: Get.find<ThemeController>().isDarkMode,
+      onToggleTheme: Get.find<ThemeController>().toggleTheme,
+      customActions: customActions,
+    );
+
+    final hrmsDrawer = Drawer(
+      width: 250,
       backgroundColor: ThemeClass.darkBgColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text("Dashboard - $userName", style: Theme.of(context).textTheme.titleLarge),
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              if (role == "superadmin") {
-                Get.offAllNamed('/adminDashboard');
-              } else if (role == "hr") {
-                Get.offAllNamed('/dashboard');
-              } else if (role == "employee") {
-                Get.offAllNamed('/homeScreen');
-              }
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          Container(
+            height: 150.h,
+            padding: EdgeInsets.all(15.w).copyWith(top: 80.h),
+            decoration: const BoxDecoration(color: ThemeClass.primaryGreen),
+            child: Text(
+              'Manage Leaves',
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: ThemeClass.textWhite,
+              ),
+            ),
+          ),
+          ListTile(
+            title: Text('Dashboard', style: TextStyle(color: Colors.white)),
+            selected: _selectedIndex == 0,
+            selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
+            onTap: () {
+              _onItemTapped(0);
+              if (!isDesktop) Navigator.pop(context);
             },
           ),
+          ListTile(
+            title: Text('Apply Leave', style: TextStyle(color: Colors.white)),
+            selected: _selectedIndex == 1,
+            selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
+            onTap: () {
+              _onItemTapped(1);
+              if (!isDesktop) Navigator.pop(context);
+            },
+          ),
+          if (role == "hr" || role == "superadmin") ...[
+            ListTile(
+              title: Text(
+                'Approve Leave',
+                style: TextStyle(color: Colors.white),
+              ),
+              selected: _selectedIndex == 2,
+              selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
+              onTap: () {
+                _onItemTapped(2);
+                if (!isDesktop) Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text(
+                'Add Employee',
+                style: TextStyle(color: Colors.white),
+              ),
+              selected: _selectedIndex == 3,
+              selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
+              onTap: () {
+                _onItemTapped(3);
+                if (!isDesktop) Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text(
+                'All Employee',
+                style: TextStyle(color: Colors.white),
+              ),
+              selected: _selectedIndex == 4,
+              selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
+              onTap: () {
+                _onItemTapped(4);
+                if (!isDesktop) Navigator.pop(context);
+              },
+            ),
+          ],
         ],
       ),
-      body: SafeArea(
-        child: IndexedStack(
-          index: _selectedIndex,
-          children: [
-            const Dashboard(),
-            const ApplyLeave(),
-            if (role == "hr" || role == "superadmin") ...[
-              const ApproveLeave(),
-              const AllEmployee(),
-            ],
-          ],
-        ),
-      ),
-      drawer: Drawer(
-        width: 250,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            Container(
-              height: 150.h,
-              padding: EdgeInsets.all(15.w).copyWith(top: 80.h),
-              decoration: BoxDecoration(color: ThemeClass.primaryGreen),
-              child: Text(
-                'Manage Leaves',
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeClass.textWhite,
-                ),
-              ),
-            ),
-            ListTile(
-              title: const Text('Dashboard'),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                _onItemTapped(0);
-                Navigator.pop(context);
-              },
-            ),
+    );
 
-            ListTile(
-              title: const Text('Apply Leave'),
-              selected: _selectedIndex == 1,
-              onTap: () {
-                _onItemTapped(1);
-                Navigator.pop(context);
-              },
+    final content = IndexedStack(
+      index: _selectedIndex,
+      children: [
+        const Dashboard(),
+        const ApplyLeave(),
+        if (role == "hr" || role == "superadmin") ...[
+          const ApproveLeave(),
+          const AllEmployee(),
+        ],
+      ],
+    );
+
+    if (isDesktop) {
+      return Scaffold(
+        backgroundColor: ThemeClass.darkBgColor,
+        body: Row(
+          children: [
+            hrmsDrawer,
+            Expanded(
+              child: Column(
+                children: [
+                  desktopAppBar,
+                  Expanded(child: content),
+                ],
+              ),
             ),
-            if (role == "hr" || role == "superadmin") ...[
-              ListTile(
-                title: const Text('Approve Leave'),
-                selected: _selectedIndex == 2,
-                onTap: () {
-                  _onItemTapped(2);
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('Add Employee'),
-                selected: _selectedIndex == 3,
-                onTap: () {
-                  _onItemTapped(3);
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('All Employee'),
-                selected: _selectedIndex == 4,
-                onTap: () {
-                  _onItemTapped(4);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
           ],
         ),
-      ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: ThemeClass.darkBgColor,
+      appBar: mobileAppBar,
+      body: SafeArea(child: content),
+      drawer: hrmsDrawer,
     );
   }
 }
