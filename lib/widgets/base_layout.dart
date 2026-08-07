@@ -72,7 +72,13 @@ class _BaseLayoutState extends State<BaseLayout> {
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 1200),
-                        child: widget.child,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 48.0,
+                            vertical: 32.0,
+                          ),
+                          child: widget.child,
+                        ),
                       ),
                     ),
                   ),

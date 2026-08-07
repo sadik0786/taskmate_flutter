@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/model/leave_request_model.dart';
-import 'package:task_mate/screens/no_data.dart';
-import 'package:task_mate/screens/page_loader.dart';
+import 'package:task_mate/widgets/no_data.dart';
+import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/utils/common_fn.dart';
 
 class Dashboard extends StatefulWidget {

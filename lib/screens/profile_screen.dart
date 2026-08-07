@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/screens/page_loader.dart';
+import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/services/base_api_service.dart';
 import 'package:task_mate/services/auth_service.dart';
 import 'package:task_mate/services/user_service.dart';

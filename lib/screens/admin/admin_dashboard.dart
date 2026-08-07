@@ -5,16 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 
-import 'package:task_mate/screens/page_loader.dart';
+import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/services/user_service.dart';
 import 'package:task_mate/services/task_service.dart';
 import 'package:task_mate/services/project_service.dart';
 import 'package:task_mate/widgets/responsive_layout.dart';
 
 class AdminDashboard extends StatefulWidget {
-  static final GlobalKey<AdminDashboardState> dashboardKey = GlobalKey();
-
-  AdminDashboard({Key? key}) : super(key: key ?? dashboardKey);
+  const AdminDashboard({super.key});
 
   @override
   State<AdminDashboard> createState() => AdminDashboardState();
@@ -32,7 +30,14 @@ class AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
+    Get.put<AdminDashboardState>(this);
     _loadUser();
+  }
+
+  @override
+  void dispose() {
+    Get.delete<AdminDashboardState>();
+    super.dispose();
   }
 
   Future<void> loadSummaryData() async {
@@ -314,11 +319,12 @@ class AdminDashboardState extends State<AdminDashboard> {
                           ),
                           Text(
                             value.toString(),
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 36.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                              shadows: [
+                              shadows: const [
                                 Shadow(
                                   color: Colors.black26,
                                   blurRadius: 10,
@@ -332,6 +338,7 @@ class AdminDashboardState extends State<AdminDashboard> {
                       SizedBox(height: 20.h),
                       Text(
                         title,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 18.sp,
                           color: Colors.white.withOpacity(0.9),
@@ -353,6 +360,9 @@ class AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     final items = _getMenuItems();
+    final isDesktop =
+        ResponsiveLayout.isDesktop(context) ||
+        ResponsiveLayout.isTablet(context);
 
     return BaseLayout(
       title: "Task Mate",
@@ -370,8 +380,7 @@ class AdminDashboardState extends State<AdminDashboard> {
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16.h),
-                    if (ResponsiveLayout.isDesktop(context) ||
-                        ResponsiveLayout.isTablet(context))
+                    if (isDesktop)
                       Row(
                         children: [
                           Expanded(

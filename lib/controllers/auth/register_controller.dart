@@ -237,10 +237,10 @@ class RegisterController extends GetxController {
       email.clear();
       mobile.clear();
       password.clear();
-      selectedAdminId.value = null;
-
-      // Trigger Dashboard reload
-      AdminDashboard.dashboardKey.currentState?.loadSummaryData();
+      // Trigger Dashboard reload if it exists
+      if (Get.isRegistered<AdminDashboardState>()) {
+        Get.find<AdminDashboardState>().loadSummaryData();
+      }
 
       // Navigate to dashboard safely
       Get.until(

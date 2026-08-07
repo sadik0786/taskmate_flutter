@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/screens/no_data.dart';
-import 'package:task_mate/screens/page_loader.dart';
+import 'package:task_mate/widgets/no_data.dart';
+import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/services/user_service.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 
@@ -63,7 +63,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.until((route) => route.settings.name == Routes.adminDashboard || route.isFirst);
+            Get.until(
+              (route) =>
+                  route.settings.name == Routes.adminDashboard || route.isFirst,
+            );
           },
         ),
       ],
@@ -71,212 +74,245 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
           ? const PageLoader()
           : employees.isEmpty
           ? const Center(child: NoTasksWidget(message: "No Employee added"))
-          : ListView.builder(
-              padding: EdgeInsets.all(12.w),
-              itemCount: employees.length,
-              itemBuilder: (context, index) {
-                final e = employees[index];
-                final role = e["RoleName"] ?? "";
-                final name = e["Name"] ?? "";
-                final email = e["Email"] ?? "";
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = constraints.maxWidth > 800;
 
-                return Dismissible(
-                  key: ValueKey(e["ID"]),
-                  direction: DismissDirection.endToStart,
-                  background: ClipRRect(
-                    borderRadius: BorderRadius.circular(14.r),
-                    child: Container(
-                      color: Colors.redAccent,
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: Icon(Icons.delete, color: Colors.white),
+                Widget buildCard(int index) {
+                  final e = employees[index];
+                  final role = e["RoleName"] ?? "";
+                  final name = e["Name"] ?? "";
+                  final email = e["Email"] ?? "";
+
+                  return Dismissible(
+                    key: ValueKey(e["ID"]),
+                    direction: DismissDirection.endToStart,
+                    background: ClipRRect(
+                      borderRadius: BorderRadius.circular(14.r),
+                      child: Container(
+                        color: Colors.redAccent,
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
                     ),
-                  ),
-                  confirmDismiss: (direction) async {
-                    // show delete confirmation
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      barrierColor: Colors.transparent,
-                      builder: (ctx) => Stack(
-                        children: [
-                          BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                            child: Container(
-                              color: Colors.black.withOpacity(0),
-                            ),
-                          ),
-                          Center(
-                            child: AlertDialog(
-                              backgroundColor: ThemeClass.darkBlue,
-                              title: Text(
-                                "Confirm Delete",
-                                style: Theme.of(context).textTheme.bodySmall,
-                                textAlign: TextAlign.center,
+                    confirmDismiss: (direction) async {
+                      // show delete confirmation
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        barrierColor: Colors.transparent,
+                        builder: (ctx) => Stack(
+                          children: [
+                            BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                              child: Container(
+                                color: Colors.black.withOpacity(0),
                               ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Are you sure you want to delete?🤔",
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Text(
-                                    "👉$name",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge!
-                                        .copyWith(
-                                          color: ThemeClass.textWhite,
-                                          fontSize: 18,
+                            ),
+                            Center(
+                              child: AlertDialog(
+                                backgroundColor: ThemeClass.darkBlue,
+                                title: Text(
+                                  "Confirm Delete",
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  textAlign: TextAlign.center,
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Are you sure you want to delete?🤔",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    Text(
+                                      "👉$name",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge!
+                                          .copyWith(
+                                            color: ThemeClass.textWhite,
+                                            fontSize: 18,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                                actionsAlignment: MainAxisAlignment.center,
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.grey.shade300,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 20.w,
+                                        vertical: 10.h,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
                                         ),
-                                    textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "Cancel",
+                                      style: TextStyle(
+                                        color: ThemeClass.textBlack,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.sp,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.redAccent,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 20.w,
+                                        vertical: 10.h,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "Delete",
+                                      style: TextStyle(
+                                        color: ThemeClass.textWhite,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              actionsAlignment: MainAxisAlignment.center,
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, false),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.grey.shade300,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Cancel",
-                                    style: TextStyle(
-                                      color: ThemeClass.textBlack,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.sp,
-                                    ),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, true),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.redAccent,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Delete",
-                                    style: TextStyle(
-                                      color: ThemeClass.textWhite,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    );
+                          ],
+                        ),
+                      );
 
-                    if (confirm == true) {
-                      // Call API to delete employee
-                      final success = await UserService.deleteEmployee(e["ID"]);
-                      if (success) {
-                        Get.snackbar(
-                          "$name",
-                          "Deleted successfully",
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
+                      if (confirm == true) {
+                        // Call API to delete employee
+                        final success = await UserService.deleteEmployee(
+                          e["ID"],
                         );
-                        return true; // actually remove item from the list
-                      } else {
-                        Get.snackbar(
-                          "$name",
-                          "Failed to delete employee",
-                          backgroundColor: Colors.redAccent,
-                          colorText: Colors.white,
-                        );
-                        return false; // keep the item
-                      }
-                    }
-                    return false; // user canceled
-                  },
-                  child: Card(
-                    color: ThemeClass.tealGreen,
-                    margin: EdgeInsets.symmetric(vertical: 8.h),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      side: BorderSide(color: Colors.white, width: 1.2),
-                    ),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.only(
-                        left: 12.w,
-                        top: 4.h,
-                        bottom: 4.h,
-                        right: 5.w,
-                      ),
-                      leading: CircleAvatar(
-                        radius: 20.r,
-                        backgroundColor: ThemeClass.primaryGreen,
-                        backgroundImage:
-                            e["ProfileImage"] != null &&
-                                e["ProfileImage"].isNotEmpty
-                            ? NetworkImage("${e["ProfileImage"]}")
-                            : null,
-                        child:
-                            e["ProfileImage"] == null ||
-                                e["ProfileImage"].isEmpty
-                            ? Text(
-                                name.isNotEmpty ? name[0].toUpperCase() : "?",
-                                style: Theme.of(context).textTheme.titleLarge,
-                              )
-                            : null,
-                      ),
-                      title: Row(
-                        children: [
-                          Text(
+                        if (success) {
+                          Get.snackbar(
                             "$name",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          Text(
-                            " ($role)",
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ],
+                            "Deleted successfully",
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                          return true; // actually remove item from the list
+                        } else {
+                          Get.snackbar(
+                            "$name",
+                            "Failed to delete employee",
+                            backgroundColor: Colors.redAccent,
+                            colorText: Colors.white,
+                          );
+                          return false; // keep the item
+                        }
+                      }
+                      return false; // user canceled
+                    },
+                    child: Card(
+                      color: ThemeClass.tealGreen,
+                      margin: isDesktop
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(vertical: 8.h),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                        side: BorderSide(color: Colors.white, width: 1.2),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Assigned to : ${e["AddedByName"] ?? "Unknown"}",
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Text(
-                            email,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ],
+                      child: ListTile(
+                        contentPadding: EdgeInsets.only(
+                          left: 12.w,
+                          top: 4.h,
+                          bottom: 4.h,
+                          right: 5.w,
+                        ),
+                        leading: CircleAvatar(
+                          radius: 20.r,
+                          backgroundColor: ThemeClass.primaryGreen,
+                          backgroundImage:
+                              e["ProfileImage"] != null &&
+                                  e["ProfileImage"].isNotEmpty
+                              ? NetworkImage("${e["ProfileImage"]}")
+                              : null,
+                          child:
+                              e["ProfileImage"] == null ||
+                                  e["ProfileImage"].isEmpty
+                              ? Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : "?",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                )
+                              : null,
+                        ),
+                        title: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                "$name",
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                            Text(
+                              " ($role)",
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Assigned to : ${e["AddedByName"] ?? "Unknown"}",
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(
+                              email,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Get.toNamed(
+                            Routes.employeeTaskScreen,
+                            arguments: {
+                              "empId": e["ID"],
+                              "empName": e["Name"] ?? "Employee",
+                            },
+                          );
+                        },
                       ),
-                      onTap: () {
-                        Get.toNamed(
-                          Routes.employeeTaskScreen,
-                          arguments: {
-                            "empId": e["ID"],
-                            "empName": e["Name"] ?? "Employee",
-                          },
-                        );
-                      },
                     ),
-                  ),
+                  );
+                }
+
+                if (isDesktop) {
+                  return GridView.builder(
+                    padding: EdgeInsets.all(12.w),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 450,
+                      mainAxisExtent: 110.h,
+                      crossAxisSpacing: 16.w,
+                      mainAxisSpacing: 16.h,
+                    ),
+                    itemCount: employees.length,
+                    itemBuilder: (context, index) => buildCard(index),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: EdgeInsets.all(12.w),
+                  itemCount: employees.length,
+                  itemBuilder: (context, index) => buildCard(index),
                 );
               },
             ),

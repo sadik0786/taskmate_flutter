@@ -81,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       : registerController.currentUserRole.value.toLowerCase() == "hr"
                                       ? "Employees"
                                       : "No permission"}",
-                                  style: Theme.of(context).textTheme.titleMedium
+                                  style: Theme.of(context).textTheme.titleSmall
                                       ?.copyWith(
                                         color: Colors.grey[400],
                                         fontWeight: FontWeight.w400,
