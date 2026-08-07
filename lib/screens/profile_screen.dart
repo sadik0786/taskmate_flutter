@@ -70,13 +70,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     switch (role) {
       case 'superadmin':
-        Get.offAllNamed(Routes.adminDashboard);
+        Get.until(
+          (route) =>
+              route.settings.name == Routes.adminDashboard || route.isFirst,
+        );
         break;
       case 'admin':
-        Get.offAllNamed(Routes.adminDashboard);
+        Get.until(
+          (route) =>
+              route.settings.name == Routes.adminDashboard || route.isFirst,
+        );
+        break;
+      case 'ceo':
+      case 'hr':
+        Get.until(
+          (route) =>
+              route.settings.name == Routes.adminDashboard || route.isFirst,
+        );
         break;
       case 'employee':
-        Get.offAllNamed(Routes.homeScreen);
+        Get.until(
+          (route) => route.settings.name == Routes.homeScreen || route.isFirst,
+        );
         break;
       default:
         // If role not recognized, clear data and go to login
@@ -696,4 +711,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

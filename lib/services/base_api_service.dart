@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BaseApiService {
   // Update this to your local IP or backend URL
-  static const String baseUrl = "http://192.168.1.18:3000/api";
-  
+  static const String baseUrl = "http://192.168.1.117:5000/api";
+
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("token", token);
@@ -29,8 +29,9 @@ class BaseApiService {
   static Future<bool> hasInternetConnection() async {
     if (kIsWeb) return true; // dart:io is not supported on web
     try {
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 5));
+      final result = await InternetAddress.lookup(
+        'google.com',
+      ).timeout(const Duration(seconds: 5));
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
     } on SocketException catch (_) {
       return false;

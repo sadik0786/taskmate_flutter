@@ -45,9 +45,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       if (!mounted) return;
       setState(() => _emailVerified = exists);
       exists
-          ? CustomSnackBar.success("Email verified. You can now set a new password.")
-          : CustomSnackBar.error("Email not found or you don't have permission",
-      );
+          ? CustomSnackBar.success(
+              "Email verified. You can now set a new password.",
+            )
+          : CustomSnackBar.error(
+              "Email not found or you don't have permission",
+            );
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(
       //     content: Text(
@@ -59,7 +62,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       // );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -75,7 +80,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
 
     setState(() => _loading = true);
-    final res = await AuthService.changePassword(_email.text.trim(), _newPassword.text);
+    final res = await AuthService.changePassword(
+      _email.text.trim(),
+      _newPassword.text,
+    );
     setState(() => _loading = false);
 
     if (!mounted) return;
@@ -114,7 +122,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.offAllNamed(Routes.adminDashboard);
+            Get.until(
+              (route) =>
+                  route.settings.name == Routes.adminDashboard || route.isFirst,
+            );
           },
         ),
       ],
@@ -144,20 +155,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(Icons.lock_reset, size: 60.sp, color: Theme.of(context).primaryColor.withOpacity(0.8)),
+        Icon(
+          Icons.lock_reset,
+          size: 60.sp,
+          color: Theme.of(context).primaryColor.withOpacity(0.8),
+        ),
         SizedBox(height: 10.h),
         Text(
           "Reset Employee Password",
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         SizedBox(height: 8.h),
         Text(
           "Securely reset passwords for employees under your management",
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
       ],
@@ -185,7 +196,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           width: 32.w,
           height: 32.h,
           decoration: BoxDecoration(
-            color: isCompleted ? Theme.of(context).primaryColor : Colors.grey[300],
+            color: isCompleted
+                ? Theme.of(context).primaryColor
+                : Colors.grey[300],
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -194,7 +207,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 : Text(
                     stepNumber.toString(),
                     style: TextStyle(
-                      color: isCompleted ? ThemeClass.primaryGreen : ThemeClass.darkBlue,
+                      color: isCompleted
+                          ? ThemeClass.primaryGreen
+                          : ThemeClass.darkBlue,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -219,9 +234,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       children: [
         Text(
           "Step 1: Verify Employee Email",
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         SizedBox(height: 8.h),
         Text(
@@ -270,8 +283,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         SizedBox(height: 32.h),
 
         // Verify Button
-        CustomButton(text: "Verify Email", onPressed: _checkEmail, isLoading: _loading),
-        
+        CustomButton(
+          text: "Verify Email",
+          onPressed: _checkEmail,
+          isLoading: _loading,
+        ),
       ],
     );
   }
@@ -285,7 +301,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           onTap: _resetFlow,
           child: Row(
             children: [
-              Icon(Icons.arrow_back_ios_new, size: 16.sp, color: ThemeClass.darkBlue),
+              Icon(
+                Icons.arrow_back_ios_new,
+                size: 16.sp,
+                color: ThemeClass.darkBlue,
+              ),
               SizedBox(width: 4.w),
               Text(
                 "Back to email verification",
@@ -301,9 +321,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
         Text(
           "Step 2: Set New Password",
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
         SizedBox(height: 8.h),
         Text(
@@ -341,8 +359,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             return null;
           },
         ),
-     
-      
+
         SizedBox(height: 32.h),
 
         // Update Button
@@ -356,4 +373,3 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     );
   }
 }
-

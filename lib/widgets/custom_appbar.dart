@@ -81,6 +81,7 @@ class DesktopAppBar extends StatelessWidget {
                     "Hi, ${userName ?? ""}",
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: Colors.black,
                     ),
                   ),
                 ],

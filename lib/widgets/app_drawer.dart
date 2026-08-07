@@ -116,7 +116,11 @@ class _AppDrawerState extends State<AppDrawer> {
 
     return isDesktop
         ? Material(child: drawerContent)
-        : Drawer(backgroundColor: ThemeClass.darkBgColor, child: drawerContent);
+        : Drawer(
+            width: 260.w,
+            backgroundColor: ThemeClass.darkBgColor,
+            child: drawerContent,
+          );
   }
 
   List<Widget> _buildMenuItems() {

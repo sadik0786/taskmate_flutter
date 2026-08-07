@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/model/auth/register_request_model.dart';
 import 'package:task_mate/services/auth_service.dart';
 import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/screens/admin/admin_dashboard.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class RegisterController extends GetxController {
@@ -105,12 +107,17 @@ class RegisterController extends GetxController {
         if (roleLower == "ceo") {
           allRoles = allRoles.where((r) {
             final roleName = (r["RoleName"] ?? "").toString().toLowerCase();
-            return roleName == "hr" || roleName == "accountant" || roleName == "superadmin";
+            return roleName == "hr" ||
+                roleName == "accountant" ||
+                roleName == "manager" ||
+                roleName == "superadmin";
           }).toList();
         } else if (roleLower == "hr") {
           allRoles = allRoles.where((r) {
             final roleName = (r["RoleName"] ?? "").toString().toLowerCase();
-            return roleName == "admin" || roleName == "employee";
+            return roleName == "manager" ||
+                roleName == "admin" ||
+                roleName == "employee";
           }).toList();
         } else {
           allRoles = [];
@@ -188,9 +195,14 @@ class RegisterController extends GetxController {
 
     final currentRole = currentUserRole.value.toLowerCase();
 
-    final selectedRoleData = roles.firstWhere((r) => r["RoleId"] == roleId, orElse: () => {});
+    final selectedRoleData = roles.firstWhere(
+      (r) => r["RoleId"] == roleId,
+      orElse: () => {},
+    );
 
-    final selectedRoleName = (selectedRoleData["RoleName"] ?? "").toString().toLowerCase();
+    final selectedRoleName = (selectedRoleData["RoleName"] ?? "")
+        .toString()
+        .toLowerCase();
 
     // Superadmin assigning employee must select admin
     if ((currentRole == 'hr' || currentRole == 'superadmin') &&
@@ -219,10 +231,24 @@ class RegisterController extends GetxController {
     // ✅ Handle Typed Response
     if (response.success == true) {
       CustomSnackBar.success("Added successfully!");
-      Get.back();
+
+      // Clear fields
+      name.clear();
+      email.clear();
+      mobile.clear();
+      password.clear();
+      selectedAdminId.value = null;
+
+      // Trigger Dashboard reload
+      AdminDashboard.dashboardKey.currentState?.loadSummaryData();
+
+      // Navigate to dashboard safely
+      Get.until(
+        (route) =>
+            route.settings.name == Routes.adminDashboard || route.isFirst,
+      );
     } else {
       CustomSnackBar.error("Failed to add employee");
     }
   }
 }
-

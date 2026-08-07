@@ -51,7 +51,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Failed to load employees")));
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -63,7 +63,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.offAllNamed(Routes.adminDashboard);
+            Get.until((route) => route.settings.name == Routes.adminDashboard || route.isFirst);
           },
         ),
       ],
@@ -404,4 +404,3 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   //               },
   //             ),
 }
-

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,6 +106,9 @@ class LoginController extends GetxController
         await prefs.setString("token", res.token ?? "");
         await prefs.setString("role", role);
         await prefs.setInt("userId", userId);
+        if (kDebugMode) {
+          print("token is: ${res.token}");
+        }
         //  role-based navigation
         switch (role) {
           case "ceo":

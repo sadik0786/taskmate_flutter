@@ -12,13 +12,15 @@ import 'package:task_mate/services/project_service.dart';
 import 'package:task_mate/widgets/responsive_layout.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+  static final GlobalKey<AdminDashboardState> dashboardKey = GlobalKey();
+
+  AdminDashboard({Key? key}) : super(key: key ?? dashboardKey);
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AdminDashboard> createState() => AdminDashboardState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class AdminDashboardState extends State<AdminDashboard> {
   String? userName;
   String? role;
 
@@ -33,7 +35,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     _loadUser();
   }
 
-  Future<void> _loadSummaryData() async {
+  Future<void> loadSummaryData() async {
     try {
       final employees = await UserService.fetchEmployees();
       final projects = await ProjectService.fetchProjects();
@@ -67,7 +69,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       userName = prefs.getString("name") ?? "Employee";
       role = prefs.getString("role")?.toLowerCase() ?? "employee";
     });
-    _loadSummaryData();
+    loadSummaryData();
   }
 
   List<_DashboardItem> _getMenuItems() {
@@ -80,16 +82,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.lightBlueAccent.shade400,
             Colors.lightBlueAccent.shade200,
           ],
-          onTap: () {
-            Get.toNamed(Routes.registerScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.registerScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
           title: 'Employee',
           icon: Icons.people,
           gradient: [Colors.greenAccent.shade400, Colors.greenAccent.shade200],
-          onTap: () {
-            Get.toNamed(Routes.employeeScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.employeeScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
@@ -99,8 +103,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.purpleAccent.shade200,
             Colors.purpleAccent.shade100,
           ],
-          onTap: () {
-            Get.toNamed(Routes.profileScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.profileScreen);
+            loadSummaryData();
           },
         ),
       ];
@@ -114,16 +119,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.lightBlueAccent.shade400,
             Colors.lightBlueAccent.shade200,
           ],
-          onTap: () {
-            Get.toNamed(Routes.registerScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.registerScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
           title: 'Employee',
           icon: Icons.people,
           gradient: [Colors.greenAccent.shade400, Colors.greenAccent.shade200],
-          onTap: () {
-            Get.toNamed(Routes.employeeScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.employeeScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
@@ -133,16 +140,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.orangeAccent.shade400,
             Colors.orangeAccent.shade200,
           ],
-          onTap: () {
-            Get.toNamed(Routes.employeeTaskScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.employeeTaskScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
           title: 'Reset Password',
           icon: Icons.password_sharp,
           gradient: [Colors.red.shade400, Colors.red.shade300],
-          onTap: () {
-            Get.toNamed(Routes.resetPasswordPage);
+          onTap: () async {
+            await Get.toNamed(Routes.resetPasswordPage);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
@@ -152,8 +161,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.purpleAccent.shade200,
             Colors.purpleAccent.shade100,
           ],
-          onTap: () {
-            Get.toNamed(Routes.profileScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.profileScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
@@ -163,8 +173,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.lightBlueAccent.shade400,
             Colors.lightBlueAccent.shade200,
           ],
-          onTap: () {
-            Get.toNamed(Routes.hrmsDashboard);
+          onTap: () async {
+            await Get.toNamed(Routes.hrmsDashboard);
+            loadSummaryData();
           },
         ),
       ];
@@ -177,24 +188,27 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.lightBlueAccent.shade400,
             Colors.lightBlueAccent.shade200,
           ],
-          onTap: () {
-            Get.toNamed(Routes.registerScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.registerScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
           title: 'Employee',
           icon: Icons.people,
           gradient: [Colors.greenAccent.shade400, Colors.greenAccent.shade200],
-          onTap: () {
-            Get.toNamed(Routes.employeeScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.employeeScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
           title: 'Add Project',
           icon: Icons.library_add,
           gradient: [Colors.green.shade400, Colors.green.shade300],
-          onTap: () {
-            Get.toNamed(Routes.projectScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.projectScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
@@ -204,26 +218,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.orangeAccent.shade400,
             Colors.orangeAccent.shade200,
           ],
-          onTap: () {
-            Get.toNamed(Routes.addTaskScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.addTaskScreen);
+            loadSummaryData();
           },
         ),
         _DashboardItem(
           title: 'Task Details',
           icon: Icons.task,
           gradient: [Colors.red.shade400, Colors.red.shade300],
-          onTap: () {
-            Get.toNamed(Routes.taskScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.taskScreen);
+            loadSummaryData();
           },
         ),
-        // _DashboardItem(
-        //   title: 'Reset Password',
-        //   icon: Icons.password_sharp,
-        //   gradient: [Colors.deepOrange.shade600, Colors.deepOrange.shade300],
-        //   onTap: () {
-        //     Get.toNamed(Routes.resetPasswordPage);
-        //   },
-        // ),
         _DashboardItem(
           title: 'My Profile',
           icon: Icons.account_circle,
@@ -231,8 +239,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Colors.purpleAccent.shade200,
             Colors.purpleAccent.shade100,
           ],
-          onTap: () {
-            Get.toNamed(Routes.profileScreen);
+          onTap: () async {
+            await Get.toNamed(Routes.profileScreen);
+            loadSummaryData();
           },
         ),
       ];
@@ -259,61 +268,78 @@ class _AdminDashboardState extends State<AdminDashboard> {
             curve: Curves.easeOutBack,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(horizontal: 6.w, vertical: 8.h),
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 20.h),
+              margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Theme.of(context).cardColor,
-                    Theme.of(context).cardColor,
-                  ],
+                  colors: [color.withOpacity(0.8), color.withOpacity(1.0)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(color: color.withOpacity(0.3), width: 1),
+                borderRadius: BorderRadius.circular(24.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: color.withOpacity(0.4),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Icon(
+                      icon,
+                      size: 80.sp,
+                      color: Colors.white.withOpacity(0.2),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: EdgeInsets.all(10.w),
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(icon, size: 32.sp, color: color),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(12.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Icon(icon, size: 28.sp, color: Colors.white),
+                          ),
+                          Text(
+                            value.toString(),
+                            style: TextStyle(
+                              fontSize: 36.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                      SizedBox(height: 20.h),
                       Text(
-                        value.toString(),
+                        title,
                         style: TextStyle(
-                          fontSize: 32.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          fontSize: 18.sp,
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w600,
-                    ),
                   ),
                 ],
               ),
@@ -567,4 +593,3 @@ class _ModernCardState extends State<_ModernCard>
     );
   }
 }
-

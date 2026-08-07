@@ -58,8 +58,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
       setState(() {
         userRole = "employee";
       });
-      CustomSnackBar.warning("Failed to fetch user role: ${res['error'] ?? 'Unknown error'}");
-    
+      CustomSnackBar.warning(
+        "Failed to fetch user role: ${res['error'] ?? 'Unknown error'}",
+      );
     }
   }
 
@@ -154,7 +155,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
             if (userRole == "admin") {
-              Get.offAllNamed(Routes.adminDashboard);
+              Get.until(
+                (route) =>
+                    route.settings.name == Routes.adminDashboard ||
+                    route.isFirst,
+              );
             } else {
               Get.offNamed(Routes.homeScreen);
             }
@@ -185,7 +190,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   SizedBox(height: 20.h),
-                  CustomButton(text: "Add Project", onPressed: _addProject, isLoading: _loading),
+                  CustomButton(
+                    text: "Add Project",
+                    onPressed: _addProject,
+                    isLoading: _loading,
+                  ),
                   SizedBox(height: 20.h),
                 ],
                 Align(
@@ -195,19 +204,29 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     children: [
                       Text(
                         "All Projects",
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge,
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                       OutlinedButton.icon(
                         onPressed: _showAddSubProjectBottomSheet,
                         style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                          side: BorderSide(color: ThemeClass.warningColor, width: 1),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          side: BorderSide(
+                            color: ThemeClass.warningColor,
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                           minimumSize: const Size(0, 32),
                         ),
-                        icon: Icon(Icons.add, size: 16.sp, color: ThemeClass.textWhite),
+                        icon: Icon(
+                          Icons.add,
+                          size: 16.sp,
+                          color: ThemeClass.textWhite,
+                        ),
                         label: Text(
                           "SubProject",
                           style: Theme.of(context).textTheme.titleMedium,
@@ -221,14 +240,18 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   child: _loadingProjects
                       ? const PageLoader()
                       : _projects.isEmpty
-                      ? Center(child: NoTasksWidget(message: "No project added!"))
+                      ? Center(
+                          child: NoTasksWidget(message: "No project added!"),
+                        )
                       : ListView.separated(
                           itemCount: _projects.length,
-                          separatorBuilder: (_, __) =>
-                              Divider(color: Theme.of(context).colorScheme.primary),
+                          separatorBuilder: (_, _) => Divider(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                           itemBuilder: (context, index) {
                             final project = _projects[index];
-                            final creatorName = project["creatorName"] ?? "Unknown";
+                            final creatorName =
+                                project["creatorName"] ?? "Unknown";
                             final createdAt = project["createdAt"] != null
                                 ? DateFormat(
                                     'dd/MM/yyyy hh:mm a',
@@ -244,24 +267,27 @@ class _ProjectScreenState extends State<ProjectScreen> {
                               ),
                               title: Text(
                                 "Project: ${project["ProjectName"].toString().toUpperCase()}",
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleMedium!.copyWith(color: ThemeClass.textWhite),
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .copyWith(color: ThemeClass.textWhite),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "Created by: $creatorName",
-                                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                      color: ThemeClass.warningColor,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                          color: ThemeClass.warningColor,
+                                        ),
                                   ),
                                   Text(
                                     "Date: $createdAt",
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium!.copyWith(color: ThemeClass.darkBlue),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(color: ThemeClass.darkBlue),
                                   ),
                                 ],
                               ),
@@ -277,13 +303,15 @@ class _ProjectScreenState extends State<ProjectScreen> {
     );
   }
 
-  DropdownButtonFormField2<Map<String, dynamic>> dropDownList(BuildContext context) {
+  DropdownButtonFormField2<Map<String, dynamic>> dropDownList(
+    BuildContext context,
+  ) {
     return DropdownButtonFormField2<Map<String, dynamic>>(
       isExpanded: true,
-      value: _selectedProject,
+      valueListenable: ValueNotifier(_selectedProject),
       items: _projectslist
           .map(
-            (p) => DropdownMenuItem<Map<String, dynamic>>(
+            (p) => DropdownItem<Map<String, dynamic>>(
               value: p,
               child: Text(p["ProjectName"] ?? ""),
             ),
@@ -311,7 +339,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         width: MediaQuery.of(context).size.width - 40.w,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       ),
-      buttonStyleData: ButtonStyleData(
+      buttonStyleData: FormFieldButtonStyleData(
         padding: EdgeInsets.symmetric(horizontal: 6.w),
         height: 20.h,
         width: double.infinity,
@@ -342,7 +370,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Add SubProject", style: Theme.of(ctx).textTheme.titleLarge),
+                Text(
+                  "Add SubProject",
+                  style: Theme.of(ctx).textTheme.titleLarge,
+                ),
                 SizedBox(height: 20.h),
                 CustomDropdownField<int>(
                   fillColor: ThemeClass.darkBlue,
@@ -352,7 +383,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   hintText: "Select Main Project",
                   prefixIcon: Icons.work,
                   items: _projectslist
-                      .map((p) => {"ID": p["ProjectId"], "Name": p["ProjectName"] ?? ""})
+                      .map(
+                        (p) => {
+                          "ID": p["ProjectId"],
+                          "Name": p["ProjectName"] ?? "",
+                        },
+                      )
                       .toList(),
                   valueKey: "ID",
                   labelKey: "Name",
@@ -360,7 +396,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   isEnabled: true,
                   onChanged: (value) {
                     setState(() {
-                      _selectedProject = _projectslist.firstWhere((p) => p["ProjectId"] == value);
+                      _selectedProject = _projectslist.firstWhere(
+                        (p) => p["ProjectId"] == value,
+                      );
                     });
                   },
                   validator: (value) {
@@ -415,4 +453,3 @@ class _ProjectScreenState extends State<ProjectScreen> {
     );
   }
 }
-

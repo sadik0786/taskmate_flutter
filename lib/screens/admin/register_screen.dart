@@ -29,7 +29,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Get.offAllNamed(Routes.adminDashboard);
+            Get.until(
+              (route) =>
+                  route.settings.name == Routes.adminDashboard || route.isFirst,
+            );
           },
         ),
       ],
@@ -327,10 +330,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return DropdownButtonFormField2<int>(
       isExpanded: true,
-      value: registerController.selectedRoleId.value,
+      valueListenable: ValueNotifier(registerController.selectedRoleId.value),
       items: registerController.roles
           .map(
-            (role) => DropdownMenuItem<int>(
+            (role) => DropdownItem<int>(
               value: role["RoleId"],
               child: Text(role["RoleName"]),
             ),
@@ -355,7 +358,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         width: MediaQuery.of(context).size.width - 40.w,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
       ),
-      buttonStyleData: ButtonStyleData(
+      buttonStyleData: FormFieldButtonStyleData(
         padding: EdgeInsets.symmetric(horizontal: 8.w),
         height: 26.h,
         width: double.infinity,
