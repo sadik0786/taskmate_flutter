@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BaseApiService {
-  // Update this to your local IP or backend URL
-  static const String baseUrl = "http://192.168.1.117:5000/api";
+  // URL is loaded from .env file (baseApiUrl key)
+  static String get baseUrl =>
+      dotenv.env['baseApiUrl'] ?? "http://taskmateapi.5nance.com/api";
 
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();

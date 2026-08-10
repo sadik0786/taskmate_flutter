@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 
 import 'package:task_mate/widgets/page_loader.dart';
@@ -122,16 +121,7 @@ class AdminDashboardState extends State<AdminDashboard> {
           icon: Icons.celebration,
           gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
           onTap: () {
-            Get.to(
-              () => Scaffold(
-                appBar: AppBar(
-                  title: const Text("Holidays"),
-                  backgroundColor: ThemeClass.primaryGreen,
-                  foregroundColor: Colors.white,
-                ),
-                body: const HolidaysScreen(),
-              ),
-            );
+            Get.to(() => const HolidaysScreen());
           },
         ),
       ];
@@ -225,16 +215,7 @@ class AdminDashboardState extends State<AdminDashboard> {
           icon: Icons.celebration,
           gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
           onTap: () {
-            Get.to(
-              () => Scaffold(
-                appBar: AppBar(
-                  title: const Text("Holidays"),
-                  backgroundColor: ThemeClass.primaryGreen,
-                  foregroundColor: Colors.white,
-                ),
-                body: const HolidaysScreen(),
-              ),
-            );
+            Get.to(() => const HolidaysScreen());
           },
         ),
       ];
@@ -324,16 +305,7 @@ class AdminDashboardState extends State<AdminDashboard> {
           icon: Icons.celebration,
           gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
           onTap: () {
-            Get.to(
-              () => Scaffold(
-                appBar: AppBar(
-                  title: const Text("Holidays"),
-                  backgroundColor: ThemeClass.primaryGreen,
-                  foregroundColor: Colors.white,
-                ),
-                body: const HolidaysScreen(),
-              ),
-            );
+            Get.to(() => const HolidaysScreen());
           },
         ),
       ];

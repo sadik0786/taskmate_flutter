@@ -72,10 +72,15 @@ class _PayslipsScreenState extends State<PayslipsScreen> {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: Colors.grey.shade200, width: 1),
+                      border: Border.all(
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
+                        width: 1,
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Theme.of(
+                            context,
+                          ).shadowColor.withOpacity(0.05),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -105,7 +110,9 @@ class _PayslipsScreenState extends State<PayslipsScreen> {
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: ThemeClass.textBlack,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
                               ),
                               SizedBox(height: 4.h),
@@ -123,7 +130,9 @@ class _PayslipsScreenState extends State<PayslipsScreen> {
                         IconButton(
                           icon: Icon(
                             Icons.download,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             Get.snackbar(

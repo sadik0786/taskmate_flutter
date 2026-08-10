@@ -48,7 +48,7 @@ dependencies:
   path_provider: ^2.1.5
   open_filex: ^4.7.0
   dropdown_button2: ^3.1.0
-  permission_handler: ^13.0.0
+  permission_handler: 11.3.1
   connectivity_plus: ^7.0.0
   flutter_dotenv: ^6.0.0
 

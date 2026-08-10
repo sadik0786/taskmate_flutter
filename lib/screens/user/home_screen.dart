@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-// import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/screens/hrms/shared/attendance_widget.dart';
 import 'package:task_mate/screens/shared/holidays_screen.dart';
@@ -97,16 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.celebration,
         gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
         onTap: () {
-          Get.to(
-            () => Scaffold(
-              appBar: AppBar(
-                title: const Text("Holidays"),
-                backgroundColor: ThemeClass.primaryGreen,
-                foregroundColor: Colors.white,
-              ),
-              body: const HolidaysScreen(),
-            ),
-          );
+          Get.to(() => const HolidaysScreen());
         },
       ),
     ];
