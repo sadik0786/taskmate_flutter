@@ -257,13 +257,15 @@ class _ModernCardState extends State<_ModernCard>
                               : widget.item.gradient[0],
                         ),
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 8.h),
                       Text(
                         widget.item.title,
                         textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          fontSize: 18.sp,
+                          fontSize: 14.sp,
                           color: _isHovered
                               ? Colors.white
                               : theme.colorScheme.onSurface,

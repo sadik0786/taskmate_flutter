@@ -21,6 +21,9 @@ import 'package:task_mate/screens/admin/employee_task_screen.dart';
 import 'package:task_mate/screens/auth/register_screen.dart';
 import 'package:task_mate/screens/auth/reset_password.dart';
 import 'package:task_mate/screens/user/task_screen.dart';
+import 'package:task_mate/screens/hrms/admin/admin_attendance_report_screen.dart';
+import 'package:task_mate/screens/hrms/admin/admin_regularization_requests_screen.dart';
+import 'package:task_mate/screens/hrms/user/regularization_request_screen.dart';
 
 class Routes {
   static const String initialRoute = "/splash";
@@ -47,6 +50,10 @@ class Routes {
   static const String approveLeave = "/approveLeave";
   static const String addEmployee = "/addEmployee";
   static const String allEmployee = "/allEmployee";
+  // Attendance & Regularization
+  static const String adminAttendanceReport = "/adminAttendanceReport";
+  static const String adminRegularizationRequests = "/adminRegularizationRequests";
+  static const String regularizationRequest = "/regularizationRequest";
 }
 
 const Duration transitionDuration = Duration(
@@ -83,4 +90,8 @@ List<GetPage> appPages() => [
   _getPage(Routes.applyLeave, ApplyLeave()),
   _getPage(Routes.dashboard, Dashboard()),
   _getPage(Routes.allEmployee, AllLeavesReport()),
+  // Attendance & Regularization
+  _getPage(Routes.adminAttendanceReport, AdminAttendanceReportScreen()),
+  _getPage(Routes.adminRegularizationRequests, AdminRegularizationRequestsScreen()),
+  _getPage(Routes.regularizationRequest, RegularizationRequestScreen()),
 ];

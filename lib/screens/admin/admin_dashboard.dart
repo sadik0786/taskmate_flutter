@@ -205,6 +205,22 @@ class AdminDashboardState extends State<AdminDashboard> {
           },
         ),
         _DashboardItem(
+          title: 'Attendance Report',
+          icon: Icons.assignment_ind,
+          gradient: [Colors.teal.shade400, Colors.teal.shade300],
+          onTap: () {
+            Get.toNamed(Routes.adminAttendanceReport);
+          },
+        ),
+        _DashboardItem(
+          title: 'Regularization',
+          icon: Icons.edit_calendar,
+          gradient: [Colors.deepPurple.shade400, Colors.deepPurple.shade300],
+          onTap: () {
+            Get.toNamed(Routes.adminRegularizationRequests);
+          },
+        ),
+        _DashboardItem(
           title: 'Company Holidays',
           icon: Icons.celebration,
           gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
@@ -234,6 +250,22 @@ class AdminDashboardState extends State<AdminDashboard> {
           onTap: () async {
             await Get.toNamed(Routes.registerScreen);
             loadSummaryData();
+          },
+        ),
+        _DashboardItem(
+          title: 'Attendance Report',
+          icon: Icons.assignment_ind,
+          gradient: [Colors.teal.shade400, Colors.teal.shade300],
+          onTap: () {
+            Get.toNamed(Routes.adminAttendanceReport);
+          },
+        ),
+        _DashboardItem(
+          title: 'Regularization',
+          icon: Icons.edit_calendar,
+          gradient: [Colors.deepPurple.shade400, Colors.deepPurple.shade300],
+          onTap: () {
+            Get.toNamed(Routes.adminRegularizationRequests);
           },
         ),
         _DashboardItem(
@@ -433,8 +465,9 @@ class AdminDashboardState extends State<AdminDashboard> {
                     const AttendanceWidget(),
                     Text(
                       "Dashboard Overview",
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16.h),
                     if (isDesktop)
@@ -492,8 +525,9 @@ class AdminDashboardState extends State<AdminDashboard> {
                     SizedBox(height: 32.h),
                     Text(
                       "Quick Actions",
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16.h),
                     LayoutBuilder(

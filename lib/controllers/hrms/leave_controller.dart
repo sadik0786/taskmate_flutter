@@ -23,6 +23,11 @@ class LeaveController extends GetxController {
   var todayAttendance = Rxn<Map<String, dynamic>>();
   var attendanceHistory = <dynamic>[].obs;
 
+  // Regularization & Admin Report
+  var adminAttendanceReport = <dynamic>[].obs;
+  var myRegularizations = <dynamic>[].obs;
+  var pendingRegularizations = <dynamic>[].obs;
+
   RxBool isLoading = false.obs;
   RxString userRole = "".obs;
 
@@ -91,6 +96,94 @@ class LeaveController extends GetxController {
       }
     } catch (err) {
       CustomSnackBar.error("Error - $err");
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // ================= ADMIN REPORT & REGULARIZATION =================
+
+  Future<void> fetchAdminAttendanceReport(String? date) async {
+    try {
+      isLoading.value = true;
+      final data = await ApiHrmsService.getAdminAttendanceReport(date);
+      adminAttendanceReport.assignAll(data);
+    } catch (e) {
+      CustomSnackBar.error("Error fetching report: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> applyRegularization(
+      String targetDate, String reason, String? reqIn, String? reqOut) async {
+    try {
+      isLoading.value = true;
+      final res = await ApiHrmsService.applyRegularization(
+        targetDate: targetDate,
+        reason: reason,
+        requestedCheckIn: reqIn,
+        requestedCheckOut: reqOut,
+      );
+      if (res["success"] == true) {
+        CustomSnackBar.success("Regularization requested successfully");
+        fetchMyRegularizations();
+        return true;
+      } else {
+        throw res["message"] ?? "Failed";
+      }
+    } catch (e) {
+      CustomSnackBar.error("Error: $e");
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchMyRegularizations() async {
+    try {
+      isLoading.value = true;
+      final data = await ApiHrmsService.getMyRegularizations();
+      myRegularizations.assignAll(data);
+    } catch (e) {
+      CustomSnackBar.error("Failed to fetch my regularizations: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchPendingRegularizations() async {
+    try {
+      isLoading.value = true;
+      final data = await ApiHrmsService.getPendingRegularizations();
+      pendingRegularizations.assignAll(data);
+    } catch (e) {
+      CustomSnackBar.error("Failed to fetch pending regularizations: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateRegularizationStatus(
+      int reqId, String status, String hrReason) async {
+    try {
+      isLoading.value = true;
+      final res = await ApiHrmsService.updateRegularizationStatus(
+          reqId, status, hrReason);
+      if (res["success"] == true) {
+        CustomSnackBar.success("Regularization $status");
+        fetchPendingRegularizations();
+        // If they approved, it might affect history, so refresh that too
+        if (status == "Approved") {
+          fetchAttendanceHistory(null, null);
+        }
+        return true;
+      } else {
+        throw res["message"] ?? "Failed";
+      }
+    } catch (e) {
+      CustomSnackBar.error("Error: $e");
       return false;
     } finally {
       isLoading.value = false;
