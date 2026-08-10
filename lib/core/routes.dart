@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/app_constants.dart';
-import 'package:task_mate/screens/add_task_screen.dart';
-import 'package:task_mate/screens/forgot_password.dart';
-import 'package:task_mate/screens/home_screen.dart';
+import 'package:task_mate/screens/admin/add_task_screen.dart';
+import 'package:task_mate/screens/auth/forgot_password.dart';
+import 'package:task_mate/screens/user/home_screen.dart';
 import 'package:task_mate/screens/hrms/hrms_dashboard.dart';
-import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
-import 'package:task_mate/screens/hrms/widgets/apply_leave.dart';
-import 'package:task_mate/screens/hrms/widgets/approve_leave.dart';
-import 'package:task_mate/screens/hrms/widgets/dashboard.dart';
-import 'package:task_mate/screens/login_screen.dart';
-import 'package:task_mate/screens/profile_screen.dart';
+import 'package:task_mate/screens/hrms/admin/all_employee.dart';
+import 'package:task_mate/screens/hrms/user/apply_leave.dart';
+import 'package:task_mate/screens/hrms/user/dashboard.dart';
+import 'package:task_mate/screens/auth/login_screen.dart';
+import 'package:task_mate/screens/user/profile_screen.dart';
 import 'package:task_mate/screens/splash_screent.dart';
 // for admin pages
 import 'package:task_mate/screens/admin/admin_dashboard.dart';
 import 'package:task_mate/screens/admin/employee_screen.dart';
+import 'package:task_mate/screens/admin/employee_detail_screen.dart';
+import 'package:task_mate/screens/admin/employee_update_screen.dart';
 import 'package:task_mate/screens/admin/project_screen.dart';
 import 'package:task_mate/screens/admin/employee_task_screen.dart';
-import 'package:task_mate/screens/admin/register_screen.dart';
-import 'package:task_mate/screens/admin/reset_password.dart';
-import 'package:task_mate/screens/task_screen.dart';
+import 'package:task_mate/screens/auth/register_screen.dart';
+import 'package:task_mate/screens/auth/reset_password.dart';
+import 'package:task_mate/screens/user/task_screen.dart';
 
 class Routes {
   static const String initialRoute = "/splash";
@@ -34,6 +35,8 @@ class Routes {
   static const String adminDashboard = "/adminDashboard";
   static const String registerScreen = "/registerScreen";
   static const String employeeScreen = "/employeeScreen";
+  static const String employeeDetail = "/employeeDetail";
+  static const String employeeUpdateScreen = "/employeeUpdateScreen";
   static const String employeeTaskScreen = "/employeeTaskScreen";
   static const String projectScreen = "/projectScreen";
   static const String resetPasswordPage = "/resetPasswordPage";
@@ -46,7 +49,9 @@ class Routes {
   static const String allEmployee = "/allEmployee";
 }
 
-const Duration transitionDuration = Duration(milliseconds: AppConstants.transitionDuration);
+const Duration transitionDuration = Duration(
+  milliseconds: AppConstants.transitionDuration,
+);
 
 GetPage _getPage(String name, Widget page) => GetPage(
   name: name,
@@ -68,6 +73,8 @@ List<GetPage> appPages() => [
   _getPage(Routes.registerScreen, RegisterScreen()),
   _getPage(Routes.adminDashboard, AdminDashboard()),
   _getPage(Routes.employeeScreen, EmployeeScreen()),
+  _getPage(Routes.employeeDetail, EmployeeDetailScreen()),
+  _getPage(Routes.employeeUpdateScreen, EmployeeUpdateScreen()),
   _getPage(Routes.projectScreen, ProjectScreen()),
   _getPage(Routes.employeeTaskScreen, EmployeeTaskScreen()),
   _getPage(Routes.resetPasswordPage, ResetPasswordPage()),
@@ -75,6 +82,5 @@ List<GetPage> appPages() => [
   _getPage(Routes.hrmsDashboard, HrmsDashboard()),
   _getPage(Routes.applyLeave, ApplyLeave()),
   _getPage(Routes.dashboard, Dashboard()),
-  _getPage(Routes.approveLeave, ApproveLeave()),
-  _getPage(Routes.allEmployee, AllEmployee()),
+  _getPage(Routes.allEmployee, AllLeavesReport()),
 ];

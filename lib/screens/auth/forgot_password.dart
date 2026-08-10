@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/services/auth_service.dart';
+import 'package:task_mate/services/auth/auth_service.dart';
 import 'package:get/get.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -65,7 +65,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     setState(() => _loading = true);
     try {
-      final res = await AuthService.resetPasswordSelf(_email.text.trim(), _newPassword.text);
+      final res = await AuthService.resetPasswordSelf(
+        _email.text.trim(),
+        _newPassword.text,
+      );
       setState(() => _loading = false);
 
       if (!mounted) return;
@@ -131,7 +134,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
-        title: Text("Forgot Password", style: Theme.of(context).textTheme.titleLarge),
+        title: Text(
+          "Forgot Password",
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -153,16 +159,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               padding: EdgeInsets.all(24.w),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Header Section
-            _buildHeaderSection(),
-            SizedBox(height: 40.h),
-            // Progress Indicator
-            _buildProgressIndicator(),
-            SizedBox(height: 40.h),
-            // Content based on step
-            if (!_emailVerified) _buildEmailVerificationStep(),
-            if (_emailVerified) _buildPasswordResetStep(),
+                children: [
+                  // Header Section
+                  _buildHeaderSection(),
+                  SizedBox(height: 40.h),
+                  // Progress Indicator
+                  _buildProgressIndicator(),
+                  SizedBox(height: 40.h),
+                  // Content based on step
+                  if (!_emailVerified) _buildEmailVerificationStep(),
+                  if (_emailVerified) _buildPasswordResetStep(),
                 ],
               ),
             ),
@@ -183,7 +189,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: Theme.of(context).primaryColor.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.lock_reset_rounded, size: 40.sp, color: Theme.of(context).primaryColor),
+          child: Icon(
+            Icons.lock_reset_rounded,
+            size: 40.sp,
+            color: Theme.of(context).primaryColor,
+          ),
         ),
         SizedBox(height: 24.h),
         Text(
@@ -197,9 +207,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         SizedBox(height: 12.h),
         Text(
           "Enter your email address and we'll help you reset your password",
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600], height: 1.5.h),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: Colors.grey[600],
+            height: 1.5.h,
+          ),
         ),
       ],
     );
@@ -216,9 +227,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             decoration: BoxDecoration(
               gradient: _emailVerified
                   ? LinearGradient(
-                      colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor],
+                      colors: [
+                        Theme.of(context).primaryColor,
+                        Theme.of(context).primaryColor,
+                      ],
                     )
-                  : LinearGradient(colors: [Colors.grey.shade300, Colors.grey.shade300]),
+                  : LinearGradient(
+                      colors: [Colors.grey.shade300, Colors.grey.shade300],
+                    ),
               borderRadius: BorderRadius.circular(2.r),
             ),
           ),
@@ -235,10 +251,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           width: 36.w,
           height: 36.h,
           decoration: BoxDecoration(
-            color: isCompleted ? Theme.of(context).primaryColor : Colors.grey.shade300,
+            color: isCompleted
+                ? Theme.of(context).primaryColor
+                : Colors.grey.shade300,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isCompleted ? Theme.of(context).primaryColor : Colors.grey.shade400,
+              color: isCompleted
+                  ? Theme.of(context).primaryColor
+                  : Colors.grey.shade400,
               width: 2.w,
             ),
           ),
@@ -259,7 +279,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Text(
           label,
           style: TextStyle(
-            color: isCompleted ? Theme.of(context).primaryColor : Colors.grey.shade600,
+            color: isCompleted
+                ? Theme.of(context).primaryColor
+                : Colors.grey.shade600,
             fontSize: 12.sp,
             fontWeight: isCompleted ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -274,14 +296,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       children: [
         Text(
           "Step 1: Verify Your Identity",
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[800],
+          ),
         ),
         SizedBox(height: 8.h),
         Text(
           "Enter the email address associated with your account",
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
         ),
         SizedBox(height: 24.h),
 
@@ -292,10 +317,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             labelText: "Your Email Address",
             hintText: "Enter your registered email",
             prefixIcon: const Icon(Icons.email_outlined),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2.w,
+              ),
             ),
           ),
           keyboardType: TextInputType.emailAddress,
@@ -310,14 +340,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             onPressed: _loading ? null : _checkEmail,
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).primaryColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
               elevation: 2,
             ),
             child: _loading
                 ? SizedBox(
                     width: 20.w,
                     height: 20.h,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.w),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.w,
+                    ),
                   )
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -352,7 +387,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.arrow_back_ios_new, size: 16.sp, color: Theme.of(context).primaryColor),
+                Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 16.sp,
+                  color: Theme.of(context).primaryColor,
+                ),
                 SizedBox(width: 4.w),
                 Text(
                   "Back to email",
@@ -369,14 +408,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
         Text(
           "Step 2: Create New Password",
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[800],
+          ),
         ),
         SizedBox(height: 8.h),
         Text(
           "Create a strong password to secure your account",
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
         ),
         SizedBox(height: 24.h),
 
@@ -398,10 +440,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 });
               },
             ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2.w,
+              ),
             ),
           ),
         ),
@@ -416,7 +463,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             prefixIcon: const Icon(Icons.lock_reset_rounded),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                _obscureConfirmPassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 color: Colors.grey.shade600,
               ),
               onPressed: () {
@@ -425,10 +474,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 });
               },
             ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2.w,
+              ),
             ),
           ),
         ),
@@ -446,14 +500,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             onPressed: _loading ? null : _changePassword,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green.shade600,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
               elevation: 2,
             ),
             child: _loading
                 ? SizedBox(
                     width: 20.w,
                     height: 20.h,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.w),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.w,
+                    ),
                   )
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -482,9 +541,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       children: [
         Text(
           "Password must:",
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         SizedBox(height: 4.h),
         Row(
@@ -492,12 +552,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             Icon(
               _newPassword.text.length >= 6 ? Icons.check_circle : Icons.circle,
               size: 14.sp,
-              color: _newPassword.text.length >= 6 ? Colors.green : Colors.grey.shade400,
+              color: _newPassword.text.length >= 6
+                  ? Colors.green
+                  : Colors.grey.shade400,
             ),
             const SizedBox(width: 6),
             Text(
               "Be at least 6 characters long",
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -505,18 +569,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Row(
           children: [
             Icon(
-              _newPassword.text.isNotEmpty && _newPassword.text == _confirmPassword.text
+              _newPassword.text.isNotEmpty &&
+                      _newPassword.text == _confirmPassword.text
                   ? Icons.check_circle
                   : Icons.circle,
               size: 14.sp,
-              color: _newPassword.text.isNotEmpty && _newPassword.text == _confirmPassword.text
+              color:
+                  _newPassword.text.isNotEmpty &&
+                      _newPassword.text == _confirmPassword.text
                   ? Colors.green
                   : Colors.grey.shade400,
             ),
             SizedBox(width: 6.w),
             Text(
               "Passwords must match",
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -524,4 +593,3 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 }
-

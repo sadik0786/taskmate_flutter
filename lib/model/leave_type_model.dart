@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 List<LeaveTypeModel> leaveTypeModelFromJson(String str) =>
-    List<LeaveTypeModel>.from(json.decode(str).map((x) => LeaveTypeModel.fromJson(x)));
+    List<LeaveTypeModel>.from(
+      json.decode(str).map((x) => LeaveTypeModel.fromJson(x)),
+    );
 
 String leaveTypeModelToJson(List<LeaveTypeModel> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
@@ -10,11 +12,26 @@ class LeaveTypeModel {
   int? id;
   String? leaveName;
   int? leaveCount;
+  int? remainingLeaves;
 
-  LeaveTypeModel({this.id, this.leaveName, this.leaveCount});
+  LeaveTypeModel({
+    this.id,
+    this.leaveName,
+    this.leaveCount,
+    this.remainingLeaves,
+  });
 
-  factory LeaveTypeModel.fromJson(Map<String, dynamic> json) =>
-      LeaveTypeModel(id: json["Id"], leaveName: json["LeaveName"], leaveCount: json["LeaveCount"]);
+  factory LeaveTypeModel.fromJson(Map<String, dynamic> json) => LeaveTypeModel(
+    id: json["Id"],
+    leaveName: json["LeaveName"],
+    leaveCount: json["LeaveCount"],
+    remainingLeaves: json["RemainingLeaves"] ?? json["LeaveCount"],
+  );
 
-  Map<String, dynamic> toJson() => {"Id": id, "LeaveName": leaveName, "LeaveCount": leaveCount};
+  Map<String, dynamic> toJson() => {
+    "Id": id,
+    "LeaveName": leaveName,
+    "LeaveCount": leaveCount,
+    "RemainingLeaves": remainingLeaves,
+  };
 }

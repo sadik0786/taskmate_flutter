@@ -3,13 +3,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 
 import 'package:task_mate/widgets/page_loader.dart';
-import 'package:task_mate/services/user_service.dart';
-import 'package:task_mate/services/task_service.dart';
-import 'package:task_mate/services/project_service.dart';
+import 'package:task_mate/services/admin/user_service.dart';
+import 'package:task_mate/services/user/task_service.dart';
+import 'package:task_mate/services/admin/project_service.dart';
 import 'package:task_mate/widgets/responsive_layout.dart';
+import 'package:task_mate/screens/hrms/shared/attendance_widget.dart';
+import 'package:task_mate/screens/shared/holidays_screen.dart';
+import 'package:task_mate/screens/hrms/shared/events_widget.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -113,6 +117,23 @@ class AdminDashboardState extends State<AdminDashboard> {
             loadSummaryData();
           },
         ),
+        _DashboardItem(
+          title: 'Holidays',
+          icon: Icons.celebration,
+          gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
+          onTap: () {
+            Get.to(
+              () => Scaffold(
+                appBar: AppBar(
+                  title: const Text("Holidays"),
+                  backgroundColor: ThemeClass.primaryGreen,
+                  foregroundColor: Colors.white,
+                ),
+                body: const HolidaysScreen(),
+              ),
+            );
+          },
+        ),
       ];
     }
     if (role == "superadmin") {
@@ -183,6 +204,23 @@ class AdminDashboardState extends State<AdminDashboard> {
             loadSummaryData();
           },
         ),
+        _DashboardItem(
+          title: 'Company Holidays',
+          icon: Icons.celebration,
+          gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
+          onTap: () {
+            Get.to(
+              () => Scaffold(
+                appBar: AppBar(
+                  title: const Text("Holidays"),
+                  backgroundColor: ThemeClass.primaryGreen,
+                  foregroundColor: Colors.white,
+                ),
+                body: const HolidaysScreen(),
+              ),
+            );
+          },
+        ),
       ];
     } else if (role == "admin") {
       return [
@@ -247,6 +285,23 @@ class AdminDashboardState extends State<AdminDashboard> {
           onTap: () async {
             await Get.toNamed(Routes.profileScreen);
             loadSummaryData();
+          },
+        ),
+        _DashboardItem(
+          title: 'Company Holidays',
+          icon: Icons.celebration,
+          gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
+          onTap: () {
+            Get.to(
+              () => Scaffold(
+                appBar: AppBar(
+                  title: const Text("Holidays"),
+                  backgroundColor: ThemeClass.primaryGreen,
+                  foregroundColor: Colors.white,
+                ),
+                body: const HolidaysScreen(),
+              ),
+            );
           },
         ),
       ];
@@ -374,6 +429,8 @@ class AdminDashboardState extends State<AdminDashboard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const EventsWidget(),
+                    const AttendanceWidget(),
                     Text(
                       "Dashboard Overview",
                       style: Theme.of(context).textTheme.headlineSmall

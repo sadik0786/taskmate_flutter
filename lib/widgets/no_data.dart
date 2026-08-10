@@ -5,18 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NoTasksWidget extends StatefulWidget {
-  final String message; 
+  final String message;
 
-  const NoTasksWidget({
-    super.key,
-    this.message = "No tasks found",
-  });
+  const NoTasksWidget({super.key, this.message = "No tasks found"});
 
   @override
   State<NoTasksWidget> createState() => _NoTasksWidgetState();
 }
 
-class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateMixin {
+class _NoTasksWidgetState extends State<NoTasksWidget>
+    with TickerProviderStateMixin {
   late AnimationController _eyeMoveController;
   late Animation<double> _eyeMove;
 
@@ -28,13 +26,14 @@ class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateM
     super.initState();
 
     // 👀 Left-right movement
-    _eyeMoveController = AnimationController(duration: const Duration(seconds: 3), vsync: this)
-      ..repeat(reverse: true);
+    _eyeMoveController = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
 
-    _eyeMove = Tween<double>(
-      begin: -6,
-      end: 6,
-    ).animate(CurvedAnimation(parent: _eyeMoveController, curve: Curves.easeInOut));
+    _eyeMove = Tween<double>(begin: -6, end: 6).animate(
+      CurvedAnimation(parent: _eyeMoveController, curve: Curves.easeInOut),
+    );
 
     // 👁️ Blink
     _blinkController = AnimationController(
@@ -42,10 +41,9 @@ class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateM
       vsync: this,
     );
 
-    _blink = Tween<double>(
-      begin: 1.0,
-      end: 0.05,
-    ).animate(CurvedAnimation(parent: _blinkController, curve: Curves.easeInOut));
+    _blink = Tween<double>(begin: 1.0, end: 0.05).animate(
+      CurvedAnimation(parent: _blinkController, curve: Curves.easeInOut),
+    );
 
     _scheduleBlink();
   }
@@ -72,7 +70,7 @@ class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateM
       animation: Listenable.merge([_eyeMove, _blink]),
       builder: (context, child) {
         return Transform.scale(
-          scaleY: _blink.value, 
+          scaleY: _blink.value,
           child: Container(
             width: 50.w,
             height: 40.h,
@@ -110,7 +108,10 @@ class _NoTasksWidgetState extends State<NoTasksWidget> with TickerProviderStateM
                   Container(
                     width: 14.w,
                     height: 14.h,
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black,
+                    ),
                   ),
                   // shine (gloss highlight)
                   Positioned(

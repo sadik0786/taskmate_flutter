@@ -3,13 +3,12 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/model/auth/register_request_model.dart';
-import 'package:task_mate/services/auth_service.dart';
-import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/services/auth/auth_service.dart';
+import 'package:task_mate/services/admin/user_service.dart';
 import 'package:task_mate/screens/admin/admin_dashboard.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class RegisterController extends GetxController {
-  final formKey = GlobalKey<FormState>();
   final name = TextEditingController();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -110,7 +109,7 @@ class RegisterController extends GetxController {
             return roleName == "hr" ||
                 roleName == "accountant" ||
                 roleName == "manager" ||
-                roleName == "superadmin";
+                roleName == "ceo";
           }).toList();
         } else if (roleLower == "hr") {
           allRoles = allRoles.where((r) {
@@ -128,6 +127,7 @@ class RegisterController extends GetxController {
         // Set default selection if roles exist
         if (roles.isNotEmpty) {
           selectedRoleId.value = roles.first["RoleId"];
+          _loadAdminsForRole(roles.first["RoleName"].toString().toLowerCase());
         } else {
           selectedRoleId.value = null;
         }
@@ -142,16 +142,34 @@ class RegisterController extends GetxController {
     }
   }
 
+  Future<void> _loadAdminsForRole(String selectedRoleName) async {
+    final currentRole = currentUserRole.value.toLowerCase();
+    if (currentRole == "hr") {
+      if (selectedRoleName == "admin") {
+        await loadSuperAdmins();
+      } else if (selectedRoleName == "employee") {
+        await loadAdminsAndSuperAdmins();
+      }
+    }
+  }
+
   Future<void> loadSuperAdmins() async {
     adminLoading.value = true;
     selectedAdminId.value = null;
     admins.clear();
 
     try {
-      final res = await UserService.getUsersByRole("superadmin");
+      final res = await UserService.getUsersByRoles(["manager"]);
 
       if (res["success"] == true && res["data"] != null) {
-        admins.value = List<Map<String, dynamic>>.from(res["data"]);
+        admins.value = List<Map<String, dynamic>>.from(res["data"]).map((
+          admin,
+        ) {
+          final name = admin["Name"] ?? "";
+          final role = admin["RoleName"]?.toString().toLowerCase() ?? "";
+          admin["DisplayName"] = "$name ($role)";
+          return admin;
+        }).toList();
       } else {
         admins.clear();
       }
@@ -168,10 +186,17 @@ class RegisterController extends GetxController {
     admins.clear();
 
     try {
-      final res = await UserService.getUsersByRoles(["admin", "superadmin"]);
+      final res = await UserService.getUsersByRoles(["manager"]);
 
       if (res["success"] == true && res["data"] != null) {
-        admins.value = List<Map<String, dynamic>>.from(res["data"]);
+        admins.value = List<Map<String, dynamic>>.from(res["data"]).map((
+          admin,
+        ) {
+          final name = admin["Name"] ?? "";
+          final role = admin["RoleName"]?.toString().toLowerCase() ?? "";
+          admin["DisplayName"] = "$name ($role)";
+          return admin;
+        }).toList();
       } else {
         admins.clear();
       }
@@ -182,7 +207,7 @@ class RegisterController extends GetxController {
     adminLoading.value = false;
   }
 
-  Future<void> register() async {
+  Future<void> register(GlobalKey<FormState> formKey) async {
     if (!formKey.currentState!.validate()) return;
 
     final roleId = selectedRoleId.value;
@@ -205,7 +230,7 @@ class RegisterController extends GetxController {
         .toLowerCase();
 
     // Superadmin assigning employee must select admin
-    if ((currentRole == 'hr' || currentRole == 'superadmin') &&
+    if ((currentRole == 'hr' || currentRole == 'ceo') &&
         (selectedRoleName == 'admin' || selectedRoleName == 'employee') &&
         selectedAdminId.value == null) {
       loading.value = false;
@@ -237,6 +262,9 @@ class RegisterController extends GetxController {
       email.clear();
       mobile.clear();
       password.clear();
+      selectedRoleId.value = null;
+      selectedAdminId.value = null;
+      admins.clear();
       // Trigger Dashboard reload if it exists
       if (Get.isRegistered<AdminDashboardState>()) {
         Get.find<AdminDashboardState>().loadSummaryData();
@@ -245,7 +273,9 @@ class RegisterController extends GetxController {
       // Navigate to dashboard safely
       Get.until(
         (route) =>
-            route.settings.name == Routes.adminDashboard || route.isFirst,
+            route.settings.name == Routes.adminDashboard ||
+            route.settings.name == Routes.hrmsDashboard ||
+            route.isFirst,
       );
     } else {
       CustomSnackBar.error("Failed to add employee");

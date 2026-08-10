@@ -124,47 +124,66 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   List<Widget> _buildMenuItems() {
-    if (widget.role == "ceo" || widget.role == "hr") {
-      return [
+    if (widget.role == "ceo" ||
+        widget.role == "hr" ||
+        widget.role == "manager" ||
+        widget.role == "superadmin") {
+      final List<Widget> items = [];
+      items.add(
         _buildDrawerItem(Icons.dashboard, "Dashboard", Routes.adminDashboard),
-        _buildDrawerItem(
-          Icons.person_add,
-          "Add Employee",
-          Routes.registerScreen,
-        ),
+      );
+
+      if (widget.role == "ceo" ||
+          widget.role == "hr" ||
+          widget.role == "superadmin") {
+        items.add(
+          _buildDrawerItem(
+            Icons.person_add,
+            "Add Employee",
+            Routes.registerScreen,
+          ),
+        );
+      }
+      items.add(
         _buildDrawerItem(Icons.people, "Employees", Routes.employeeScreen),
-        _buildDrawerItem(
-          Icons.account_circle,
-          "My Profile",
-          Routes.profileScreen,
-        ),
-      ];
-    } else if (widget.role == "superadmin") {
-      return [
-        _buildDrawerItem(Icons.dashboard, "Dashboard", Routes.adminDashboard),
-        _buildDrawerItem(
-          Icons.person_add,
-          "Add Employee",
-          Routes.registerScreen,
-        ),
-        _buildDrawerItem(Icons.people, "Employees", Routes.employeeScreen),
-        _buildDrawerItem(Icons.task, "Task Details", Routes.employeeTaskScreen),
-        _buildDrawerItem(
-          Icons.password_sharp,
-          "Reset Password",
-          Routes.resetPasswordPage,
-        ),
+      );
+
+      if (widget.role == "manager" || widget.role == "superadmin") {
+        items.add(
+          _buildDrawerItem(
+            Icons.task,
+            "Task Details",
+            Routes.employeeTaskScreen,
+          ),
+        );
+      }
+
+      if (widget.role == "superadmin") {
+        items.add(
+          _buildDrawerItem(
+            Icons.password_sharp,
+            "Reset Password",
+            Routes.resetPasswordPage,
+          ),
+        );
+      }
+
+      items.add(
         _buildDrawerItem(
           Icons.manage_history,
           "Manage Leave",
           Routes.hrmsDashboard,
         ),
+      );
+      items.add(
         _buildDrawerItem(
           Icons.account_circle,
           "My Profile",
           Routes.profileScreen,
         ),
-      ];
+      );
+
+      return items;
     } else if (widget.role == "admin") {
       return [
         _buildDrawerItem(Icons.dashboard, "Dashboard", Routes.adminDashboard),

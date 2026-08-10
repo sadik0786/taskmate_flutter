@@ -30,7 +30,7 @@ class _DashboardState extends State<Dashboard> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
 
             // Leave Summary
             Row(
@@ -58,12 +58,70 @@ class _DashboardState extends State<Dashboard> {
               ],
             ),
 
-            SizedBox(height: 16.h),
+            SizedBox(height: 10.h),
+
+            // Leave Balances
+            if (leaveController.leaveTypes.isNotEmpty) ...[
+              Text(
+                "Leave Balances",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              SizedBox(height: 8.h),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: leaveController.leaveTypes.map((type) {
+                    return Container(
+                      margin: EdgeInsets.only(right: 8.w),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: Colors.grey.shade200),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            type.leaveName ?? "",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+
+                          Text(
+                            "${type.remainingLeaves ?? 0} Remaining",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: ThemeClass.textBlack,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              SizedBox(height: 10.h),
+            ],
 
             // Leave List
             Text(
               "My Leave Requests",
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
 
             SizedBox(height: 8.h),
@@ -105,7 +163,7 @@ class _DashboardState extends State<Dashboard> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -133,24 +191,24 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
-                          padding: EdgeInsets.all(8.w),
+                          padding: EdgeInsets.all(6.w),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(icon, size: 28.sp, color: color),
+                          child: Icon(icon, size: 26.sp, color: color),
                         ),
                         Text(
                           value.toString(),
                           style: TextStyle(
-                            fontSize: 28.sp,
+                            fontSize: 26.sp,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 6.h),
                     Text(
                       title,
                       textAlign: TextAlign.center,
@@ -311,6 +369,69 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
               ],
+            ),
+          ],
+          if (leave.status == 'PENDING') ...[
+            SizedBox(height: 12.h),
+            Align(
+              alignment: Alignment.centerRight,
+              child: InkWell(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(
+                        "Cancel Leave",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.sp,
+                        ),
+                      ),
+                      content: const Text(
+                        "Are you sure you want to cancel this leave request?",
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text("No"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            leaveController.cancelLeave(leave.id);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          child: const Text(
+                            "Yes, Cancel",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 8.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Text(
+                    "Cancel Leave",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ],

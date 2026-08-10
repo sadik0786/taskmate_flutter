@@ -19,16 +19,23 @@ class CustomSnackBar {
           ? const SizedBox.shrink() // hides title widget
           : Text(
               title,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
       snackPosition: SnackPosition.TOP,
       backgroundColor:
-          backgroundColor ?? (isDark ? ThemeClass.darkCardColor : ThemeClass.lightCardColor),
+          backgroundColor ??
+          (isDark ? ThemeClass.darkCardColor : ThemeClass.lightCardColor),
       colorText: isDark ? ThemeClass.textWhite : ThemeClass.textWhite,
       margin: const EdgeInsets.all(12),
       borderRadius: 12,
       duration: Duration(seconds: durationInSeconds),
-      icon: Icon(icon, color: isDark ? ThemeClass.textWhite : ThemeClass.textWhite),
+      icon: Icon(
+        icon,
+        color: isDark ? ThemeClass.textWhite : ThemeClass.textWhite,
+      ),
       shouldIconPulse: true,
     );
   }
@@ -39,7 +46,9 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? ThemeClass.primaryGreen : ThemeClass.successColor,
+      backgroundColor: isDark
+          ? ThemeClass.primaryGreen
+          : ThemeClass.successColor,
       icon: Icons.check_circle_outline,
     );
   }
@@ -61,7 +70,9 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? ThemeClass.warningColor : ThemeClass.warningColor,
+      backgroundColor: isDark
+          ? ThemeClass.warningColor
+          : ThemeClass.warningColor,
       icon: Icons.warning_amber_rounded,
     );
   }

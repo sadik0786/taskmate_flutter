@@ -9,13 +9,17 @@ class PageLoader extends StatefulWidget {
   State<PageLoader> createState() => _PageLoaderState();
 }
 
-class _PageLoaderState extends State<PageLoader> with SingleTickerProviderStateMixin {
+class _PageLoaderState extends State<PageLoader>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
   }
 
   @override
@@ -58,8 +62,15 @@ class _PageLoaderState extends State<PageLoader> with SingleTickerProviderStateM
           Container(
             width: 70.w,
             height: 70.h,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: ThemeClass.warningColor),
-            child: Icon(Icons.access_time, color: ThemeClass.darkBlue, size: 50.sp),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: ThemeClass.warningColor,
+            ),
+            child: Icon(
+              Icons.access_time,
+              color: ThemeClass.darkBlue,
+              size: 50.sp,
+            ),
           ),
         ],
       ),

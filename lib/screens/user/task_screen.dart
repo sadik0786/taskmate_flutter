@@ -7,10 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 import 'package:intl/intl.dart';
-import 'package:task_mate/services/task_service.dart';
+import 'package:task_mate/services/user/task_service.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
-import 'add_task_screen.dart';
+import 'package:task_mate/screens/admin/add_task_screen.dart';
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
@@ -771,4 +771,3 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 }
-

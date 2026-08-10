@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/screens/task_screen.dart';
+import 'package:task_mate/screens/user/task_screen.dart';
 import 'package:task_mate/services/base_api_service.dart';
-import 'package:task_mate/services/task_service.dart';
-import 'package:task_mate/services/project_service.dart';
+import 'package:task_mate/services/user/task_service.dart';
+import 'package:task_mate/services/admin/project_service.dart';
 import 'package:task_mate/widgets/custom_date_field.dart';
 import 'package:task_mate/widgets/custom_time_field.dart';
 import 'package:task_mate/widgets/custom_button.dart';
@@ -437,4 +437,3 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 }
-

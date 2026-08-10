@@ -71,12 +71,18 @@ class CustomDateField extends StatelessWidget {
                 prefixIcon: Icon(prefixIcon, color: ThemeClass.textWhite),
                 filled: true,
                 fillColor: fillColor,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-                contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 12.h,
+                  horizontal: 12.w,
+                ),
               ),
               validator: (val) {
                 if (isRequired && selectedDate == null) {
-                  return validator?.call(selectedDate) ?? "Please select a date";
+                  return validator?.call(selectedDate) ??
+                      "Please select a date";
                 }
                 return null;
               },

@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/page_loader.dart';
-import 'package:task_mate/services/user_service.dart';
-import 'package:task_mate/services/task_service.dart';
+import 'package:task_mate/services/admin/user_service.dart';
+import 'package:task_mate/services/user/task_service.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
@@ -113,13 +113,18 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                 taskDate.month == today.month &&
                 taskDate.day == today.day;
           case "week":
-            final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+            final startOfWeek = today.subtract(
+              Duration(days: today.weekday - 1),
+            );
             final endOfWeek = startOfWeek.add(const Duration(days: 6));
-            return taskDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
+            return taskDate.isAfter(
+                  startOfWeek.subtract(const Duration(days: 1)),
+                ) &&
                 taskDate.isBefore(endOfWeek.add(const Duration(days: 1)));
           case "month":
             if (selectedMonth == null || selectedYear == null) return false;
-            return taskDate.year == selectedYear && taskDate.month == selectedMonth;
+            return taskDate.year == selectedYear &&
+                taskDate.month == selectedMonth;
           default:
             return true; // all
         }
@@ -166,7 +171,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                         const SizedBox(width: 12),
                         Text(
                           "$tempYear",
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         IconButton(
@@ -183,21 +191,25 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                       child: GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: 12,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 6,
-                          childAspectRatio: 2.2,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 6,
+                              childAspectRatio: 2.2,
+                            ),
                         itemBuilder: (context, index) {
                           final month = index + 1;
-                          final isFutureMonth = (tempYear == currentYear && month > currentMonth);
+                          final isFutureMonth =
+                              (tempYear == currentYear && month > currentMonth);
 
                           return ChoiceChip(
                             label: Text(
                               DateFormat.MMM().format(DateTime(0, month)),
                               style: TextStyle(
-                                color: isFutureMonth ? Colors.grey : Colors.black,
+                                color: isFutureMonth
+                                    ? Colors.grey
+                                    : Colors.black,
                                 fontWeight: tempMonth == month
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -206,7 +218,8 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                             selected: tempMonth == month,
                             onSelected: isFutureMonth
                                 ? null
-                                : (_) => setDialogState(() => tempMonth = month),
+                                : (_) =>
+                                      setDialogState(() => tempMonth = month),
                             selectedColor: Colors.green.shade400,
                             backgroundColor: isFutureMonth
                                 ? Colors.grey.shade300
@@ -225,7 +238,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                         const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(ctx, {"month": tempMonth, "year": tempYear});
+                            Navigator.pop(ctx, {
+                              "month": tempMonth,
+                              "year": tempYear,
+                            });
                           },
                           child: const Text("Select"),
                         ),
@@ -274,7 +290,7 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
       return "$minutes minutes";
     }
   }
-  
+
   String getFormattedDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) return "";
     try {
@@ -354,10 +370,13 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final monthLabel = (selectedFilter == "month" && selectedMonth != null && selectedYear != null)
+    final monthLabel =
+        (selectedFilter == "month" &&
+            selectedMonth != null &&
+            selectedYear != null)
         ? "Month (${DateFormat.MMM().format(DateTime(0, selectedMonth!))} $selectedYear)"
         : "Month";
-       
+
     return BaseLayout(
       title: selectedEmpName != null && selectedEmpName!.isNotEmpty
           ? "Tasks - $selectedEmpName"
@@ -393,7 +412,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                       items: [
                         {"ID": "", "Name": "All Employees"},
                         ...employees.map(
-                          (e) => {"ID": e["ID"].toString(), "Name": e["Name"]?.toString() ?? "Unknown"},
+                          (e) => {
+                            "ID": e["ID"].toString(),
+                            "Name": e["Name"]?.toString() ?? "Unknown",
+                          },
                         ),
                       ],
                       valueKey: "ID",
@@ -431,7 +453,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                 // 🔹 Filter Chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
+                  ),
                   child: Row(
                     children: [
                       CustomChoiceChip(
@@ -485,14 +510,23 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                             final t = tasks[index];
                             final createdAt = t["startTime"];
                             final dateStr = createdAt != null
-                                ? DateFormat("dd/MM/yyyy").format(DateTime.parse(createdAt))
+                                ? DateFormat(
+                                    "dd/MM/yyyy",
+                                  ).format(DateTime.parse(createdAt))
                                 : "";
                             return Card(
                               elevation: 0,
-                              margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
+                              margin: EdgeInsets.symmetric(
+                                vertical: 6.h,
+                                horizontal: 12.w,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16.r),
-                                side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                                side: BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outlineVariant,
+                                ),
                               ),
                               child: Padding(
                                 padding: EdgeInsets.all(16.w),
@@ -500,21 +534,28 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Task : ${index + 1}",
-                                          style: Theme.of(context).textTheme.titleMedium,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
                                         ),
                                         Row(
                                           children: [
                                             Text(
                                               "Mode :  ",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                             Text(
                                               t["mode"] ?? "",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
@@ -522,17 +563,22 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                     ),
                                     Divider(height: 24.h),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
                                             Text(
                                               "Project : ",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                             Text(
                                               "${t["project"] ?? ""}",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
@@ -543,27 +589,36 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                       children: [
                                         Text(
                                           "Sub Project : ",
-                                          style: Theme.of(context).textTheme.titleMedium,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
                                         ),
                                         Text(
                                           "${t["subProject"] ?? ""}",
-                                          style: Theme.of(context).textTheme.titleMedium,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
                                         ),
                                       ],
                                     ),
                                     SizedBox(height: 6.h),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
                                             Text(
                                               "Title :",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                             Text(
                                               " ${t["title"] ?? ""}",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
@@ -571,17 +626,22 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                     ),
                                     SizedBox(height: 6.h),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
                                             Text(
                                               "Details :",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                             Text(
                                               " ${t["description"] ?? ""}",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
@@ -589,20 +649,29 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                     ),
                                     Divider(height: 24.h),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
                                             Text(
                                               "$dateStr |",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                             SizedBox(width: 4.w),
                                             Text(
-                                              _calculateDuration(t["startTime"], t["endTime"]),
-                                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                                fontWeight: FontWeight.w700,
+                                              _calculateDuration(
+                                                t["startTime"],
+                                                t["endTime"],
                                               ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -610,15 +679,21 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                           children: [
                                             Text(
                                               "Status :",
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
                                             ),
                                             Text(
                                               " ${t["status"] ?? ""}",
-                                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                                color: t["status"] == "Working"
-                                                    ? Colors.orange
-                                                    : Colors.green,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .copyWith(
+                                                    color:
+                                                        t["status"] == "Working"
+                                                        ? Colors.orange
+                                                        : Colors.green,
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -639,4 +714,3 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
     );
   }
 }
-

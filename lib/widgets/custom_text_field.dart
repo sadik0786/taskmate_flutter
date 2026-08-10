@@ -15,7 +15,9 @@ class CustomTextField extends StatefulWidget {
   final String? pattern;
   final bool isObscure;
   final int? maxLines;
-  final Color? fillColor; // Keeping for backwards compatibility but not explicitly needed
+  final Color?
+  fillColor; // Keeping for backwards compatibility but not explicitly needed
+  final void Function(String)? onChanged;
 
   const CustomTextField({
     super.key,
@@ -33,6 +35,7 @@ class CustomTextField extends StatefulWidget {
     this.isObscure = false,
     this.maxLines,
     this.fillColor,
+    this.onChanged,
   });
 
   @override
@@ -59,10 +62,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         if (widget.labelText != null) ...[
           Row(
             children: [
-              Text(
-                widget.labelText!,
-                style: theme.textTheme.labelLarge,
-              ),
+              Text(widget.labelText!, style: theme.textTheme.labelLarge),
               if (widget.isRequired)
                 Text(
                   " *",
@@ -83,8 +83,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
           obscureText: _obscureText,
           maxLength: widget.maxLength,
           maxLines: widget.isObscure ? 1 : (widget.maxLines ?? 1),
+          onChanged: widget.onChanged,
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: widget.isEnabled ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withOpacity(0.5),
+            color: widget.isEnabled
+                ? theme.colorScheme.onSurface
+                : theme.colorScheme.onSurface.withOpacity(0.5),
           ),
           decoration: InputDecoration(
             fillColor: widget.fillColor ?? theme.inputDecorationTheme.fillColor,
@@ -93,7 +96,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
                     widget.prefixIcon,
-                    color: widget.isEnabled ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.onSurface.withOpacity(0.3),
+                    color: widget.isEnabled
+                        ? theme.colorScheme.onSurfaceVariant
+                        : theme.colorScheme.onSurface.withOpacity(0.3),
                   )
                 : null,
             suffixIcon: widget.isObscure
@@ -110,12 +115,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   )
                 : null,
           ),
-          validator: widget.validator ??
+          validator:
+              widget.validator ??
               (val) {
                 if (widget.isRequired && (val == null || val.trim().isEmpty)) {
                   return "${widget.labelText ?? 'Field'} cannot be empty";
                 }
-                if (widget.pattern != null && val != null && !RegExp(widget.pattern!).hasMatch(val.trim())) {
+                if (widget.pattern != null &&
+                    val != null &&
+                    !RegExp(widget.pattern!).hasMatch(val.trim())) {
                   return "Invalid ${widget.labelText?.toLowerCase() ?? 'value'}";
                 }
                 return null;

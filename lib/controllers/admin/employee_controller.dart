@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:task_mate/model/user_request_model.dart';
-import 'package:task_mate/services/hrms_service.dart';
+import 'package:task_mate/services/hrms/hrms_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class UserController extends GetxController {
@@ -25,23 +25,4 @@ class UserController extends GetxController {
       isLoading.value = false;
     }
   }
-
-  // Future<void> registerUser(UserRequestModel request) async {
-  //   try {
-  //     isLoading.value = true;
-  //     errorMessage.value = "";
-
-  //     final response = await ApiHrmsService.registerUser(request);
-
-  //     registrationResponse.value = response;
-
-  //     if (!response.success) {
-  //       errorMessage.value = response.message;
-  //     }
-  //   } catch (e) {
-  //     errorMessage.value = e.toString();
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
 }

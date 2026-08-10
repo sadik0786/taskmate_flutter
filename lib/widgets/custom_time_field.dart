@@ -26,7 +26,9 @@ class CustomTimeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayText = selectedTime != null ? selectedTime!.format(context) : hintText;
+    final displayText = selectedTime != null
+        ? selectedTime!.format(context)
+        : hintText;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,12 +65,18 @@ class CustomTimeField extends StatelessWidget {
                 filled: true,
                 fillColor: fillColor,
                 prefixIcon: Icon(prefixIcon, color: ThemeClass.textWhite),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-                contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 12.h,
+                  horizontal: 12.w,
+                ),
               ),
               validator: (val) {
                 if (isRequired && selectedTime == null) {
-                  return validator?.call(selectedTime) ?? "Please select a time";
+                  return validator?.call(selectedTime) ??
+                      "Please select a time";
                 }
                 return null;
               },

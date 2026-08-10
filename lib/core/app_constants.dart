@@ -6,10 +6,16 @@ import 'package:flutter/foundation.dart';
 
 class AppConstants {
   static const int transitionDuration = kIsWeb ? 0 : 320;
-  static const Transition transition = kIsWeb ? Transition.noTransition : Transition.rightToLeft;
+  static const Transition transition = kIsWeb
+      ? Transition.noTransition
+      : Transition.rightToLeft;
 
   static List<BoxShadow> boxShadow = [
-    const BoxShadow(color: Color.fromARGB(25, 0, 0, 0), blurRadius: 3, offset: Offset(2, 2)),
+    const BoxShadow(
+      color: Color.fromARGB(25, 0, 0, 0),
+      blurRadius: 3,
+      offset: Offset(2, 2),
+    ),
   ];
   static InputBorder enabledBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(10),

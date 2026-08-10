@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/services/base_api_service.dart';
-import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/services/admin/user_service.dart';
 import 'package:task_mate/core/theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,7 +14,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -25,7 +26,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
 
     // Setup animation
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
     _scaleAnimation = Tween<double>(
       begin: 0.5,
       end: 1.0,
@@ -215,7 +219,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     height: 40.h,
                     child: CircularProgressIndicator(
                       strokeWidth: 3.w,
-                      valueColor: AlwaysStoppedAnimation<Color>(ThemeClass.primaryGreen),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeClass.primaryGreen,
+                      ),
                       backgroundColor: ThemeClass.textWhite.withOpacity(0.2),
                     ),
                   ),
@@ -231,7 +237,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   opacity: _fadeAnimation.value,
                   child: Text(
                     "Loading...",
-                    style: TextStyle(color: ThemeClass.textWhite.withOpacity(0.7), fontSize: 14.sp),
+                    style: TextStyle(
+                      color: ThemeClass.textWhite.withOpacity(0.7),
+                      fontSize: 14.sp,
+                    ),
                   ),
                 ),
               ),
@@ -278,7 +287,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 30.h),
-                Text("Enter App Lock PIN", style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  "Enter App Lock PIN",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 SizedBox(height: 30.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -296,17 +308,26 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         cursorHeight: 30.sp,
                         cursorWidth: 2,
                         cursorColor: Colors.blueAccent,
-                        style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 30.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                         decoration: InputDecoration(
                           counterText: "",
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                         ),
                         onChanged: (val) {
                           if (val.isNotEmpty && i < 3) {
-                            FocusScope.of(context).requestFocus(focusNodes[i + 1]);
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(focusNodes[i + 1]);
                           }
                           if (val.isEmpty && i > 0) {
-                            FocusScope.of(context).requestFocus(focusNodes[i - 1]);
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(focusNodes[i - 1]);
                           }
                         },
                       ),
@@ -339,7 +360,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        final enteredPin = controllers.map((c) => c.text).join();
+                        final enteredPin = controllers
+                            .map((c) => c.text)
+                            .join();
                         if (enteredPin == savedPin) {
                           Navigator.pop(ctx, true);
                         } else {
@@ -354,7 +377,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
                         backgroundColor: Colors.red,
                       ),
                       child: const Text("Unlock"),
@@ -371,4 +396,3 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return result ?? false;
   }
 }
-

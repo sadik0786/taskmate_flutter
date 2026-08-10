@@ -3,7 +3,8 @@ import 'dart:convert';
 RegisterRequestModel registerRequestModelFromJson(String str) =>
     RegisterRequestModel.fromJson(json.decode(str));
 
-String registerRequestModelToJson(RegisterRequestModel data) => json.encode(data.toJson());
+String registerRequestModelToJson(RegisterRequestModel data) =>
+    json.encode(data.toJson());
 
 class RegisterRequestModel {
   final String name;

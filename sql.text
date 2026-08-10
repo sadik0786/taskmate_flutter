@@ -1,0 +1,68 @@
+CREATE TABLE dbo.EmployeeDetailsTaskMateApp (
+    DetailID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
+    EmployeeID VARCHAR(50) NULL,
+    Gender VARCHAR(20) NULL,
+    DateOfBirth DATE NULL,
+    BloodGroup VARCHAR(10) NULL,
+    EmergencyContact VARCHAR(20) NULL,
+    Address NVARCHAR(MAX) NULL,
+    Department VARCHAR(100) NULL,
+    DateOfJoining DATE NULL,
+    EmploymentType VARCHAR(50) NULL,
+    OfficeLocation VARCHAR(100) NULL,
+    Salary DECIMAL(18,2) NULL,
+    AadhaarNumber VARCHAR(20) NULL,
+    PANNumber VARCHAR(20) NULL,
+    BankDetails NVARCHAR(MAX) NULL,
+    ProfileStatus VARCHAR(50) DEFAULT 'Active',
+    
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE(),
+    
+    -- Foreign Key Constraint linking to UserTaskMateApp
+    CONSTRAINT FK_EmployeeDetails_User FOREIGN KEY (UserID) 
+    REFERENCES dbo.UserTaskMateApp(ID)
+    ON DELETE CASCADE 
+);
+
+
+
+select * from RoleTaskMateApp
+select * from UserTaskMateApp
+select * from EmployeeDetailsTaskMateApp
+select * from LeaveTypeTaskMateApp
+select * from ApplyLeaveTaskMateApp
+
+
+select * from DailyTaskMateApp
+select * from ProjectTaskMateApp
+
+ALTER TABLE ApplyLeaveTaskMateApp
+DROP CONSTRAINT DF__ApplyLeav__Compa__04606DCB;
+ALTER TABLE ApplyLeaveTaskMateApp
+DROP COLUMN CompanyID;
+
+SELECT column_name
+FROM information_schema.columns
+WHERE table_name = 'UserTaskMateApp';
+
+TRUNCATE TABLE RoleTaskMateApp;
+
+
+INSERT INTO dbo.RoleTaskMateApp
+(
+    RoleName,
+    IsActive,
+    EntryTimeStamp
+)
+VALUES
+('CEO', 1, GETDATE()),
+('HR', 1, GETDATE()),
+('Accountant', 1, GETDATE()),
+('Manager', 1, GETDATE()),
+('Admin', 1, GETDATE()),
+('Employee', 1, GETDATE()),
+('OfficeSupport', 1, GETDATE());
+
+

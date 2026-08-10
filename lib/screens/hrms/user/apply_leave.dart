@@ -5,7 +5,7 @@ import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
-import 'package:task_mate/services/hrms_service.dart';
+import 'package:task_mate/services/hrms/hrms_service.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_date_field.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
@@ -222,7 +222,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
                     SizedBox(height: 10.h),
                     CustomTextField(
                       labelText: "Reason",
-                      hintText: "Enter Reason",
+                      hintText: "Type your reason",
                       controller: reasonCtrl,
                       prefixIcon: Icons.description,
                     ),
@@ -236,33 +236,41 @@ class _ApplyLeaveState extends State<ApplyLeave> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16.w),
-          child: CustomButton(icon: Icons.save, text: "Apply Leave", onPressed: onSubmit),
+          child: CustomButton(
+            icon: Icons.save,
+            text: "Apply Leave",
+            onPressed: onSubmit,
+          ),
         ),
       ),
     );
   }
 
-  Widget leaveCard({required String leaveName, double? leaveBalance, bool isTotalDay = false}) {
+  Widget leaveCard({
+    required String leaveName,
+    double? leaveBalance,
+    bool isTotalDay = false,
+  }) {
     return Card(
       color: ThemeClass.darkCardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
       elevation: 3,
       shadowColor: Colors.white54,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 5,
+          spacing: 3,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(leaveName, style: Theme.of(context).textTheme.titleLarge),
+                Text(leaveName, style: Theme.of(context).textTheme.titleMedium),
                 SizedBox(height: 4.h),
                 Text(
                   leaveBalance != null ? leaveBalance.toString() : "0",
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ],
             ),
@@ -271,9 +279,15 @@ class _ApplyLeaveState extends State<ApplyLeave> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Days Selected", style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    "Total Days Selected",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   SizedBox(height: 4.h),
-                  Text("${calculateLeaveDays()}", style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    "${calculateLeaveDays()}",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ],
               ),
           ],
@@ -282,4 +296,3 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     );
   }
 }
-

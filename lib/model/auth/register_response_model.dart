@@ -3,7 +3,8 @@ import 'dart:convert';
 RegisterResponseModel registerResponseModelFromJson(String str) =>
     RegisterResponseModel.fromJson(json.decode(str));
 
-String registerResponseModelToJson(RegisterResponseModel data) => json.encode(data.toJson());
+String registerResponseModelToJson(RegisterResponseModel data) =>
+    json.encode(data.toJson());
 
 class RegisterResponseModel {
   bool? success;
@@ -11,12 +12,18 @@ class RegisterResponseModel {
 
   RegisterResponseModel({this.success, this.employee});
 
-  factory RegisterResponseModel.fromJson(Map<String, dynamic> json) => RegisterResponseModel(
-    success: json["success"],
-    employee: json["employee"] == null ? null : Employee.fromJson(json["employee"]),
-  );
+  factory RegisterResponseModel.fromJson(Map<String, dynamic> json) =>
+      RegisterResponseModel(
+        success: json["success"],
+        employee: json["employee"] == null
+            ? null
+            : Employee.fromJson(json["employee"]),
+      );
 
-  Map<String, dynamic> toJson() => {"success": success, "employee": employee?.toJson()};
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "employee": employee?.toJson(),
+  };
 }
 
 class Employee {
@@ -48,7 +55,9 @@ class Employee {
     roleId: json["RoleID"],
     reportingId: json["ReportingID"],
     createdBy: json["CreatedBy"],
-    createdAt: json["CreatedAt"] == null ? null : DateTime.parse(json["CreatedAt"]),
+    createdAt: json["CreatedAt"] == null
+        ? null
+        : DateTime.parse(json["CreatedAt"]),
   );
 
   Map<String, dynamic> toJson() => {

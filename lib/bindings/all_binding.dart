@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
-import 'package:task_mate/controllers/user/user_controller.dart';
+import 'package:task_mate/controllers/admin/employee_controller.dart';
 
 class AllBinding extends Bindings {
   @override

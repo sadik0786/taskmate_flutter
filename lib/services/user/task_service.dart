@@ -108,7 +108,9 @@ class TaskService {
         "startDate": startDate,
         "endDate": endDate,
       };
-      final url = Uri.parse("${BaseApiService.baseUrl}/task/updateTask/$taskId");
+      final url = Uri.parse(
+        "${BaseApiService.baseUrl}/task/updateTask/$taskId",
+      );
       final response = await http.post(
         url,
         headers: {

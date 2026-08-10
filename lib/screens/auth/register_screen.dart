@@ -20,6 +20,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final RegisterController registerController = Get.put(RegisterController());
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +78,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 Text(
                                   "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
-                                      ? "Hr / Accountant / Manager"
+                                      ? "HR / Accountant / Manager"
                                       : registerController.currentUserRole.value.toLowerCase() == "hr"
-                                      ? "Employees"
+                                      ? "Admin / Employees"
                                       : "No permission"}",
                                   style: Theme.of(context).textTheme.titleSmall
                                       ?.copyWith(
@@ -96,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   Form(
-                    key: registerController.formKey,
+                    key: _formKey,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -149,7 +150,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Obx(
                           () => CustomButton(
                             text: "Submit",
-                            onPressed: registerController.register,
+                            onPressed: () =>
+                                registerController.register(_formKey),
                             isLoading: registerController.loading.value,
                           ),
                         ),
@@ -224,7 +226,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         prefixIcon: Icons.admin_panel_settings,
         items: registerController.admins,
         valueKey: "ID",
-        labelKey: "Name",
+        labelKey: "DisplayName",
         value: registerController.selectedAdminId.value,
         isEnabled: true,
         onChanged: (value) {

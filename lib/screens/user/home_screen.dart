@@ -4,7 +4,11 @@ import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/screens/hrms/shared/attendance_widget.dart';
+import 'package:task_mate/screens/shared/holidays_screen.dart';
+import 'package:task_mate/screens/hrms/shared/events_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -88,33 +92,58 @@ class _HomeScreenState extends State<HomeScreen> {
           Get.toNamed(Routes.hrmsDashboard);
         },
       ),
+      _DashboardItem(
+        title: 'Company Holidays',
+        icon: Icons.celebration,
+        gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
+        onTap: () {
+          Get.to(
+            () => Scaffold(
+              appBar: AppBar(
+                title: const Text("Holidays"),
+                backgroundColor: ThemeClass.primaryGreen,
+                foregroundColor: Colors.white,
+              ),
+              body: const HolidaysScreen(),
+            ),
+          );
+        },
+      ),
     ];
 
     return BaseLayout(
       title: "Task Mate",
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            int crossAxisCount = 2;
-            if (constraints.maxWidth >= 1024) {
-              crossAxisCount = 4; // Desktop
-            } else if (constraints.maxWidth >= 600) {
-              crossAxisCount = 3; // Tablet
-            }
-            return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 24.h,
-                crossAxisSpacing: 24.w,
-                childAspectRatio: 1.15,
+        child: Column(
+          children: [
+            const EventsWidget(),
+            const AttendanceWidget(),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  int crossAxisCount = 2;
+                  if (constraints.maxWidth >= 1024) {
+                    crossAxisCount = 4; // Desktop
+                  } else if (constraints.maxWidth >= 600) {
+                    crossAxisCount = 3; // Tablet
+                  }
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 24.h,
+                      crossAxisSpacing: 24.w,
+                      childAspectRatio: 1.15,
+                    ),
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return _ModernCard(item: items[index]);
+                    },
+                  );
+                },
               ),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return _ModernCard(item: items[index]);
-              },
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
@@ -251,4 +280,3 @@ class _ModernCardState extends State<_ModernCard>
     );
   }
 }
-

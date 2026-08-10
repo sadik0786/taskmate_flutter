@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/theme.dart';
-import 'package:task_mate/screens/hrms/widgets/all_employee.dart';
-import 'package:task_mate/screens/hrms/widgets/apply_leave.dart';
-import 'package:task_mate/screens/hrms/widgets/approve_leave.dart';
-import 'package:task_mate/screens/hrms/widgets/dashboard.dart';
+import 'package:task_mate/screens/hrms/admin/all_employee.dart'; // File kept the same name, but we will rename the widget inside
+
+import 'package:task_mate/screens/hrms/user/apply_leave.dart';
+import 'package:task_mate/screens/hrms/admin/approve_leave.dart';
+import 'package:task_mate/screens/hrms/user/dashboard.dart';
+import 'package:task_mate/screens/hrms/shared/payslips_screen.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/widgets/responsive_layout.dart';
 import 'package:task_mate/widgets/custom_appbar.dart';
+import 'package:task_mate/widgets/app_drawer.dart';
 
 class HrmsDashboard extends StatefulWidget {
   const HrmsDashboard({super.key});
@@ -40,23 +42,66 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
     });
   }
 
-  // static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  // static const List<Widget> _widgetOptions = <Widget>[Dashboard(), ApplyLeave(), ApproveLeave()];
-  // Widget _buildBody() {
-  //   switch (_selectedIndex) {
-  //     case 0:
-  //       return const Dashboard();
-  //     case 1:
-  //       return const ApplyLeave();
-  //     case 2:
-  //       if (role == "hr" || role == "superadmin") {
-  //         return const ApproveLeave();
-  //       }
-  //       return const Dashboard();
-  //     default:
-  //       return const Dashboard();
-  //   }
-  // }
+  Widget _buildBody() {
+    final List<Widget> pages = [const Dashboard()];
+
+    if (role != "ceo") {
+      pages.add(const ApplyLeave());
+    }
+
+    if (role == "hr" ||
+        role == "superadmin" ||
+        role == "ceo" ||
+        role == "manager") {
+      pages.add(const ApproveLeave());
+    }
+
+    if (role == "hr" ||
+        role == "superadmin" ||
+        role == "ceo" ||
+        role == "manager") {
+      pages.add(const AllLeavesReport()); // Changed from AllEmployee
+    }
+
+    // Add Payslips for everyone
+    pages.add(const PayslipsScreen());
+
+    if (_selectedIndex >= 0 && _selectedIndex < pages.length) {
+      return pages[_selectedIndex];
+    }
+
+    return const Dashboard();
+  }
+
+  String _getPageTitle() {
+    final List<String> titles = ["Dashboard"];
+
+    if (role != "ceo") {
+      titles.add("Apply Leave");
+    }
+
+    if (role == "hr" ||
+        role == "superadmin" ||
+        role == "ceo" ||
+        role == "manager") {
+      titles.add("Approve Leave");
+    }
+
+    if (role == "hr" ||
+        role == "superadmin" ||
+        role == "ceo" ||
+        role == "manager") {
+      titles.add("Leave Report");
+    }
+
+    titles.add("My Payslips");
+
+    if (_selectedIndex >= 0 && _selectedIndex < titles.length) {
+      return titles[_selectedIndex];
+    }
+
+    return "Dashboard";
+  }
 
   @override
   void initState() {
@@ -73,8 +118,8 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
         onPressed: () {
           if (role == "superadmin") {
             Get.offAllNamed('/adminDashboard');
-          } else if (role == "hr") {
-            Get.offAllNamed('/dashboard');
+          } else if (role == "hr" || role == "ceo" || role == "manager") {
+            Get.offAllNamed('/adminDashboard');
           } else if (role == "employee") {
             Get.offAllNamed('/homeScreen');
           }
@@ -83,7 +128,7 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
     ];
 
     final desktopAppBar = DesktopAppBar(
-      title: "Dashboard - $userName",
+      title: _getPageTitle(),
       userName: userName,
       onLogout: () {},
       isDarkMode: Get.find<ThemeController>().isDarkMode,
@@ -92,7 +137,7 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
     );
 
     final mobileAppBar = MobileAppBar(
-      title: "Dashboard - $userName",
+      title: _getPageTitle(),
       userName: userName,
       onLogout: () {},
       isDarkMode: Get.find<ThemeController>().isDarkMode,
@@ -100,113 +145,78 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
       customActions: customActions,
     );
 
-    final hrmsDrawer = Drawer(
-      width: 250,
+    final bottomNavBar = BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
       backgroundColor: ThemeClass.darkBgColor,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          Container(
-            height: 150.h,
-            padding: EdgeInsets.all(15.w).copyWith(top: 80.h),
-            decoration: const BoxDecoration(color: ThemeClass.primaryGreen),
-            child: Text(
-              'Manage Leaves',
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-                color: ThemeClass.textWhite,
-              ),
-            ),
+      items: <BottomNavigationBarItem>[
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.dashboard),
+          label: 'Dashboard',
+        ),
+        if (role != "ceo")
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Apply Leave',
           ),
-          ListTile(
-            title: Text('Dashboard', style: TextStyle(color: Colors.white)),
-            selected: _selectedIndex == 0,
-            selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
-            onTap: () {
-              _onItemTapped(0);
-              if (!isDesktop) Navigator.pop(context);
-            },
+        if (role == "hr" ||
+            role == "superadmin" ||
+            role == "ceo" ||
+            role == "manager")
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle),
+            label: 'Approve Leave',
           ),
-          ListTile(
-            title: Text('Apply Leave', style: TextStyle(color: Colors.white)),
-            selected: _selectedIndex == 1,
-            selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
-            onTap: () {
-              _onItemTapped(1);
-              if (!isDesktop) Navigator.pop(context);
-            },
+        if (role == "hr" ||
+            role == "superadmin" ||
+            role == "ceo" ||
+            role == "manager")
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.analytics_outlined),
+            label: 'Leave Report',
           ),
-          if (role == "hr" || role == "superadmin") ...[
-            ListTile(
-              title: Text(
-                'Approve Leave',
-                style: TextStyle(color: Colors.white),
-              ),
-              selected: _selectedIndex == 2,
-              selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
-              onTap: () {
-                _onItemTapped(2);
-                if (!isDesktop) Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Add Employee',
-                style: TextStyle(color: Colors.white),
-              ),
-              selected: _selectedIndex == 3,
-              selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
-              onTap: () {
-                _onItemTapped(3);
-                if (!isDesktop) Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                'All Employee',
-                style: TextStyle(color: Colors.white),
-              ),
-              selected: _selectedIndex == 4,
-              selectedTileColor: ThemeClass.primaryGreen.withOpacity(0.2),
-              onTap: () {
-                _onItemTapped(4);
-                if (!isDesktop) Navigator.pop(context);
-              },
-            ),
-          ],
-        ],
-      ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.request_quote),
+          label: 'Payslips',
+        ),
+      ],
+      currentIndex: _selectedIndex,
+      selectedItemColor: ThemeClass.primaryGreen,
+      unselectedItemColor: Colors.white60,
+      onTap: _onItemTapped,
     );
 
-    final content = IndexedStack(
-      index: _selectedIndex,
-      children: [
-        const Dashboard(),
-        const ApplyLeave(),
-        if (role == "hr" || role == "superadmin") ...[
-          const ApproveLeave(),
-          const AllEmployee(),
-        ],
-      ],
-    );
+    final content = _buildBody();
 
     if (isDesktop) {
       return Scaffold(
         backgroundColor: ThemeClass.darkBgColor,
         body: Row(
           children: [
-            hrmsDrawer,
+            AppDrawer(role: role ?? "employee"),
             Expanded(
               child: Column(
                 children: [
                   desktopAppBar,
-                  Expanded(child: content),
+                  Expanded(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1200),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                            vertical: 16.0,
+                          ),
+                          child: content,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
         ),
+        bottomNavigationBar: bottomNavBar,
       );
     }
 
@@ -214,7 +224,8 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
       backgroundColor: ThemeClass.darkBgColor,
       appBar: mobileAppBar,
       body: SafeArea(child: content),
-      drawer: hrmsDrawer,
+      drawer: AppDrawer(role: role ?? "employee"),
+      bottomNavigationBar: bottomNavBar,
     );
   }
 }

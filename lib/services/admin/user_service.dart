@@ -59,7 +59,7 @@ class UserService {
     final token = await BaseApiService.getToken();
 
     final res = await http.get(
-      Uri.parse("${BaseApiService.baseUrl}/users/by-role?role=$role"),
+      Uri.parse("${BaseApiService.baseUrl}/auth/by-role?role=$role"),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
@@ -77,7 +77,7 @@ class UserService {
     final query = roles.map((r) => "roles=$r").join("&");
 
     final res = await http.get(
-      Uri.parse("${BaseApiService.baseUrl}/users/by-roles?$query"),
+      Uri.parse("${BaseApiService.baseUrl}/auth/by-roles?$query"),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
@@ -135,6 +135,35 @@ class UserService {
       return data["url"];
     } else {
       throw Exception("Failed to upload avatar: ${response.body}");
+    }
+  }
+
+  static Future<bool> updateEmployeeDetails(
+    int id,
+    Map<String, dynamic> data,
+  ) async {
+    final token = await BaseApiService.getToken();
+    if (token == null) return false;
+
+    try {
+      final res = await http.post(
+        Uri.parse(
+          "${BaseApiService.baseUrl}/admin/employee/update_details/$id",
+        ),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(data),
+      );
+
+      if (res.statusCode == 200) {
+        final resData = jsonDecode(res.body);
+        return resData["success"] == true;
+      }
+      return false;
+    } catch (e) {
+      return false;
     }
   }
 

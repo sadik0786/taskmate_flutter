@@ -22,7 +22,9 @@ class CustomChoiceChip extends StatelessWidget {
       label: Text(
         label,
         style: TextStyle(
-          color: selected ? Colors.white : (isDark ? Colors.white70 : ThemeClass.textBlack),
+          color: selected
+              ? Colors.white
+              : (isDark ? Colors.white70 : ThemeClass.textBlack),
           fontWeight: FontWeight.w500,
           fontSize: 14.sp,
         ),

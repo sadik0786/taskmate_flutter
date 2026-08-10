@@ -28,19 +28,73 @@ class ThemeClass {
   // Base Text Theme generator
   static TextTheme _buildTextTheme(Color color) {
     return TextTheme(
-      displayLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.w700, color: color, letterSpacing: -1),
-      displayMedium: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.w700, color: color, letterSpacing: -0.5),
-      headlineLarge: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w600, color: color),
-      headlineMedium: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: color),
-      titleLarge: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: color),
-      titleMedium: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, color: color),
-      titleSmall: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: color),
-      bodyLarge: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400, color: color),
-      bodyMedium: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: color),
-      bodySmall: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400, color: color),
-      labelLarge: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: color),
-      labelMedium: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500, color: color),
-      labelSmall: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w500, color: color),
+      displayLarge: TextStyle(
+        fontSize: 32.sp,
+        fontWeight: FontWeight.w700,
+        color: color,
+        letterSpacing: -1,
+      ),
+      displayMedium: TextStyle(
+        fontSize: 28.sp,
+        fontWeight: FontWeight.w700,
+        color: color,
+        letterSpacing: -0.5,
+      ),
+      headlineLarge: TextStyle(
+        fontSize: 24.sp,
+        fontWeight: FontWeight.w600,
+        color: color,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 20.sp,
+        fontWeight: FontWeight.w600,
+        color: color,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w600,
+        color: color,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        color: color,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: color,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w400,
+        color: color,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w400,
+        color: color,
+      ),
+      bodySmall: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w400,
+        color: color,
+      ),
+      labelLarge: TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w600,
+        color: color,
+      ),
+      labelMedium: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: color,
+      ),
+      labelSmall: TextStyle(
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w500,
+        color: color,
+      ),
     );
   }
 
@@ -66,7 +120,11 @@ class ThemeClass {
       elevation: 0,
       scrolledUnderElevation: 2,
       centerTitle: true,
-      titleTextStyle: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: textBlack),
+      titleTextStyle: TextStyle(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w600,
+        color: textBlack,
+      ),
     ),
     textTheme: _buildTextTheme(textBlack),
     fontFamily: fontFamily,
@@ -123,7 +181,11 @@ class ThemeClass {
       elevation: 0,
       scrolledUnderElevation: 2,
       centerTitle: true,
-      titleTextStyle: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: textWhite),
+      titleTextStyle: TextStyle(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w600,
+        color: textWhite,
+      ),
     ),
     textTheme: _buildTextTheme(textWhite),
     fontFamily: fontFamily,

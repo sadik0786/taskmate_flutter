@@ -8,7 +8,7 @@ import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/page_loader.dart';
-import 'package:task_mate/services/user_service.dart';
+import 'package:task_mate/services/admin/user_service.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 
 class EmployeeScreen extends StatefulWidget {
@@ -282,11 +282,20 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                           ],
                         ),
                         onTap: () {
+                          // go to emp details
+
+                          // Get.toNamed(
+                          //   Routes.employeeTaskScreen,
+                          //   arguments: {
+                          //     "empId": e["ID"],
+                          //     "empName": e["Name"] ?? "Employee",
+                          //   },
+                          // );
                           Get.toNamed(
-                            Routes.employeeTaskScreen,
+                            Routes.employeeDetail,
                             arguments: {
-                              "empId": e["ID"],
-                              "empName": e["Name"] ?? "Employee",
+                              "employee": e,
+                              "currentUserRole": currentUserRole,
                             },
                           );
                         },

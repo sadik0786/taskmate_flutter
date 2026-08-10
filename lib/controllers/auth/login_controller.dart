@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/model/auth/login_request_model.dart';
 import 'package:task_mate/services/base_api_service.dart';
-import 'package:task_mate/services/auth_service.dart';
+import 'package:task_mate/services/auth/auth_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class LoginController extends GetxController

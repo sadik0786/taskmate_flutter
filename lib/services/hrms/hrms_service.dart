@@ -37,14 +37,14 @@ class ApiHrmsService {
           response = await http.post(
             uri,
             headers: headers,
-            body: jsonEncode(body),
+            body: body != null ? jsonEncode(body) : null,
           );
           break;
         case "PUT":
           response = await http.put(
             uri,
             headers: headers,
-            body: jsonEncode(body),
+            body: body != null ? jsonEncode(body) : null,
           );
           break;
         case "DELETE":
@@ -94,6 +94,28 @@ class ApiHrmsService {
     }
 
     throw Exception(data["error"] ?? "Failed to fetch employee");
+  }
+
+  static Future<List<dynamic>> fetchMyPayslips() async {
+    final res = await request("/hrms/my-payslips");
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data["success"] == true) {
+      return data["data"] as List;
+    }
+    throw Exception(data["message"] ?? "Failed to fetch payslips");
+  }
+
+  static Future<List<dynamic>> fetchTodayEvents() async {
+    try {
+      final res = await request("/hrms/today-events");
+      final data = jsonDecode(res.body);
+      if (res.statusCode == 200 && data["success"] == true) {
+        return data["data"] as List;
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   // get all leaves type
@@ -159,6 +181,32 @@ class ApiHrmsService {
     throw Exception(data["message"] ?? "Failed to fetch leaves");
   }
 
+  // get all leaves report (Pending, Approved, Rejected)
+  static Future<List<LeaveRequestModel>> fetchAllLeaveReport() async {
+    final res = await request("/hrms/all-leaves-report");
+    final data = jsonDecode(res.body);
+
+    if (res.statusCode == 200 && data["success"] == true) {
+      return (data["data"] as List)
+          .map((e) => LeaveRequestModel.fromJson(e))
+          .toList();
+    }
+    throw Exception(data["message"] ?? "Failed to fetch all leaves report");
+  }
+
+  // get today's leaves for HR/Manager
+  static Future<List<LeaveRequestModel>> fetchTodayLeaves() async {
+    final res = await request("/hrms/today-leaves");
+    final data = jsonDecode(res.body);
+
+    if (res.statusCode == 200 && data["success"] == true) {
+      return (data["data"] as List)
+          .map((e) => LeaveRequestModel.fromJson(e))
+          .toList();
+    }
+    throw Exception(data["message"] ?? "Failed to fetch today leaves");
+  }
+
   // approve / reject leave by HR or SuperAdmin
   static Future<Map<String, dynamic>> updateLeaveStatus(
     int leaveId,
@@ -187,5 +235,80 @@ class ApiHrmsService {
     }
   }
 
-  ///
+  // cancel pending leave by employee
+  static Future<Map<String, dynamic>> cancelLeave(int leaveId) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {"success": false, "error": "No token found"};
+      }
+
+      final res = await ApiHrmsService.request(
+        "/hrms/leave-cancel/$leaveId",
+        method: "DELETE",
+      );
+
+      final data = jsonDecode(res.body);
+      if (res.statusCode == 200 && data["success"] == true) {
+        return data;
+      }
+      throw Exception(data["message"] ?? "Failed to cancel leave");
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
+  // ======================== PHASE 2 & 3 ========================
+
+  static Future<List<dynamic>> fetchHolidays() async {
+    final res = await request("/hrms/holidays");
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data["success"] == true) {
+      return data["data"] as List;
+    }
+    throw Exception(data["message"] ?? "Failed to fetch holidays");
+  }
+
+  static Future<Map<String, dynamic>> punchIn() async {
+    try {
+      final res = await request("/hrms/attendance/punch-in", method: "POST");
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> punchOut() async {
+    try {
+      final res = await request("/hrms/attendance/punch-out", method: "POST");
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>?> fetchTodayAttendance() async {
+    final res = await request("/hrms/attendance/today");
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data["success"] == true) {
+      return data["data"]; // could be null if no punch in
+    }
+    return null;
+  }
+
+  static Future<List<dynamic>> fetchAttendanceHistory(
+    String? startDate,
+    String? endDate,
+  ) async {
+    String query = "";
+    if (startDate != null && endDate != null) {
+      query = "?startDate=$startDate&endDate=$endDate";
+    }
+    final res = await request("/hrms/attendance/history$query");
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data["success"] == true) {
+      return data["data"] as List;
+    }
+    throw Exception(data["message"] ?? "Failed to fetch attendance history");
+  }
 }

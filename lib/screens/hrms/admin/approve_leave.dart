@@ -55,6 +55,10 @@ class _ApproveLeaveState extends State<ApproveLeave> {
   /// ---------------- APPROVAL CARD ----------------
   Widget _approvalCard(LeaveRequestModel leave) {
     final isHr = leaveController.userRole.value == "hr";
+    final targetRole = leave.employeeRole.toLowerCase();
+
+    // HR can only approve OfficeSupport.
+    final bool canApprove = !isHr || targetRole == "officesupport";
 
     // ensure default value exists
     hrApprovalMap.putIfAbsent(leave.id, () => false);
@@ -75,7 +79,10 @@ class _ApproveLeaveState extends State<ApproveLeave> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(leave.employeeName, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  "${leave.employeeName} (${leave.employeeRole})",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 _statusChip("${leave.totalDays} days"),
               ],
             ),
@@ -83,7 +90,10 @@ class _ApproveLeaveState extends State<ApproveLeave> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(leave.leaveTypeName, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  leave.leaveTypeName,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 Text(
                   "${CommonFn.formatDate(leave.fromDate)} to ${CommonFn.formatDate(leave.toDate)}",
                   style: Theme.of(context).textTheme.titleMedium,
@@ -92,16 +102,20 @@ class _ApproveLeaveState extends State<ApproveLeave> {
             ),
             SizedBox(height: 6.h),
             if (leave.reason != null && leave.reason!.isNotEmpty)
-              Text(leave.reason ?? "", style: Theme.of(context).textTheme.titleMedium),
-            SizedBox(height: isHr ? 0.h : 10.h),
+              Text(
+                leave.reason ?? "",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            SizedBox(height: isHr && canApprove ? 0.h : 10.h),
 
-            // ✅ SHOW CHECKBOX ONLY FOR HR
-            if (isHr)
+            // ✅ SHOW CHECKBOX ONLY FOR HR, IF THEY CAN APPROVE
+            if (isHr && canApprove)
               GestureDetector(
                 onTap: () {
                   setState(() {
                     _showHrReasonBottomSheet(leave.id, isReject: false);
-                    hrApprovalMap[leave.id] = !(hrApprovalMap[leave.id] ?? false);
+                    hrApprovalMap[leave.id] =
+                        !(hrApprovalMap[leave.id] ?? false);
                   });
                 },
                 child: Row(
@@ -114,7 +128,10 @@ class _ApproveLeaveState extends State<ApproveLeave> {
                         checkColor: Colors.white,
                         side: const BorderSide(color: Colors.white),
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity(horizontal: -4.w, vertical: 4.h),
+                        visualDensity: VisualDensity(
+                          horizontal: -4.w,
+                          vertical: 4.h,
+                        ),
                         onChanged: (val) {
                           setState(() {
                             _showHrReasonBottomSheet(leave.id, isReject: false);
@@ -123,13 +140,29 @@ class _ApproveLeaveState extends State<ApproveLeave> {
                         },
                       ),
                     ),
-                    Text("Approve as HR with reason", style: TextStyle(color: Colors.white)),
+                    Text(
+                      "Approve as HR with reason",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               ),
 
-            // ACTION BUTTONS
-            SwipeApproveReject(leave: leave),
+            // ACTION BUTTONS (Only if authorized)
+            if (canApprove)
+              SwipeApproveReject(leave: leave)
+            else
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 4.h),
+                child: Text(
+                  "Read Only - You cannot approve this role.",
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 13.sp,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -146,10 +179,17 @@ class _ApproveLeaveState extends State<ApproveLeave> {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20.r)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
       child: Text(
         status,
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.sp),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12.sp,
+        ),
       ),
     );
   }
@@ -191,7 +231,11 @@ class _ApproveLeaveState extends State<ApproveLeave> {
 
                 final status = isReject ? "REJECTED" : "APPROVED";
 
-                leaveController.updateLeaveStatus(leaveId, status, reasonCtrl.text.trim());
+                leaveController.updateLeaveStatus(
+                  leaveId,
+                  status,
+                  reasonCtrl.text.trim(),
+                );
 
                 Get.back();
               },
@@ -224,7 +268,9 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
       height: 40.h,
       decoration: BoxDecoration(
         color: isCompleted
-            ? (dragPosition == 1.0 ? Colors.green.shade200 : Colors.red.shade200)
+            ? (dragPosition == 1.0
+                  ? Colors.green.shade200
+                  : Colors.red.shade200)
             : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(30.r),
       ),
@@ -235,7 +281,9 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
           Positioned(
             left: 20.w,
             child: Text(
-              isCompleted ? (dragPosition == -1.0 ? "REJECT" : "APPROVE") : "REJECT",
+              isCompleted
+                  ? (dragPosition == -1.0 ? "REJECT" : "APPROVE")
+                  : "REJECT",
               style: TextStyle(
                 color: isCompleted ? Colors.green : Colors.red,
                 fontWeight: FontWeight.bold,
@@ -247,7 +295,9 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
           Positioned(
             right: 20.w,
             child: Text(
-              isCompleted ? (dragPosition == 1.0 ? "APPROVE" : "REJECT") : "APPROVE",
+              isCompleted
+                  ? (dragPosition == 1.0 ? "APPROVE" : "REJECT")
+                  : "APPROVE",
               style: TextStyle(
                 color: isCompleted ? Colors.red : Colors.green,
                 fontWeight: FontWeight.bold,
@@ -264,7 +314,10 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                   : (details) {
                       setState(() {
                         dragPosition += details.delta.dx / 150;
-                        dragPosition = dragPosition.clamp(-1.0, 1.0); // limit range
+                        dragPosition = dragPosition.clamp(
+                          -1.0,
+                          1.0,
+                        ); // limit range
                       });
                     },
               onHorizontalDragEnd: (details) {
@@ -276,7 +329,11 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                   });
 
                   // print("Approved");
-                  leaveController.updateLeaveStatus(widget.leave.id, "APPROVED", "");
+                  leaveController.updateLeaveStatus(
+                    widget.leave.id,
+                    "APPROVED",
+                    "",
+                  );
                 } else if (dragPosition < -0.5) {
                   // REJECT
                   setState(() {
@@ -293,14 +350,21 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                 }
               },
               child: Container(
-                margin: EdgeInsets.only(left: isCompleted ? 4 : 0, right: isCompleted ? 4 : 0),
+                margin: EdgeInsets.only(
+                  left: isCompleted ? 4 : 0,
+                  right: isCompleted ? 4 : 0,
+                ),
                 width: 100.w,
                 height: 35.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20.r),
                   boxShadow: [
-                    BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
                   ],
                 ),
                 alignment: Alignment.center,

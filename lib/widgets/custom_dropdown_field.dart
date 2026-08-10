@@ -5,7 +5,7 @@ import 'package:task_mate/core/theme.dart';
 
 class CustomDropdownField<T> extends StatefulWidget {
   final String? labelText;
-  final bool isRequired; 
+  final bool isRequired;
   final String hintText;
   final IconData prefixIcon;
   final List<Map<String, dynamic>> items;
@@ -41,9 +41,30 @@ class CustomDropdownField<T> extends StatefulWidget {
 
 class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
   bool _isDropdownOpen = false;
+  late final ValueNotifier<T?> _valueNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _valueNotifier = ValueNotifier<T?>(widget.value);
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomDropdownField<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) {
+      _valueNotifier.value = widget.value;
+    }
+  }
+
+  @override
+  void dispose() {
+    _valueNotifier.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     if (widget.isLoading) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -71,14 +92,19 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
             children: [
               Text(
                 widget.labelText!,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w400, fontSize: 15.sp),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 15.sp,
+                ),
               ),
               if (widget.isRequired)
                 Text(
                   " *",
-                  style: TextStyle(color: Colors.red, fontSize: 15.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
             ],
           ),
@@ -86,7 +112,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
         ],
         DropdownButtonFormField2<T>(
           isExpanded: true,
-          valueListenable: ValueNotifier(widget.value),
+          valueListenable: _valueNotifier,
           hint: Text(
             widget.hintText,
             style: TextStyle(
@@ -102,7 +128,9 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
               child: Text(
                 item[widget.labelKey].toString(),
                 style: TextStyle(
-                  color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+                  color: widget.isEnabled
+                      ? ThemeClass.textWhite
+                      : ThemeClass.textBlack,
                   fontSize: 16.sp,
                 ),
               ),
@@ -124,12 +152,21 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
           decoration: InputDecoration(
             prefixIcon: Icon(
               widget.prefixIcon,
-              color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+              color: widget.isEnabled
+                  ? ThemeClass.textWhite
+                  : ThemeClass.textBlack,
             ),
             filled: true,
-            fillColor: widget.isEnabled ? widget.fillColor : ThemeClass.textBlack,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-            contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+            fillColor: widget.isEnabled
+                ? widget.fillColor
+                : ThemeClass.textBlack,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: 12.h,
+              horizontal: 12.w,
+            ),
           ),
           iconStyleData: IconStyleData(
             icon: AnimatedRotation(
@@ -137,7 +174,9 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
               duration: const Duration(milliseconds: 200),
               child: Icon(
                 Icons.keyboard_arrow_down,
-                color: widget.isEnabled ? ThemeClass.textWhite : ThemeClass.textBlack,
+                color: widget.isEnabled
+                    ? ThemeClass.textWhite
+                    : ThemeClass.textBlack,
                 size: 24.sp,
               ),
             ),
@@ -146,7 +185,9 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
             maxHeight: 300.h,
             width: MediaQuery.of(context).size.width - 35.w,
             decoration: BoxDecoration(
-              color: widget.isEnabled ? ThemeClass.textBlack : ThemeClass.textBlack,
+              color: widget.isEnabled
+                  ? ThemeClass.textBlack
+                  : ThemeClass.textBlack,
               borderRadius: BorderRadius.circular(12.r),
             ),
           ),
