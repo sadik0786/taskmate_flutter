@@ -407,7 +407,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                     } else if (status == 'ABSENT') {
                       absentDays += 1;
                     }
-                    totalMins += (item["TotalWorkedMinutes"] ?? 0) as int;
+                    totalMins +=
+                        ((item["TotalWorkedMinutes"] ?? 0) as int) +
+                        ((item["TotalBreakMinutes"] ?? 0) as int);
                   } else {
                     if (controller.leaveDates.contains(dateStr)) {
                       approvedLeaves += 1;
@@ -488,16 +490,20 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               checkOutTime = DateFormat('hh:mm a').format(cOut);
                             }
 
-                            final int workedMins =
+                            final int actualWorkedMins =
                                 item["TotalWorkedMinutes"] ?? 0;
-                            if (workedMins > 0) {
-                              final int hrs = workedMins ~/ 60;
-                              final int mins = workedMins % 60;
+                            final int breakMins =
+                                item["TotalBreakMinutes"] ?? 0;
+
+                            final int totalItemMins =
+                                actualWorkedMins + breakMins;
+
+                            if (totalItemMins > 0) {
+                              final int hrs = totalItemMins ~/ 60;
+                              final int mins = totalItemMins % 60;
                               hoursText = "${hrs}h ${mins}m";
                             }
 
-                            final int breakMins =
-                                item["TotalBreakMinutes"] ?? 0;
                             if (breakMins > 0) {
                               final int bHrs = breakMins ~/ 60;
                               final int bMins = breakMins % 60;
