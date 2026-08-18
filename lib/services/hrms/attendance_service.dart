@@ -47,7 +47,7 @@ class AttendanceService {
     return null;
   }
 
-  static Future<List<dynamic>> fetchAttendanceHistory(
+  static Future<Map<String, dynamic>> fetchAttendanceHistory(
     String? startDate,
     String? endDate,
   ) async {
@@ -58,7 +58,7 @@ class AttendanceService {
     final res = await BaseApiService.request("/hrms/attendance/history$query");
     final data = jsonDecode(res.body);
     if (res.statusCode == 200 && data["success"] == true) {
-      return data["data"] as List;
+      return data;
     }
     throw Exception(data["message"] ?? "Failed to fetch attendance history");
   }

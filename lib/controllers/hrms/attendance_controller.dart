@@ -5,6 +5,8 @@ import 'package:task_mate/widgets/custom_snackbar.dart';
 class AttendanceController extends GetxController {
   var todayAttendance = Rxn<Map<String, dynamic>>();
   var attendanceHistory = <dynamic>[].obs;
+  var leaveDates = <String>[].obs;
+  var holidayDates = <String>[].obs;
   RxBool isOnBreak = false.obs;
   RxBool isLoading = false.obs;
 
@@ -107,7 +109,16 @@ class AttendanceController extends GetxController {
         startDate,
         endDate,
       );
-      attendanceHistory.assignAll(data);
+      attendanceHistory.assignAll(data["data"] ?? []);
+      
+      final summary = data["summary"];
+      if (summary != null) {
+        leaveDates.assignAll(List<String>.from(summary["leaveDates"] ?? []));
+        holidayDates.assignAll(List<String>.from(summary["holidayDates"] ?? []));
+      } else {
+        leaveDates.clear();
+        holidayDates.clear();
+      }
     } catch (e) {
       CustomSnackBar.error("Failed to fetch history: $e");
     } finally {

@@ -1,0 +1,109 @@
+# TaskMate (Work Trackers) - App Workflow & Structure Notes
+
+This document serves as a comprehensive guide to how the TaskMate application is structured and how its core workflows operate from both the frontend (Flutter) and backend (Node.js + MSSQL) perspectives.
+
+---
+
+## 1. Core Architecture
+- **Frontend**: Flutter (Dart) using **GetX** for state management, routing, and dependency injection. Designed primarily with Desktop UI in mind using `flutter_screenutil`.
+- **Backend**: Node.js (Express.js) serving RESTful APIs.
+- **Database**: Microsoft SQL Server (MSSQL). The backend uses the `mssql` package to execute raw SQL queries (`pool.request().query(...)`) without relying on an ORM.
+
+---
+
+## 2. User Roles & Authentication Flow
+**Roles Available**: `Admin`, `HR`, `Employee`, `OfficeSupport`.
+
+**Workflow**:
+1. **Login**: User enters credentials.
+2. **Backend**: Validates against the `UserTaskMateApp` table. Returns a JWT token and user details (including Role).
+3. **Frontend (`AuthService` & `LoginController`)**: Saves the token in `SharedPreferences`.
+4. **Routing (`AllBinding`)**: Based on the role, the app injects specific controllers and navigates the user to their designated Dashboard (e.g., Admin Dashboard vs. User Dashboard).
+
+---
+
+## 3. HRMS Workflows (Human Resource Management)
+
+### A. Daily Attendance & Time Tracking
+The core feature for tracking employee hours.
+
+- **Punch In**: 
+  - User clicks "Punch In".
+  - Backend logs `IN` in `AttendanceLogsTaskMateApp` and creates a daily record in `AttendanceTaskMateApp`. If punched in after 9:30 AM, status is marked as `LATE`, otherwise `PRESENT`.
+- **Take Break**:
+  - User clicks "Take Break".
+  - Backend logs `BREAK_START`. It calculates the worked minutes from the last `IN` punch up to this moment and updates `TotalWorkedMinutes`.
+- **End Break**:
+  - User clicks "End Break".
+  - Backend logs `BREAK_END`. It calculates the break duration and updates `TotalBreakMinutes`.
+- **Punch Out**:
+  - User clicks "Punch Out".
+  - Backend logs `OUT`. It calculates the final worked minutes since the last `BREAK_END` or `IN` and finalizes `TotalWorkedMinutes`.
+
+*UI Component*: Managed by `AttendanceController` and displayed via `AttendanceWidget`. The UI uses animations (pulse effect) to show active tracking.
+
+### B. Leave Management
+How employees request time off and how it gets approved.
+
+1. **Apply Leave**: 
+   - Employee selects Leave Type (Sick, Casual, etc.), dates, and submits a reason.
+   - Backend inserts a record into `ApplyLeaveTaskMateApp` with status `PENDING`.
+2. **Admin/HR Approval**:
+   - `AdminHrmsController` fetches all `PENDING` leaves.
+   - HR can only approve leaves for the `OfficeSupport` role. Admins can approve for everyone.
+   - In the `ApproveLeave` screen, authorized users swipe right to **APPROVE** or swipe left to **REJECT**. They can also provide an HR Reason.
+   - Backend updates the status in `ApplyLeaveTaskMateApp`.
+
+### C. Regularization
+Handling missed punches or system errors.
+
+- **Request**: Employee submits a regularization request with target date, reason, and requested Check-In/Check-Out times.
+- **Approval**: Similar to leaves, Admin views pending requests in `AdminRegularizationRequestsScreen` and can Approve or Reject them. If approved, the backend ideally corrects the attendance log.
+
+---
+
+## 4. Task & Project Management Workflow
+How actual work is tracked.
+
+1. **Project Creation**: Admins create Master Projects and Sub-projects.
+2. **Task Assignment**: Tasks are created under specific projects and assigned to Employees.
+3. **Task Execution**: 
+   - Employees view their assigned tasks on their Dashboard.
+   - They update the status (e.g., In Progress, Completed).
+   - *Note*: Handled by `TaskService` and respective controllers.
+
+---
+
+## 5. Frontend Structure (Flutter)
+
+The Flutter codebase is modularized cleanly:
+- **`/bindings`**: Contains `all_binding.dart`. Handles lazy-loading of all `GetxControllers` so memory is only used when needed.
+- **`/controllers`**: 
+  - Divided by domain: `auth`, `admin`, `hrms`, `user`.
+  - E.g., `AttendanceController` handles UI state for punch logic, while `LeaveController` strictly handles user leaves.
+- **`/services`**: 
+  - Interacts with the Node.js API. 
+  - `BaseApiService` contains the core `request()` method for global token injection and error handling.
+  - Specialized services like `leave_service.dart` contain endpoints specific to leaves.
+- **`/screens`**: The UI files. Separated by role (`admin`, `user`) and module (`hrms`, `shared`).
+- **`/widgets`**: Reusable UI components like `CustomButton`, `PageLoader`, `SwipeApproveReject`.
+
+---
+
+## 6. Backend Structure (Node.js)
+
+- **`server.js`**: The entry point. Initializes Express, CORS, and registers routes.
+- **`db.js`**: Manages the MSSQL connection pool.
+- **`/routes`**: Defines API endpoints. E.g., `routes/hrms.js` maps `/takeBreak` to the specific controller function.
+- **`/controllers`**: Contains the core business logic.
+  - Recently modularized (e.g., `attendanceController.js`, `leaveController.js` instead of one massive file).
+  - Queries are written directly (e.g., `SELECT TOP 1 PunchType FROM AttendanceLogsTaskMateApp`).
+- **`create_hrms_tables.js`**: A utility script to initialize database tables and insert mock data if the database is fresh.
+
+---
+
+## 7. Key Technical Rules & Standards Established
+- **Direct SQL Queries**: No ORMs (like Prisma or Sequelize) are used. The project relies on raw `mssql` queries for maximum control and performance.
+- **No Automatic Schema Changes**: Database table schemas must not be altered automatically by AI without explicit user permission.
+- **Desktop First**: While responsive, the UI design places a premium on looking good and functioning well on Desktop layouts.
+- **Modular Code**: Large monolithic files (like `ApiHrmsService` and `hrmsController.js`) have been broken down into domain-specific files (Attendance, Leaves, Regularization) to ensure the project remains scalable as new features are added.

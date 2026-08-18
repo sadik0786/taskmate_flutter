@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/controllers/hrms/attendance_controller.dart';
-import 'package:task_mate/screens/hrms/shared/attendance_history_screen.dart';
 import 'package:task_mate/widgets/curved_text.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
@@ -20,8 +19,9 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  final AttendanceController attendanceController =
-      Get.put(AttendanceController());
+  final AttendanceController attendanceController = Get.put(
+    AttendanceController(),
+  );
   late Timer _clockTimer;
   String _currentTime = "";
   String _currentDate = "";
@@ -118,7 +118,9 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                   final String currentPunchState =
                       attendance?["CurrentPunchState"] ?? "";
 
-                  final bool isPunchedIn = currentPunchState == "IN";
+                  final bool isPunchedIn =
+                      currentPunchState == "IN" ||
+                      currentPunchState == "BREAK_START";
                   final int workedMins = attendance?["TotalWorkedMinutes"] ?? 0;
 
                   String statusText = "Ready to Work";
@@ -127,7 +129,7 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                   } else if (isPunchedIn) {
                     statusText = "Actively Tracking";
                   } else if (workedMins > 0) {
-                    statusText = "Done for the Day";
+                    statusText = "Punched Out";
                   }
 
                   final int breakMins = attendance?["TotalBreakMinutes"] ?? 0;
@@ -205,41 +207,6 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                               ),
                             ],
                             SizedBox(height: 12.h),
-                            InkWell(
-                              onTap: () =>
-                                  Get.to(() => const AttendanceHistoryScreen()),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12.w,
-                                  vertical: 6.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.2),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.history,
-                                      color: Colors.white,
-                                      size: 14.sp,
-                                    ),
-                                    SizedBox(width: 4.w),
-                                    Text(
-                                      "View Timeline",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11.sp,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -259,7 +226,9 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                                 child: GestureDetector(
                                   onTap: () {
                                     if (isPunchedIn) {
-                                      if (attendanceController.isOnBreak.value) {
+                                      if (attendanceController
+                                          .isOnBreak
+                                          .value) {
                                         CustomSnackBar.error(
                                           "Please end your break before punching out.",
                                         );

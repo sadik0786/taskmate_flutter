@@ -13,6 +13,7 @@ import 'package:task_mate/widgets/responsive_layout.dart';
 import 'package:task_mate/screens/hrms/shared/attendance_widget.dart';
 import 'package:task_mate/screens/shared/holidays_screen.dart';
 import 'package:task_mate/screens/hrms/shared/events_widget.dart';
+import 'package:task_mate/screens/hrms/shared/attendance_history_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -120,6 +121,14 @@ class AdminDashboardState extends State<AdminDashboard> {
             Get.to(() => const HolidaysScreen());
           },
         ),
+        _DashboardItem(
+          title: 'View Timeline',
+          icon: Icons.history,
+          gradient: standardGradient,
+          onTap: () {
+            Get.to(() => const AttendanceHistoryScreen());
+          },
+        ),
       ];
     }
     if (role == "superadmin") {
@@ -202,6 +211,14 @@ class AdminDashboardState extends State<AdminDashboard> {
             Get.to(() => const HolidaysScreen());
           },
         ),
+        _DashboardItem(
+          title: 'View Timeline',
+          icon: Icons.history,
+          gradient: standardGradient,
+          onTap: () {
+            Get.to(() => const AttendanceHistoryScreen());
+          },
+        ),
       ];
     } else if (role == "admin") {
       return [
@@ -281,6 +298,14 @@ class AdminDashboardState extends State<AdminDashboard> {
           gradient: standardGradient,
           onTap: () {
             Get.to(() => const HolidaysScreen());
+          },
+        ),
+        _DashboardItem(
+          title: 'View Timeline',
+          icon: Icons.history,
+          gradient: standardGradient,
+          onTap: () {
+            Get.to(() => const AttendanceHistoryScreen());
           },
         ),
       ];

@@ -7,6 +7,7 @@ import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/screens/hrms/shared/attendance_widget.dart';
 import 'package:task_mate/screens/shared/holidays_screen.dart';
 import 'package:task_mate/screens/hrms/shared/events_widget.dart';
+import 'package:task_mate/screens/hrms/shared/attendance_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -99,6 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
         gradient: standardGradient,
         onTap: () {
           Get.to(() => const HolidaysScreen());
+        },
+      ),
+      _DashboardItem(
+        title: 'View Timeline',
+        icon: Icons.history,
+        gradient: standardGradient,
+        onTap: () {
+          Get.to(() => const AttendanceHistoryScreen());
         },
       ),
     ];

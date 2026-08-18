@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -25,6 +26,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
   void initState() {
     super.initState();
     // Default fetch for last 30 days
+    endDate = DateTime.now();
+    startDate = endDate!.subtract(const Duration(days: 30));
     _fetchData();
   }
 
@@ -354,7 +357,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 ],
               ),
             ),
-
             // List of Attendance
             Expanded(
               child: Obx(() {
@@ -368,231 +370,664 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 12.h,
-                  ),
-                  itemCount: controller.attendanceHistory.length,
-                  itemBuilder: (context, index) {
-                    final item = controller.attendanceHistory[index];
-                    final date = DateTime.tryParse(
-                      item["AttendanceDate"] ?? "",
-                    );
+                // Build list of dates
+                List<DateTime> allDates = [];
+                if (startDate != null && endDate != null) {
+                  final int days = endDate!.difference(startDate!).inDays;
+                  for (int i = 0; i <= days; i++) {
+                    allDates.add(endDate!.subtract(Duration(days: i)));
+                  }
+                } else if (controller.attendanceHistory.isNotEmpty) {
+                  // Fallback if null
+                  allDates.add(DateTime.now());
+                }
 
-                    String checkInTime = "--:--";
-                    if (item["CheckInTime"] != null) {
-                      // Fix for time shift: parse the raw string, treating it as local time if it lacks 'Z'
-                      // If it has 'Z' but was meant to be local, replacing 'Z' prevents UTC to Local conversion shifting
-                      String raw = item["CheckInTime"].toString().replaceAll(
-                        'Z',
-                        '',
-                      );
-                      final cIn = DateTime.parse(raw);
-                      checkInTime = DateFormat('hh:mm a').format(cIn);
-                    }
+                double presentDays = 0;
+                double absentDays = 0;
+                double approvedLeaves = 0;
+                double holidays = 0;
+                int weeklyOff = 0;
+                int totalMins = 0;
 
-                    String checkOutTime = "--:--";
-                    if (item["CheckOutTime"] != null) {
-                      String raw = item["CheckOutTime"].toString().replaceAll(
-                        'Z',
-                        '',
-                      );
-                      final cOut = DateTime.parse(raw);
-                      checkOutTime = DateFormat('hh:mm a').format(cOut);
-                    }
+                for (var date in allDates) {
+                  String dateStr = DateFormat('yyyy-MM-dd').format(date);
+                  final item = controller.attendanceHistory.firstWhere((e) {
+                    if (e["AttendanceDate"] == null) return false;
+                    return e["AttendanceDate"].toString().startsWith(dateStr);
+                  }, orElse: () => null);
 
-                    final int workedMins = item["TotalWorkedMinutes"] ?? 0;
-                    String hoursText = "";
-                    if (workedMins > 0) {
-                      final int hrs = workedMins ~/ 60;
-                      final int mins = workedMins % 60;
-                      hoursText = "${hrs}h ${mins}m";
-                    }
-
-                    Color statusColor = Colors.green;
-                    String statusText = (item["Status"] ?? "PRESENT")
+                  if (item != null) {
+                    String status = (item["Status"] ?? "")
                         .toString()
                         .toUpperCase();
-                    if (statusText == 'ABSENT') statusColor = Colors.red;
-                    if (statusText == 'HALF DAY') statusColor = Colors.orange;
+                    if (status == 'PRESENT') {
+                      presentDays += 1;
+                    } else if (status == 'HALF DAY') {
+                      presentDays += 0.5;
+                    } else if (status == 'ABSENT') {
+                      absentDays += 1;
+                    }
+                    totalMins += (item["TotalWorkedMinutes"] ?? 0) as int;
+                  } else {
+                    if (controller.leaveDates.contains(dateStr)) {
+                      approvedLeaves += 1;
+                    } else if (controller.holidayDates.contains(dateStr)) {
+                      holidays += 1;
+                    } else if (date.weekday == DateTime.saturday ||
+                        date.weekday == DateTime.sunday) {
+                      weeklyOff += 1;
+                    } else {
+                      absentDays += 1;
+                    }
+                  }
+                }
 
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 6.h),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 6.w,
-                        vertical: 6.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).dividerColor.withOpacity(0.1),
+                int tHours = totalMins ~/ 60;
+                int tMins = totalMins % 60;
+                String totalHoursStr =
+                    "$tHours:${tMins.toString().padLeft(2, '0')}";
+                String monthName = startDate != null
+                    ? DateFormat('MMMM yyyy').format(startDate!)
+                    : "Summary";
+
+                return Column(
+                  children: [
+                    _buildSummaryCard(
+                      context,
+                      monthName,
+                      presentDays,
+                      absentDays,
+                      approvedLeaves,
+                      holidays,
+                      weeklyOff,
+                      totalHoursStr,
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 12.h,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
-                            blurRadius: 2,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          // Date Box
-                          Container(
-                            width: 55.w,
-                            padding: EdgeInsets.symmetric(vertical: 3.h),
+                        itemCount: allDates.length,
+                        itemBuilder: (context, index) {
+                          final date = allDates[index];
+                          final dateString = DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(date);
+
+                          final item = controller.attendanceHistory.firstWhere((
+                            e,
+                          ) {
+                            if (e["AttendanceDate"] == null) return false;
+                            return e["AttendanceDate"].toString().startsWith(
+                              dateString,
+                            );
+                          }, orElse: () => null);
+
+                          String checkInTime = "--:--";
+                          String checkOutTime = "--:--";
+                          String hoursText = "";
+                          String breakText = "";
+                          Color statusColor = Colors.grey;
+                          String statusText = "ABSENT";
+
+                          if (item != null) {
+                            if (item["CheckInTime"] != null) {
+                              String raw = item["CheckInTime"]
+                                  .toString()
+                                  .replaceAll('Z', '');
+                              final cIn = DateTime.parse(raw);
+                              checkInTime = DateFormat('hh:mm a').format(cIn);
+                            }
+
+                            if (item["CheckOutTime"] != null) {
+                              String raw = item["CheckOutTime"]
+                                  .toString()
+                                  .replaceAll('Z', '');
+                              final cOut = DateTime.parse(raw);
+                              checkOutTime = DateFormat('hh:mm a').format(cOut);
+                            }
+
+                            final int workedMins =
+                                item["TotalWorkedMinutes"] ?? 0;
+                            if (workedMins > 0) {
+                              final int hrs = workedMins ~/ 60;
+                              final int mins = workedMins % 60;
+                              hoursText = "${hrs}h ${mins}m";
+                            }
+
+                            final int breakMins =
+                                item["TotalBreakMinutes"] ?? 0;
+                            if (breakMins > 0) {
+                              final int bHrs = breakMins ~/ 60;
+                              final int bMins = breakMins % 60;
+                              breakText = bHrs > 0
+                                  ? "${bHrs}h ${bMins}m"
+                                  : "${bMins}m";
+                            }
+
+                            statusColor = Colors.green;
+                            statusText = (item["Status"] ?? "PRESENT")
+                                .toString()
+                                .toUpperCase();
+                            if (statusText == 'ABSENT') {
+                              statusColor = Colors.red;
+                            }
+                            if (statusText == 'HALF DAY') {
+                              statusColor = Colors.orange;
+                            }
+                          } else {
+                            // No record found
+                            if (controller.leaveDates.contains(dateString)) {
+                              statusText = "ON LEAVE";
+                              statusColor = Colors.amber.shade700;
+                            } else if (controller.holidayDates.contains(
+                              dateString,
+                            )) {
+                              statusText = "HOLIDAY";
+                              statusColor = Colors.teal;
+                              if (date.weekday == DateTime.saturday ||
+                                  date.weekday == DateTime.sunday) {
+                                statusText = "HOLIDAY, WEEKLY OFF";
+                              }
+                            } else if (date.weekday == DateTime.saturday ||
+                                date.weekday == DateTime.sunday) {
+                              statusText = "WEEKLY OFF";
+                              statusColor = Colors.orange.shade700;
+                            } else {
+                              statusText = "ABSENT";
+                              statusColor = Colors.red;
+                            }
+                          }
+
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 6.h),
+                            clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).primaryColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6.r),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  date != null
-                                      ? DateFormat('dd').format(date)
-                                      : "--",
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                                Text(
-                                  date != null
-                                      ? DateFormat('EEE, MMM').format(date)
-                                      : "--",
-                                  style: TextStyle(
-                                    fontSize: 9.sp,
-                                    color: Theme.of(
-                                      context,
-                                    ).primaryColor.withOpacity(0.8),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          // Times
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "In",
-                                      style: TextStyle(
-                                        fontSize: 9.sp,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.5),
-                                      ),
-                                    ),
-                                    Text(
-                                      checkInTime,
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  width: 1,
-                                  height: 20.h,
-                                  color: Theme.of(
-                                    context,
-                                  ).dividerColor.withOpacity(0.2),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Out",
-                                      style: TextStyle(
-                                        fontSize: 9.sp,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.5),
-                                      ),
-                                    ),
-                                    Text(
-                                      checkOutTime,
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          // Status & Hours
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 6.w,
-                                  vertical: 2.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(4.r),
-                                ),
-                                child: Text(
-                                  statusText,
-                                  style: TextStyle(
-                                    fontSize: 8.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: statusColor,
-                                  ),
-                                ),
+                              color:
+                                  (statusText == "WEEKLY OFF" ||
+                                      statusText == "HOLIDAY, WEEKLY OFF")
+                                  ? Colors.orange.withOpacity(0.15)
+                                  : Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(8.r),
+                              border: Border.all(
+                                color:
+                                    (statusText == "WEEKLY OFF" ||
+                                        statusText == "HOLIDAY, WEEKLY OFF")
+                                    ? Colors.orange.withOpacity(0.6)
+                                    : Theme.of(
+                                        context,
+                                      ).dividerColor.withOpacity(0.1),
                               ),
-                              if (hoursText.isNotEmpty) ...[
-                                SizedBox(height: 4.h),
-                                Text(
-                                  hoursText,
-                                  style: TextStyle(
-                                    fontSize: 9.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withOpacity(0.7),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.02),
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 6.w,
+                                    vertical: 6.h,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Date Box
+                                      Container(
+                                        width: 55.w,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 3.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(
+                                            context,
+                                          ).primaryColor.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            6.r,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              DateFormat('dd').format(date),
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(
+                                                  context,
+                                                ).primaryColor,
+                                              ),
+                                            ),
+                                            Text(
+                                              DateFormat(
+                                                'EEE, MMM',
+                                              ).format(date),
+                                              style: TextStyle(
+                                                fontSize: 9.sp,
+                                                color: Theme.of(
+                                                  context,
+                                                ).primaryColor.withOpacity(0.8),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 12.w),
+                                      // Times
+                                      Expanded(
+                                        child: ImageFiltered(
+                                          imageFilter:
+                                              ((date.weekday ==
+                                                          DateTime.saturday ||
+                                                      date.weekday ==
+                                                          DateTime.sunday) &&
+                                                  item == null)
+                                              ? ImageFilter.blur(
+                                                  sigmaX: 3,
+                                                  sigmaY: 3,
+                                                )
+                                              : ImageFilter.blur(
+                                                  sigmaX: 0,
+                                                  sigmaY: 0,
+                                                ),
+                                          child: Opacity(
+                                            opacity:
+                                                ((date.weekday ==
+                                                            DateTime.saturday ||
+                                                        date.weekday ==
+                                                            DateTime.sunday) &&
+                                                    item == null)
+                                                ? 0.4
+                                                : 1.0,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          "In",
+                                                          style: TextStyle(
+                                                            fontSize: 9.sp,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.5,
+                                                                    ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          checkInTime,
+                                                          style: TextStyle(
+                                                            fontSize: 10.sp,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      width: 1,
+                                                      height: 20.h,
+                                                      color: Theme.of(context)
+                                                          .dividerColor
+                                                          .withOpacity(0.2),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          "Out",
+                                                          style: TextStyle(
+                                                            fontSize: 9.sp,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.5,
+                                                                    ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          checkOutTime,
+                                                          style: TextStyle(
+                                                            fontSize: 10.sp,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      width: 1,
+                                                      height: 20.h,
+                                                      color: Theme.of(context)
+                                                          .dividerColor
+                                                          .withOpacity(0.2),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          "Break",
+                                                          style: TextStyle(
+                                                            fontSize: 9.sp,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.5,
+                                                                    ),
+                                                          ),
+                                                        ),
+                                                        if (breakText
+                                                            .isNotEmpty) ...[
+                                                          Text(
+                                                            breakText,
+                                                            style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Colors
+                                                                  .orangeAccent
+                                                                  .shade700,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      width: 1,
+                                                      height: 20.h,
+                                                      color: Theme.of(context)
+                                                          .dividerColor
+                                                          .withOpacity(0.2),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          "Working Hrs.",
+                                                          style: TextStyle(
+                                                            fontSize: 9.sp,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface
+                                                                    .withOpacity(
+                                                                      0.5,
+                                                                    ),
+                                                          ),
+                                                        ),
+                                                        if (hoursText
+                                                            .isNotEmpty) ...[
+                                                          Text(
+                                                            hoursText,
+                                                            style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .onSurface
+                                                                      .withOpacity(
+                                                                        0.7,
+                                                                      ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+
+                                                SizedBox(height: 6.h),
+                                                Text(
+                                                  "Shift Time: 09:30 AM - 06:00 PM",
+                                                  style: TextStyle(
+                                                    fontSize: 9.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withOpacity(0.4),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w,
+                                      vertical: 1.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12.r),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      statusText,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8.sp,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
-                            ],
-                          ),
-                        ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 );
               }),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(
+    BuildContext context,
+    String monthName,
+    double presentDays,
+    double absentDays,
+    double approvedLeaves,
+    double holidays,
+    int weeklyOff,
+    String totalHoursStr,
+  ) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).primaryColor.withOpacity(0.15),
+            Theme.of(context).primaryColor.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).primaryColor.withOpacity(0.4),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.analytics_outlined,
+                color: Theme.of(context).primaryColor,
+                size: 18.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "$monthName Summary",
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildSummaryItem(
+                context,
+                "Present Days",
+                presentDays.toString(),
+                Colors.green,
+              ),
+              _buildSummaryItem(
+                context,
+                "Absent Days",
+                absentDays.toString(),
+                Colors.red,
+              ),
+              _buildSummaryItem(
+                context,
+                "Approved Leaves",
+                approvedLeaves.toString(),
+                Colors.amber.shade700,
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildSummaryItem(
+                context,
+                "Holidays",
+                holidays.toString(),
+                Colors.teal,
+              ),
+              _buildSummaryItem(
+                context,
+                "Weekly Off",
+                weeklyOff.toString(),
+                Colors.orange.shade700,
+              ),
+              _buildSummaryItem(
+                context,
+                "Total Hours",
+                totalHoursStr,
+                Theme.of(context).primaryColor,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(
+    BuildContext context,
+    String title,
+    String value,
+    Color color,
+  ) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 9.sp,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }
