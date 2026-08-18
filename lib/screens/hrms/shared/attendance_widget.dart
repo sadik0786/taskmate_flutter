@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:task_mate/controllers/hrms/leave_controller.dart';
+import 'package:task_mate/controllers/hrms/attendance_controller.dart';
 import 'package:task_mate/screens/hrms/shared/attendance_history_screen.dart';
+import 'package:task_mate/widgets/curved_text.dart';
+import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class AttendanceWidget extends StatefulWidget {
   const AttendanceWidget({super.key});
@@ -18,7 +20,8 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  final LeaveController leaveController = Get.put(LeaveController());
+  final AttendanceController attendanceController =
+      Get.put(AttendanceController());
   late Timer _clockTimer;
   String _currentTime = "";
   String _currentDate = "";
@@ -56,7 +59,7 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      leaveController.fetchTodayAttendance();
+      attendanceController.fetchTodayAttendance();
     });
   }
 
@@ -111,7 +114,7 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                   ),
                 ),
                 child: Obx(() {
-                  final attendance = leaveController.todayAttendance.value;
+                  final attendance = attendanceController.todayAttendance.value;
                   final String currentPunchState =
                       attendance?["CurrentPunchState"] ?? "";
 
@@ -119,17 +122,30 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                   final int workedMins = attendance?["TotalWorkedMinutes"] ?? 0;
 
                   String statusText = "Ready to Work";
-                  if (isPunchedIn) {
+                  if (attendanceController.isOnBreak.value) {
+                    statusText = "On Break ☕";
+                  } else if (isPunchedIn) {
                     statusText = "Actively Tracking";
                   } else if (workedMins > 0) {
-                    statusText = "On Break / Done";
+                    statusText = "Done for the Day";
                   }
+
+                  final int breakMins = attendance?["TotalBreakMinutes"] ?? 0;
 
                   String hoursText = "";
                   if (workedMins > 0) {
                     final int hrs = workedMins ~/ 60;
                     final int mins = workedMins % 60;
                     hoursText = "${hrs}h ${mins}m logged today";
+                  }
+
+                  String breakText = "";
+                  if (breakMins > 0) {
+                    final int bHrs = breakMins ~/ 60;
+                    final int bMins = breakMins % 60;
+                    breakText = bHrs > 0
+                        ? "${bHrs}h ${bMins}m break taken"
+                        : "${bMins}m break taken";
                   }
 
                   return Row(
@@ -177,6 +193,17 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                                 ),
                               ),
                             ],
+                            if (breakText.isNotEmpty) ...[
+                              SizedBox(height: 2.h),
+                              Text(
+                                breakText,
+                                style: TextStyle(
+                                  color: Colors.orangeAccent.withOpacity(0.9),
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                             SizedBox(height: 12.h),
                             InkWell(
                               onTap: () =>
@@ -216,83 +243,166 @@ class _AttendanceWidgetState extends State<AttendanceWidget>
                           ],
                         ),
                       ),
-                      // Action Button
-                      AnimatedBuilder(
-                        animation: _pulseAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: isPunchedIn ? _pulseAnimation.value : 1.0,
-                            child: GestureDetector(
+                      // Action Button & Break Button
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _pulseAnimation,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale:
+                                    isPunchedIn &&
+                                        !attendanceController.isOnBreak.value
+                                    ? _pulseAnimation.value
+                                    : 1.0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (isPunchedIn) {
+                                      if (attendanceController.isOnBreak.value) {
+                                        CustomSnackBar.error(
+                                          "Please end your break before punching out.",
+                                        );
+                                        return;
+                                      }
+                                      attendanceController.punchOut();
+                                    } else {
+                                      attendanceController.punchIn();
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 70.w,
+                                    height: 70.w,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: isPunchedIn
+                                            ? [
+                                                Colors.orangeAccent,
+                                                Colors.deepOrange,
+                                              ]
+                                            : [Colors.greenAccent, Colors.teal],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color:
+                                              (isPunchedIn
+                                                      ? Colors.orange
+                                                      : Colors.green)
+                                                  .withOpacity(0.5),
+                                          blurRadius: 15,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
+                                    ),
+                                    child: attendanceController.isLoading.value
+                                        ? const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Icon(
+                                                isPunchedIn
+                                                    ? Icons.stop_circle_outlined
+                                                    : Icons.play_circle_fill,
+                                                color: Colors.white,
+                                                size: 32.sp,
+                                              ),
+                                              CurvedText(
+                                                text: "PUNCH",
+                                                isTop: true,
+                                                radius: 24.w,
+                                                textStyle: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                              CurvedText(
+                                                text: isPunchedIn
+                                                    ? "OUT"
+                                                    : "IN",
+                                                isTop: false,
+                                                radius: 24.w,
+                                                textStyle: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          if (isPunchedIn) ...[
+                            SizedBox(height: 12.h),
+                            GestureDetector(
                               onTap: () {
-                                if (isPunchedIn) {
-                                  leaveController.punchOut();
+                                if (attendanceController.isOnBreak.value) {
+                                  attendanceController.endBreak();
                                 } else {
-                                  leaveController.punchIn();
+                                  attendanceController.takeBreak();
                                 }
                               },
                               child: Container(
-                                width: 80.w,
-                                height: 80.w,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16.w,
+                                  vertical: 8.h,
+                                ),
                                 decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: isPunchedIn
-                                        ? [
-                                            Colors.orangeAccent,
-                                            Colors.deepOrange,
-                                          ]
-                                        : [Colors.greenAccent, Colors.teal],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
+                                  color: attendanceController.isOnBreak.value
+                                      ? Colors.blue
+                                      : Colors.amber.shade700,
+                                  borderRadius: BorderRadius.circular(16.r),
                                   boxShadow: [
                                     BoxShadow(
                                       color:
-                                          (isPunchedIn
-                                                  ? Colors.orange
-                                                  : Colors.green)
-                                              .withOpacity(0.5),
-                                      blurRadius: 15,
-                                      spreadRadius: 2,
+                                          (attendanceController.isOnBreak.value
+                                                  ? Colors.blue
+                                                  : Colors.amber)
+                                              .withOpacity(0.4),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
                                     ),
                                   ],
                                 ),
-                                child: leaveController.isLoading.value
-                                    ? const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            isPunchedIn
-                                                ? Icons.stop_circle_outlined
-                                                : Icons.play_circle_fill,
-                                            color: Colors.white,
-                                            size: 28.sp,
-                                          ),
-                                          SizedBox(height: 4.h),
-                                          Text(
-                                            isPunchedIn
-                                                ? "PUNCH OUT"
-                                                : "PUNCH IN",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10.sp,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.5,
-                                            ),
-                                          ),
-                                        ],
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      attendanceController.isOnBreak.value
+                                          ? Icons.play_arrow
+                                          : Icons.coffee,
+                                      color: Colors.white,
+                                      size: 14.sp,
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      attendanceController.isOnBreak.value
+                                          ? "End Break"
+                                          : "Take Break",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.bold,
                                       ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          );
-                        },
+                          ],
+                        ],
                       ),
                     ],
                   );

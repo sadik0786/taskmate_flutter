@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:task_mate/controllers/hrms/leave_controller.dart';
+import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
 import 'package:task_mate/model/leave_request_model.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
@@ -17,7 +17,7 @@ class AllLeavesReport extends StatefulWidget {
 }
 
 class _AllLeavesReportState extends State<AllLeavesReport> {
-  final LeaveController leaveController = Get.put(LeaveController());
+  final AdminHrmsController controller = Get.put(AdminHrmsController());
   final TextEditingController _searchCtrl = TextEditingController();
   String _selectedStatus = "All";
 
@@ -25,13 +25,13 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      leaveController.fetchAllLeaveReport();
-      leaveController.fetchTodayLeaves(); // Fetch today leaves
+      controller.fetchAllLeaveReport();
+      controller.fetchTodayLeaves(); // Fetch today leaves
     });
   }
 
   void _onSearchOrFilterChanged() {
-    leaveController.filterLeaveReport(
+    controller.filterLeaveReport(
       searchQuery: _searchCtrl.text,
       status: _selectedStatus,
     );
@@ -53,7 +53,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
 
           // Who is on leave today
           Obx(() {
-            if (leaveController.todayLeaves.isEmpty) {
+            if (controller.todayLeaves.isEmpty) {
               return const SizedBox.shrink();
             }
             return Column(
@@ -71,7 +71,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: leaveController.todayLeaves.map((leave) {
+                    children: controller.todayLeaves.map((leave) {
                       return Container(
                         margin: EdgeInsets.only(right: 12.w),
                         padding: EdgeInsets.symmetric(
@@ -149,7 +149,6 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              spacing: 8.w,
               children: ["All", "PENDING", "APPROVED", "REJECTED"].map((
                 String status,
               ) {
@@ -172,11 +171,11 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
           // List of Leaves
           Expanded(
             child: Obx(() {
-              if (leaveController.isLoading.value) {
+              if (controller.isLoading.value) {
                 return const Center(child: PageLoader());
               }
 
-              final leaves = leaveController.filteredLeaveReport;
+              final leaves = controller.filteredLeaveReport;
 
               if (leaves.isEmpty) {
                 return const NoTasksWidget(message: "No Leaves Found");

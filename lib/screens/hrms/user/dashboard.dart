@@ -78,12 +78,18 @@ class _DashboardState extends State<Dashboard> {
                         vertical: 6.h,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.1),
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
+                            color: Theme.of(
+                              context,
+                            ).shadowColor.withOpacity(0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -96,17 +102,19 @@ class _DashboardState extends State<Dashboard> {
                             type.leaveName ?? "",
                             style: TextStyle(
                               fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                           ),
-
+                          SizedBox(height: 2.h),
                           Text(
                             "${type.remainingLeaves ?? 0} Remaining",
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
-                              color: ThemeClass.textBlack,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -162,24 +170,17 @@ class _DashboardState extends State<Dashboard> {
               curve: Curves.easeOutBack,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+                margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 12.h),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).cardColor,
-                      Theme.of(context).cardColor,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: color.withOpacity(0.3), width: 1),
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(color: color.withOpacity(0.2), width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      color: Theme.of(context).shadowColor.withOpacity(0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -187,34 +188,34 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                        Container(
                           padding: EdgeInsets.all(6.w),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(icon, size: 26.sp, color: color),
+                          child: Icon(icon, size: 18.sp, color: color),
                         ),
+                        SizedBox(width: 8.w),
                         Text(
                           value.toString(),
                           style: TextStyle(
-                            fontSize: 26.sp,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 6.h),
+                    SizedBox(height: 8.h),
                     Text(
                       title,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey.shade600,
+                        fontSize: 12.sp,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -245,17 +246,20 @@ class _DashboardState extends State<Dashboard> {
         : Colors.orange.shade50;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
-      padding: EdgeInsets.all(16.w),
+      margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 2.w),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: bgColor, width: 2),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: bgColor.withOpacity(Get.isDarkMode ? 0.1 : 1.0),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Theme.of(context).shadowColor.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -291,17 +295,18 @@ class _DashboardState extends State<Dashboard> {
                       Text(
                         leave.leaveTypeName,
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                          fontSize: 15.sp,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      SizedBox(height: 2.h),
                       Text(
                         '${leave.totalDays} Days',
                         style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -309,22 +314,16 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: BorderRadius.circular(20.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: statusColor.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: statusColor.withOpacity(0.3)),
                 ),
                 child: Text(
                   leave.status,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: statusColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 11.sp,
                   ),
@@ -333,38 +332,49 @@ class _DashboardState extends State<Dashboard> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: 12.h, bottom: 8.h),
-            child: Divider(color: Colors.grey.shade200, height: 1),
+            padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
+            child: Divider(
+              color: Theme.of(context).dividerColor.withOpacity(0.1),
+              height: 1,
+            ),
           ),
           Row(
             children: [
-              Icon(Icons.date_range, size: 16.sp, color: Colors.grey.shade600),
-              SizedBox(width: 8.w),
+              Icon(
+                Icons.date_range,
+                size: 14.sp,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              SizedBox(width: 6.w),
               Text(
                 "${CommonFn.formatDate(leave.fromDate)} to ${CommonFn.formatDate(leave.toDate)}",
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13.sp,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12.sp,
                 ),
               ),
             ],
           ),
           if (leave.reason != null && leave.reason!.isNotEmpty) ...[
-            SizedBox(height: 8.h),
+            SizedBox(height: 6.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.notes, size: 16.sp, color: Colors.grey.shade600),
-                SizedBox(width: 8.w),
+                Icon(
+                  Icons.notes,
+                  size: 14.sp,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                SizedBox(width: 6.w),
                 Expanded(
                   child: Text(
                     leave.reason!,
                     textAlign: TextAlign.left,
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
-                      fontSize: 13.sp,
+                      fontSize: 12.sp,
                     ),
                   ),
                 ),

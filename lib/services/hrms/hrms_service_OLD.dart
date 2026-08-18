@@ -287,6 +287,24 @@ class ApiHrmsService {
     }
   }
 
+  static Future<Map<String, dynamic>> takeBreak() async {
+    try {
+      final res = await request("/hrms/attendance/take-break", method: "POST");
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> endBreak() async {
+    try {
+      final res = await request("/hrms/attendance/end-break", method: "POST");
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
   static Future<Map<String, dynamic>?> fetchTodayAttendance() async {
     final res = await request("/hrms/attendance/today");
     final data = jsonDecode(res.body);
@@ -365,20 +383,21 @@ class ApiHrmsService {
     if (res.statusCode == 200 && data["success"] == true) {
       return data["data"] as List;
     }
-    throw Exception(data["message"] ?? "Failed to fetch pending regularizations");
+    throw Exception(
+      data["message"] ?? "Failed to fetch pending regularizations",
+    );
   }
 
   static Future<Map<String, dynamic>> updateRegularizationStatus(
-      int reqId, String status, String hrReason) async {
+    int reqId,
+    String status,
+    String hrReason,
+  ) async {
     try {
       final res = await request(
         "/hrms/attendance/regularize/status",
         method: "PUT",
-        body: {
-          "reqId": reqId,
-          "status": status,
-          "hrReason": hrReason,
-        },
+        body: {"reqId": reqId, "status": status, "hrReason": hrReason},
       );
       return jsonDecode(res.body);
     } catch (e) {

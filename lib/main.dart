@@ -44,13 +44,12 @@ class MyApp extends StatelessWidget {
               title: 'Task Mate | 5nance',
               theme: ThemeClass.lightTheme,
               darkTheme: ThemeClass.darkTheme,
-              themeMode: ThemeMode.system,
               initialRoute: Routes.initialRoute,
               initialBinding: AllBinding(),
               getPages: appPages(),
               builder: (context, widget) {
                 return Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   child: SafeArea(
                     top: false,
                     left: false,

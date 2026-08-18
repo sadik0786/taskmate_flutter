@@ -10,6 +10,7 @@ import 'package:task_mate/screens/hrms/user/apply_leave.dart';
 import 'package:task_mate/screens/hrms/user/dashboard.dart';
 import 'package:task_mate/screens/auth/login_screen.dart';
 import 'package:task_mate/screens/user/profile_screen.dart';
+import 'package:task_mate/screens/user/settings_screen.dart';
 import 'package:task_mate/screens/splash_screent.dart';
 // for admin pages
 import 'package:task_mate/screens/admin/admin_dashboard.dart';
@@ -34,6 +35,7 @@ class Routes {
   static const String taskScreen = "/taskScreen";
   static const String forgotPasswordPage = "/forgotPasswordPage";
   static const String profileScreen = "/profileScreen";
+  static const String settingsScreen = "/settingsScreen";
   // for admin pages
   static const String adminDashboard = "/adminDashboard";
   static const String registerScreen = "/registerScreen";
@@ -52,7 +54,8 @@ class Routes {
   static const String allEmployee = "/allEmployee";
   // Attendance & Regularization
   static const String adminAttendanceReport = "/adminAttendanceReport";
-  static const String adminRegularizationRequests = "/adminRegularizationRequests";
+  static const String adminRegularizationRequests =
+      "/adminRegularizationRequests";
   static const String regularizationRequest = "/regularizationRequest";
 }
 
@@ -76,6 +79,7 @@ List<GetPage> appPages() => [
   _getPage(Routes.taskScreen, TaskScreen()),
   _getPage(Routes.forgotPasswordPage, ForgotPasswordPage()),
   _getPage(Routes.profileScreen, ProfileScreen()),
+  _getPage(Routes.settingsScreen, SettingsScreen()),
   // for admin pages
   _getPage(Routes.registerScreen, RegisterScreen()),
   _getPage(Routes.adminDashboard, AdminDashboard()),
@@ -92,6 +96,9 @@ List<GetPage> appPages() => [
   _getPage(Routes.allEmployee, AllLeavesReport()),
   // Attendance & Regularization
   _getPage(Routes.adminAttendanceReport, AdminAttendanceReportScreen()),
-  _getPage(Routes.adminRegularizationRequests, AdminRegularizationRequestsScreen()),
+  _getPage(
+    Routes.adminRegularizationRequests,
+    AdminRegularizationRequestsScreen(),
+  ),
   _getPage(Routes.regularizationRequest, RegularizationRequestScreen()),
 ];

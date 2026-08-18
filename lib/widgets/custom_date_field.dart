@@ -21,7 +21,7 @@ class CustomDateField extends StatelessWidget {
     required this.prefixIcon,
     required this.hintText,
     this.validator,
-    this.fillColor = ThemeClass.darkCardColor,
+    this.fillColor,
   });
 
   @override
@@ -29,8 +29,6 @@ class CustomDateField extends StatelessWidget {
     final displayText = selectedDate != null
         ? "${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}"
         : hintText;
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,19 +56,26 @@ class CustomDateField extends StatelessWidget {
             child: TextFormField(
               style: TextStyle(
                 fontSize: 16.sp,
-                color: isDark ? ThemeClass.textWhite : Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 hintText: displayText,
                 hintStyle: TextStyle(
                   color: selectedDate != null
-                      ? ThemeClass.textWhite
-                      : ThemeClass.textWhite.withAlpha(80),
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 16.sp,
                 ),
-                prefixIcon: Icon(prefixIcon, color: ThemeClass.textWhite),
+                prefixIcon: Icon(
+                  prefixIcon,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 filled: true,
-                fillColor: fillColor,
+                fillColor:
+                    fillColor ??
+                    Theme.of(context).inputDecorationTheme.fillColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
                 ),

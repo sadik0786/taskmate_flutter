@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:task_mate/controllers/hrms/leave_controller.dart';
+import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 
@@ -16,7 +16,7 @@ class AdminAttendanceReportScreen extends StatefulWidget {
 
 class _AdminAttendanceReportScreenState
     extends State<AdminAttendanceReportScreen> {
-  final LeaveController leaveController = Get.find<LeaveController>();
+  final AdminHrmsController controller = Get.put(AdminHrmsController());
   DateTime selectedDate = DateTime.now();
 
   @override
@@ -26,7 +26,7 @@ class _AdminAttendanceReportScreenState
   }
 
   void _fetchReport() {
-    leaveController.fetchAdminAttendanceReport(
+    controller.fetchAdminAttendanceReport(
         DateFormat('yyyy-MM-dd').format(selectedDate));
   }
 
@@ -62,7 +62,7 @@ class _AdminAttendanceReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Attendance Report"),
         backgroundColor: ThemeClass.primaryGreen,
@@ -134,10 +134,10 @@ class _AdminAttendanceReportScreenState
           // List
           Expanded(
             child: Obx(() {
-              if (leaveController.isLoading.value) {
+              if (controller.isLoading.value) {
                 return const PageLoader();
               }
-              if (leaveController.adminAttendanceReport.isEmpty) {
+              if (controller.adminAttendanceReport.isEmpty) {
                 return Center(
                   child: Text(
                     "No attendance data found for this date.",
@@ -148,10 +148,10 @@ class _AdminAttendanceReportScreenState
 
               return ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                itemCount: leaveController.adminAttendanceReport.length,
+                itemCount: controller.adminAttendanceReport.length,
                 itemBuilder: (context, index) {
-                  final item = leaveController.adminAttendanceReport[index];
-                  return _buildEmployeeCard(item);
+                  final record = controller.adminAttendanceReport[index];
+                  return _buildEmployeeCard(record);
                 },
               );
             }),

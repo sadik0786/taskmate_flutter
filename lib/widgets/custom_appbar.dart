@@ -81,7 +81,6 @@ class DesktopAppBar extends StatelessWidget {
                     "Hi, ${userName ?? ""}",
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
                     ),
                   ),
                 ],
@@ -122,7 +121,6 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: theme.textTheme.titleLarge!.copyWith(
           fontWeight: FontWeight.w700,
           fontSize: 18.sp,
-          color: Colors.white,
         ),
       ),
       actions: [

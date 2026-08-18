@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/controllers/auth/login_controller.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 
@@ -19,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -41,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Icon(
                             Icons.assignment_turned_in_outlined,
                             size: 40.sp,
-                            color: Colors.white,
+                            color: Theme.of(context).primaryColor,
                           ),
                           SizedBox(height: 10.h),
                           Text(
@@ -60,11 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Login Card
                   Card(
                     margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                    color: ThemeClass.darkCardColor,
+                    color: Theme.of(context).cardColor,
                     elevation: 16,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.r),
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      side: BorderSide(
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
+                      ),
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(14.w),

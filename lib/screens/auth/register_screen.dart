@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/controllers/auth/register_controller.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
@@ -47,12 +46,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Obx(
                     () => Card(
-                      color: ThemeClass.darkCardColor,
+                      color: Theme.of(context).cardColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14.r),
                       ),
                       elevation: 4,
-                      shadowColor: Colors.white54,
+                      shadowColor: Theme.of(
+                        context,
+                      ).shadowColor.withOpacity(0.1),
 
                       child: Padding(
                         padding: EdgeInsets.all(12.w),

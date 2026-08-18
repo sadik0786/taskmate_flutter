@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:task_mate/controllers/hrms/leave_controller.dart';
+import 'package:task_mate/controllers/hrms/regularization_controller.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/widgets/no_data.dart';
@@ -17,12 +17,12 @@ class AdminRegularizationRequestsScreen extends StatefulWidget {
 
 class _AdminRegularizationRequestsScreenState
     extends State<AdminRegularizationRequestsScreen> {
-  final LeaveController leaveController = Get.find<LeaveController>();
+  final RegularizationController controller = Get.put(RegularizationController());
 
   @override
   void initState() {
     super.initState();
-    leaveController.fetchPendingRegularizations();
+    controller.fetchPendingRegularizations();
   }
 
   void _showActionDialog(dynamic item, String action) {
@@ -32,7 +32,7 @@ class _AdminRegularizationRequestsScreenState
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           title: Text(
             "$action Request",
@@ -70,7 +70,7 @@ class _AdminRegularizationRequestsScreenState
             ElevatedButton(
               onPressed: () async {
                 final navigator = Navigator.of(context);
-                final success = await leaveController.updateRegularizationStatus(
+                final success = await controller.updateRegularizationStatus(
                   item["Id"],
                   action == "Approve" ? "Approved" : "Rejected",
                   hrReasonController.text,
@@ -96,27 +96,27 @@ class _AdminRegularizationRequestsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Pending Regularizations"),
         backgroundColor: ThemeClass.primaryGreen,
         foregroundColor: Colors.white,
       ),
       body: Obx(() {
-        if (leaveController.isLoading.value &&
-            leaveController.pendingRegularizations.isEmpty) {
+        if (controller.isLoading.value &&
+            controller.pendingRegularizations.isEmpty) {
           return const PageLoader();
         }
 
-        if (leaveController.pendingRegularizations.isEmpty) {
+        if (controller.pendingRegularizations.isEmpty) {
           return const NoTasksWidget(message: "No pending requests found.");
         }
 
         return ListView.builder(
           padding: EdgeInsets.all(16.w),
-          itemCount: leaveController.pendingRegularizations.length,
+          itemCount: controller.pendingRegularizations.length,
           itemBuilder: (context, index) {
-            final item = leaveController.pendingRegularizations[index];
+            final item = controller.pendingRegularizations[index];
             return _buildRequestCard(item);
           },
         );

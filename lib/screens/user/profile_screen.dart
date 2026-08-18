@@ -41,7 +41,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List allTasks = [];
   bool isDarkMode = false;
   bool _isLoading = true;
-  String? _savedPin;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -49,14 +48,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _loadUser();
-    _loadSavedPin();
-  }
-
-  Future<void> _loadSavedPin() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _savedPin = prefs.getString("appLockPin");
-    });
   }
 
   Future<void> _checkAuthAndNavigate() async {
@@ -420,48 +411,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Light/Dark Toggle
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                          //     Row(
-                          //       children: [
-                          //         Text(
-                          //           _themeController.isDarkMode.value ? "Dark Mode" : "Light Mode",
-                          //           style: Theme.of(context).textTheme.titleLarge,
-                          //         ),
-                          //         SizedBox(width: 8.w),
-                          //         Icon(
-                          //           _themeController.isDarkMode.value
-                          //               ? Icons.dark_mode
-                          //               : Icons.light_mode,
-                          //           color: ThemeClass.textWhite,
-                          //         ),
-                          //       ],
-                          //     ),
-                          //     Switch(
-                          //       value: _themeController.isDarkMode.value,
-                          //       onChanged: (value) {
-                          //         _themeController.toggleTheme();
-                          //       },
-                          //       activeColor: Colors.white,
-                          //       activeTrackColor: Colors.greenAccent.withOpacity(0.5),
-                          //       inactiveThumbColor: Colors.grey.shade300,
-                          //       inactiveTrackColor: Colors.grey.shade600,
-                          //       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          //     ),
-                          //   ],
-                          // ),
-                          // SizedBox(height: 20.h),
-                          // Set App Lock PIN Button
-                          CustomButton(
-                            icon: Icons.lock,
-                            text: _savedPin == null
-                                ? "Set App Lock PIN"
-                                : "Change App Lock PIN",
-                            onPressed: _showSetPinBottomSheet,
-                          ),
-                          SizedBox(height: 20.h),
                           CustomButton(
                             backgroundColor: ThemeClass.errorColor,
                             icon: Icons.logout,
@@ -584,129 +533,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showSetPinBottomSheet() {
-    final TextEditingController pinController = TextEditingController();
-    final TextEditingController confirmController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: ThemeClass.darkBlue,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: 16.w,
-          right: 16.w,
-          top: 24.h,
-        ),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                _savedPin == null ? "Set App Lock PIN" : "Change App Lock PIN",
-                style: Theme.of(ctx).textTheme.titleLarge,
-              ),
-              SizedBox(height: 20.h),
-              CustomTextField(
-                labelText: "Set PIN",
-                hintText: "Enter 4-digit number",
-                controller: pinController,
-                keyboardType: TextInputType.number,
-                isObscure: true,
-                maxLength: 4,
-                fillColor: ThemeClass.darkBlue,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return "PIN required";
-                  if (value.length != 4) return "PIN must be 4 digits";
-                  return null;
-                },
-              ),
-              // SizedBox(height: 12.h),
-              CustomTextField(
-                labelText: "Confirm Set PIN",
-                hintText: "Enter 4-digit number",
-                controller: confirmController,
-                keyboardType: TextInputType.number,
-                isObscure: true,
-                maxLength: 4,
-                fillColor: ThemeClass.darkBlue,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return "Confirm your PIN";
-                  if (value != pinController.text) return "PINs do not match";
-                  return null;
-                },
-              ),
-              SizedBox(height: 20.h),
-              CustomButton(
-                txtColor: ThemeClass.textBlack,
-                backgroundColor: ThemeClass.textWhite,
-                text: _savedPin == null ? "Save PIN" : "Update PIN",
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString("appLockPin", pinController.text);
-                    setState(() {
-                      _savedPin = pinController.text;
-                    });
-                    Navigator.pop(Get.context!);
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          _savedPin == null
-                              ? "PIN set successfully!"
-                              : "PIN updated successfully!",
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-              // ElevatedButton.icon(
-              //   // icon: Icon(Icons.check, color: ThemeClass.lightCardColor),
-              //   label: Text(
-              //     _savedPin == null ? "Save PIN" : "Update PIN",
-              //     style: TextStyle(
-              //       fontSize: 16.sp,
-              //       fontWeight: FontWeight.w600,
-              //       color: Theme.of(context).colorScheme.onPrimary,
-              //     ),
-              //   ),
-              //   onPressed: () async {
-              //     if (formKey.currentState!.validate()) {
-              //       final prefs = await SharedPreferences.getInstance();
-              //       await prefs.setString("appLockPin", pinController.text);
-              //       setState(() {
-              //         _savedPin = pinController.text;
-              //       });
-              //       Navigator.pop(Get.context!);
-              //       if (!mounted) return;
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         SnackBar(
-              //           content: Text(
-              //             _savedPin == null ? "PIN set successfully!" : "PIN updated successfully!",
-              //           ),
-              //         ),
-              //       );
-              //     }
-              //   },
-              //   style: ElevatedButton.styleFrom(
-              //     padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 14.w),
-              //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-              //     backgroundColor: Theme.of(context).colorScheme.primary,
-              //   ),
-              // ),
-              SizedBox(height: 24.h),
-            ],
-          ),
-        ),
       ),
     );
   }

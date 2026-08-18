@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:task_mate/core/routes.dart';
 
 class BaseApiService {
-  // URL is loaded from .env file (baseApiUrl key)
   static String get baseUrl =>
       dotenv.env['baseApiUrl'] ?? "http://taskmateapi.5nance.com/api";
 
@@ -40,5 +43,51 @@ class BaseApiService {
     } catch (e) {
       return false;
     }
+  }
+
+  static Future<http.Response> request(
+    String endpoint, {
+    String method = "GET",
+    Map<String, dynamic>? body,
+  }) async {
+    final token = await getToken();
+
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) "Authorization": "Bearer $token",
+    };
+    late http.Response response;
+    try {
+      final uri = Uri.parse("$baseUrl$endpoint");
+      switch (method) {
+        case "POST":
+          response = await http.post(
+            uri,
+            headers: headers,
+            body: body != null ? jsonEncode(body) : null,
+          );
+          break;
+        case "PUT":
+          response = await http.put(
+            uri,
+            headers: headers,
+            body: body != null ? jsonEncode(body) : null,
+          );
+          break;
+        case "DELETE":
+          response = await http.delete(uri, headers: headers);
+          break;
+        default:
+          response = await http.get(uri, headers: headers);
+      }
+    } catch (e) {
+      rethrow;
+    }
+    if (response.statusCode == 401) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      Get.offAllNamed(Routes.login);
+    }
+    return response;
   }
 }

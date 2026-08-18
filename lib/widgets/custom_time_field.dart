@@ -21,7 +21,7 @@ class CustomTimeField extends StatelessWidget {
     required this.prefixIcon,
     required this.hintText,
     this.validator,
-    this.fillColor = ThemeClass.darkCardColor,
+    this.fillColor,
   });
 
   @override
@@ -53,18 +53,28 @@ class CustomTimeField extends StatelessWidget {
           onTap: onTap,
           child: AbsorbPointer(
             child: TextFormField(
-              style: TextStyle(fontSize: 16.sp, color: ThemeClass.textWhite),
+              style: TextStyle(
+                fontSize: 16.sp,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
                 hintText: displayText,
                 hintStyle: TextStyle(
                   color: selectedTime != null
-                      ? ThemeClass.textWhite
-                      : ThemeClass.textWhite.withAlpha(80),
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 14.sp,
                 ),
                 filled: true,
-                fillColor: fillColor,
-                prefixIcon: Icon(prefixIcon, color: ThemeClass.textWhite),
+                fillColor:
+                    fillColor ??
+                    Theme.of(context).inputDecorationTheme.fillColor,
+                prefixIcon: Icon(
+                  prefixIcon,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
                 ),

@@ -5,12 +5,13 @@ import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
-import 'package:task_mate/services/hrms/hrms_service.dart';
+
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_date_field.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/services/hrms/leave_service.dart';
 
 class ApplyLeave extends StatefulWidget {
   const ApplyLeave({super.key});
@@ -117,7 +118,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
 
   Future<void> loadleaveTypes() async {
     try {
-      final res = await ApiHrmsService.fetchAllLeaveTypes();
+      final res = await LeaveService.fetchAllLeaveTypes();
       setState(() {
         leaveTypes.clear();
         leaveTypes.addAll(res.map((p) => Map<String, dynamic>.from(p)));

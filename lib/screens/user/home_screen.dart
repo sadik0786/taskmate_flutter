@@ -40,11 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+    final standardGradient = [primaryColor, primaryColor.withOpacity(0.8)];
+
     final items = [
       _DashboardItem(
         title: 'Add Task',
         icon: Icons.add_task,
-        gradient: [Colors.lightBlueAccent, Colors.blue],
+        gradient: standardGradient,
         onTap: () {
           Get.toNamed(Routes.addTaskScreen);
         },
@@ -52,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Task Details',
         icon: Icons.list,
-        gradient: [Colors.orangeAccent, Colors.deepOrange],
+        gradient: standardGradient,
         onTap: () {
           Get.toNamed(Routes.taskScreen);
           _loadTasks();
@@ -61,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Add Project',
         icon: Icons.library_add,
-        gradient: [Colors.green.shade400, Colors.green.shade600],
+        gradient: standardGradient,
         onTap: () {
           Get.toNamed(Routes.projectScreen);
         },
@@ -69,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Change Password',
         icon: Icons.password,
-        gradient: [Colors.redAccent, Colors.red.shade700],
+        gradient: standardGradient,
         onTap: () {
           Get.toNamed(Routes.forgotPasswordPage);
         },
@@ -77,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'My Profile',
         icon: Icons.manage_accounts,
-        gradient: [Colors.purpleAccent.shade200, Colors.purpleAccent.shade400],
+        gradient: standardGradient,
         onTap: () {
           Get.toNamed(Routes.profileScreen);
         },
@@ -85,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Manage Leave',
         icon: Icons.manage_history,
-        gradient: [Colors.tealAccent.shade400, Colors.teal.shade400],
+        gradient: standardGradient,
         onTap: () {
           Get.toNamed(Routes.hrmsDashboard);
         },
@@ -93,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _DashboardItem(
         title: 'Company Holidays',
         icon: Icons.celebration,
-        gradient: [Colors.pinkAccent.shade200, Colors.pink.shade400],
+        gradient: standardGradient,
         onTap: () {
           Get.to(() => const HolidaysScreen());
         },
@@ -120,9 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 24.h,
-                      crossAxisSpacing: 24.w,
-                      childAspectRatio: 1.15,
+                      mainAxisSpacing: 16.h,
+                      crossAxisSpacing: 16.w,
+                      childAspectRatio: 1.25,
                     ),
                     itemCount: items.length,
                     itemBuilder: (context, index) {
@@ -189,7 +192,7 @@ class _ModernCardState extends State<_ModernCard>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(24.r),
+              borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
                 color: _isHovered
                     ? Colors.transparent
@@ -199,17 +202,17 @@ class _ModernCardState extends State<_ModernCard>
               boxShadow: _isHovered
                   ? [
                       BoxShadow(
-                        color: widget.item.gradient[0].withOpacity(0.4),
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 8),
+                        color: widget.item.gradient[0].withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 4),
                       ),
                     ]
                   : [
                       BoxShadow(
-                        color: theme.colorScheme.shadow.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        color: theme.colorScheme.shadow.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
             ),
@@ -231,7 +234,7 @@ class _ModernCardState extends State<_ModernCard>
                     children: [
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
-                        padding: EdgeInsets.all(16.w),
+                        padding: EdgeInsets.all(12.w),
                         decoration: BoxDecoration(
                           color: _isHovered
                               ? Colors.white.withOpacity(0.2)
@@ -240,7 +243,7 @@ class _ModernCardState extends State<_ModernCard>
                         ),
                         child: Icon(
                           widget.item.icon,
-                          size: 36.sp,
+                          size: 28.sp,
                           color: _isHovered
                               ? Colors.white
                               : widget.item.gradient[0],
@@ -254,7 +257,7 @@ class _ModernCardState extends State<_ModernCard>
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
+                          fontSize: 13.sp,
                           color: _isHovered
                               ? Colors.white
                               : theme.colorScheme.onSurface,

@@ -130,7 +130,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -139,14 +139,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).appBarTheme.foregroundColor),
           onPressed: () {
             Get.back();
           },
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
+            icon: Icon(Icons.home, color: Theme.of(context).appBarTheme.foregroundColor),
             onPressed: _navigateToHome,
           ),
         ],

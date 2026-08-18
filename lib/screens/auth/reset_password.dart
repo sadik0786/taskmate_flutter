@@ -209,7 +209,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     style: TextStyle(
                       color: isCompleted
                           ? ThemeClass.primaryGreen
-                          : ThemeClass.darkBlue,
+                          : Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -219,7 +219,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         Text(
           label,
           style: TextStyle(
-            color: isCompleted ? ThemeClass.primaryGreen : ThemeClass.darkBlue,
+            color: isCompleted ? ThemeClass.primaryGreen : Theme.of(context).primaryColor,
             fontSize: 12.sp,
             fontWeight: isCompleted ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -304,13 +304,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               Icon(
                 Icons.arrow_back_ios_new,
                 size: 16.sp,
-                color: ThemeClass.darkBlue,
+                color: Theme.of(context).primaryColor,
               ),
               SizedBox(width: 4.w),
               Text(
                 "Back to email verification",
                 style: TextStyle(
-                  color: ThemeClass.darkBlue,
+                  color: Theme.of(context).primaryColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),

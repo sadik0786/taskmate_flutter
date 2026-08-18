@@ -72,7 +72,7 @@ class EventsWidget extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 24.r,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).cardColor,
                           backgroundImage: event["image"] != null
                               ? NetworkImage(
                                   "${dotenv.env['baseApiUrl'] ?? ''}${event["image"]}",

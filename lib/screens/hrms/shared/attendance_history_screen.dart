@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:task_mate/controllers/hrms/leave_controller.dart';
+import 'package:task_mate/controllers/hrms/attendance_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/no_data.dart';
@@ -17,7 +17,7 @@ class AttendanceHistoryScreen extends StatefulWidget {
 }
 
 class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
-  final LeaveController leaveController = Get.find<LeaveController>();
+  final AttendanceController controller = Get.put(AttendanceController());
   DateTime? startDate;
   DateTime? endDate;
 
@@ -35,7 +35,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       startStr = DateFormat('yyyy-MM-dd').format(startDate!);
       endStr = DateFormat('yyyy-MM-dd').format(endDate!);
     }
-    leaveController.fetchAttendanceHistory(startStr, endStr);
+    controller.fetchAttendanceHistory(startStr, endStr);
   }
 
   void _showFilterModal(BuildContext context) {
@@ -52,7 +52,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
             right: 20.w,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
           ),
           child: Column(
@@ -62,7 +62,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: Theme.of(context).dividerColor,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
@@ -72,11 +72,11 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: ThemeClass.textBlack,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 20.h),
-              _buildFilterOption("Today", () {
+              _buildFilterOption(context, "Today", () {
                 Navigator.pop(ctx);
                 setState(() {
                   startDate = DateTime.now();
@@ -84,7 +84,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 });
                 _fetchData();
               }),
-              _buildFilterOption("Last 7 Days", () {
+              _buildFilterOption(context, "Last 7 Days", () {
                 Navigator.pop(ctx);
                 setState(() {
                   endDate = DateTime.now();
@@ -92,7 +92,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 });
                 _fetchData();
               }),
-              _buildFilterOption("Last 30 Days", () {
+              _buildFilterOption(context, "Last 30 Days", () {
                 Navigator.pop(ctx);
                 setState(() {
                   endDate = DateTime.now();
@@ -100,34 +100,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 });
                 _fetchData();
               }),
-              _buildFilterOption("Custom Range", () async {
+              _buildFilterOption(context, "Select Month", () {
                 Navigator.pop(ctx);
-                final picked = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                  builder: (context, child) {
-                    return Theme(
-                      data: ThemeData.light().copyWith(
-                        colorScheme: const ColorScheme.light(
-                          primary: ThemeClass.primaryGreen,
-                          onPrimary: Colors.white,
-                          surface: Colors.white,
-                          onSurface: Colors.black,
-                        ),
-                        dialogBackgroundColor: Colors.white,
-                      ),
-                      child: child!,
-                    );
-                  },
-                );
-                if (picked != null) {
-                  setState(() {
-                    startDate = picked.start;
-                    endDate = picked.end;
-                  });
-                  _fetchData();
-                }
+                _showMonthYearPicker(context);
               }),
             ],
           ),
@@ -136,7 +111,77 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
     );
   }
 
-  Widget _buildFilterOption(String title, VoidCallback onTap) {
+  void _showMonthYearPicker(BuildContext context) {
+    final now = DateTime.now();
+    final List<DateTime> months = List.generate(12, (index) {
+      return DateTime(now.year, now.month - index, 1);
+    });
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                child: Text(
+                  "Select Month",
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  itemCount: months.length,
+                  itemBuilder: (context, index) {
+                    final month = months[index];
+                    return ListTile(
+                      title: Text(
+                        DateFormat('MMMM yyyy').format(month),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: Theme.of(context).dividerColor,
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        setState(() {
+                          startDate = DateTime(month.year, month.month, 1);
+                          endDate = DateTime(month.year, month.month + 1, 0);
+                        });
+                        _fetchData();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFilterOption(
+    BuildContext context,
+    String title,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
@@ -145,8 +190,10 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
         padding: EdgeInsets.symmetric(vertical: 14.h),
         margin: EdgeInsets.only(bottom: 12.h),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          border: Border.all(color: Colors.grey.shade200),
+          color: Theme.of(context).cardColor,
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
           borderRadius: BorderRadius.circular(12.r),
         ),
         alignment: Alignment.center,
@@ -155,7 +202,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
-            color: ThemeClass.textBlack,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),
@@ -165,7 +212,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Attendance History"),
         backgroundColor: ThemeClass.primaryGreen,
@@ -175,10 +222,17 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
             onPressed: () {
               Get.toNamed(Routes.regularizationRequest);
             },
-            icon: const Icon(Icons.edit_calendar, color: Colors.white, size: 18),
+            icon: const Icon(
+              Icons.edit_calendar,
+              color: Colors.white,
+              size: 18,
+            ),
             label: const Text(
               "Regularize",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -249,7 +303,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                             style: TextStyle(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
-                              color: ThemeClass.textBlack,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -304,27 +358,27 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
             // List of Attendance
             Expanded(
               child: Obx(() {
-                if (leaveController.isLoading.value) {
+                if (controller.isLoading.value) {
                   return const PageLoader();
                 }
 
-                if (leaveController.attendanceHistory.isEmpty) {
+                if (controller.attendanceHistory.isEmpty) {
                   return const NoTasksWidget(
                     message: "No attendance records found.",
                   );
                 }
 
                 return ListView.builder(
-                  padding: EdgeInsets.all(16.w),
-                  itemCount: leaveController.attendanceHistory.length,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 12.h,
+                  ),
+                  itemCount: controller.attendanceHistory.length,
                   itemBuilder: (context, index) {
-                    final item = leaveController.attendanceHistory[index];
+                    final item = controller.attendanceHistory[index];
                     final date = DateTime.tryParse(
                       item["AttendanceDate"] ?? "",
                     );
-                    final dateStr = date != null
-                        ? DateFormat('EEE, dd MMM yyyy').format(date)
-                        : "Unknown Date";
 
                     String checkInTime = "--:--";
                     if (item["CheckInTime"] != null) {
@@ -356,101 +410,178 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                       hoursText = "${hrs}h ${mins}m";
                     }
 
+                    Color statusColor = Colors.green;
+                    String statusText = (item["Status"] ?? "PRESENT")
+                        .toString()
+                        .toUpperCase();
+                    if (statusText == 'ABSENT') statusColor = Colors.red;
+                    if (statusText == 'HALF DAY') statusColor = Colors.orange;
+
                     return Container(
-                      margin: EdgeInsets.only(bottom: 12.h),
-                      padding: EdgeInsets.all(16.w),
+                      margin: EdgeInsets.only(bottom: 6.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.grey.shade200),
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.1),
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.02),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            blurRadius: 2,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                dateStr,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14.sp,
-                                  color: ThemeClass.textBlack,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  if (hoursText.isNotEmpty)
-                                    Container(
-                                      margin: EdgeInsets.only(right: 8.w),
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8.w,
-                                        vertical: 4.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade50,
-                                        borderRadius: BorderRadius.circular(
-                                          8.r,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        hoursText,
-                                        style: TextStyle(
-                                          fontSize: 10.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue.shade700,
-                                        ),
-                                      ),
-                                    ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                      vertical: 4.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.shade50,
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                    child: Text(
-                                      item["Status"] ?? "PRESENT",
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green.shade700,
-                                      ),
-                                    ),
+                          // Date Box
+                          Container(
+                            width: 55.w,
+                            padding: EdgeInsets.symmetric(vertical: 3.h),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  date != null
+                                      ? DateFormat('dd').format(date)
+                                      : "--",
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                Text(
+                                  date != null
+                                      ? DateFormat('EEE, MMM').format(date)
+                                      : "--",
+                                  style: TextStyle(
+                                    fontSize: 9.sp,
+                                    color: Theme.of(
+                                      context,
+                                    ).primaryColor.withOpacity(0.8),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(height: 12.h),
-                          Row(
+                          SizedBox(width: 12.w),
+                          // Times
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "In",
+                                      style: TextStyle(
+                                        fontSize: 9.sp,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
+                                    Text(
+                                      checkInTime,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 20.h,
+                                  color: Theme.of(
+                                    context,
+                                  ).dividerColor.withOpacity(0.2),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Out",
+                                      style: TextStyle(
+                                        fontSize: 9.sp,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
+                                    Text(
+                                      checkOutTime,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          // Status & Hours
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: _buildTimeBox(
-                                  "Punch In",
-                                  checkInTime,
-                                  Icons.login,
-                                  Colors.blue,
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 2.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                child: Text(
+                                  statusText,
+                                  style: TextStyle(
+                                    fontSize: 8.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: statusColor,
+                                  ),
                                 ),
                               ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: _buildTimeBox(
-                                  "Punch Out",
-                                  checkOutTime,
-                                  Icons.logout,
-                                  Colors.orange,
+                              if (hoursText.isNotEmpty) ...[
+                                SizedBox(height: 4.h),
+                                Text(
+                                  hoursText,
+                                  style: TextStyle(
+                                    fontSize: 9.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.7),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ],
@@ -462,39 +593,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTimeBox(String title, String time, IconData icon, Color color) {
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 20.sp, color: color),
-          SizedBox(width: 8.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade600),
-              ),
-              Text(
-                time,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeClass.textBlack,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

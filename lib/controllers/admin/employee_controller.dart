@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:task_mate/model/user_request_model.dart';
-import 'package:task_mate/services/hrms/hrms_service.dart';
+import 'package:task_mate/services/hrms/misc_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class UserController extends GetxController {
@@ -17,7 +17,7 @@ class UserController extends GetxController {
   Future<void> getAllEmployee() async {
     try {
       isLoading.value = true;
-      final data = await ApiHrmsService.allEmployee();
+      final data = await MiscService.allEmployee();
       allEmployee.assignAll(data);
     } catch (e) {
       CustomSnackBar.error("Error - $e");

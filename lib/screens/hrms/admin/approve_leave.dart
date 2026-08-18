@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/model/leave_request_model.dart';
@@ -19,7 +20,7 @@ class ApproveLeave extends StatefulWidget {
 }
 
 class _ApproveLeaveState extends State<ApproveLeave> {
-  final LeaveController leaveController = Get.put(LeaveController());
+  final AdminHrmsController controller = Get.put(AdminHrmsController());
   Map<int, bool> hrApprovalMap = {};
 
   @override
@@ -29,11 +30,11 @@ class _ApproveLeaveState extends State<ApproveLeave> {
       body: Padding(
         padding: EdgeInsets.all(16.w),
         child: Obx(() {
-          if (leaveController.isLoading.value) {
+          if (controller.isLoading.value) {
             return PageLoader();
           }
 
-          final pendingLeaves = leaveController.otherLeavesRequest
+          final pendingLeaves = controller.otherLeavesRequest
               .where((e) => e.status == "PENDING")
               .toList();
 
@@ -54,7 +55,7 @@ class _ApproveLeaveState extends State<ApproveLeave> {
 
   /// ---------------- APPROVAL CARD ----------------
   Widget _approvalCard(LeaveRequestModel leave) {
-    final isHr = leaveController.userRole.value == "hr";
+    final isHr = Get.find<LeaveController>().userRole.value == "hr";
     final targetRole = leave.employeeRole.toLowerCase();
 
     // HR can only approve OfficeSupport.
@@ -231,10 +232,10 @@ class _ApproveLeaveState extends State<ApproveLeave> {
 
                 final status = isReject ? "REJECTED" : "APPROVED";
 
-                leaveController.updateLeaveStatus(
+                controller.updateLeaveStatus(
                   leaveId,
                   status,
-                  reasonCtrl.text.trim(),
+                  hrReason: reasonCtrl.text.trim(),
                 );
 
                 Get.back();
@@ -260,7 +261,7 @@ class SwipeApproveReject extends StatefulWidget {
 class _SwipeApproveRejectState extends State<SwipeApproveReject> {
   double dragPosition = 0.0; // -1 = left, 0 = center, 1 = right
   bool isCompleted = false; // to lock thumb after decision
-  final LeaveController leaveController = Get.find<LeaveController>();
+  final AdminHrmsController controller = Get.find<AdminHrmsController>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -329,10 +330,10 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                   });
 
                   // print("Approved");
-                  leaveController.updateLeaveStatus(
+                  controller.updateLeaveStatus(
                     widget.leave.id,
                     "APPROVED",
-                    "",
+                    hrReason: "",
                   );
                 } else if (dragPosition < -0.5) {
                   // REJECT
@@ -342,10 +343,10 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                   });
 
                   // print("Rejected");
-                  leaveController.updateLeaveStatus(
+                  controller.updateLeaveStatus(
                     widget.leave.id,
                     "REJECTED",
-                    "Rejected via swipe",
+                    hrReason: "Rejected via swipe",
                   );
                 }
               },

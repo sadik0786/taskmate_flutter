@@ -42,11 +42,16 @@ class _AppDrawerState extends State<AppDrawer> {
 
     Widget drawerContent = Container(
       width: 260.w,
-      color: ThemeClass.darkBgColor,
+      color:
+          Theme.of(context).drawerTheme.backgroundColor ??
+          Theme.of(context).scaffoldBackgroundColor,
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 30.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 20.w,
+              vertical: 30.h,
+            ).copyWith(top: 60.h),
             decoration: const BoxDecoration(color: ThemeClass.primaryGreen),
             child: Row(
               children: [
@@ -100,7 +105,7 @@ class _AppDrawerState extends State<AppDrawer> {
               children: _buildMenuItems(),
             ),
           ),
-          Divider(color: Colors.grey.shade800, height: 1),
+          Divider(color: Theme.of(context).dividerColor, height: 1),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
             child: _buildDrawerItem(
@@ -118,7 +123,9 @@ class _AppDrawerState extends State<AppDrawer> {
         ? Material(child: drawerContent)
         : Drawer(
             width: 260.w,
-            backgroundColor: ThemeClass.darkBgColor,
+            backgroundColor:
+                Theme.of(context).drawerTheme.backgroundColor ??
+                Theme.of(context).scaffoldBackgroundColor,
             child: drawerContent,
           );
   }
@@ -182,6 +189,9 @@ class _AppDrawerState extends State<AppDrawer> {
           Routes.profileScreen,
         ),
       );
+      items.add(
+        _buildDrawerItem(Icons.settings, "Settings", Routes.settingsScreen),
+      );
 
       return items;
     } else if (widget.role == "admin") {
@@ -205,6 +215,7 @@ class _AppDrawerState extends State<AppDrawer> {
           "My Profile",
           Routes.profileScreen,
         ),
+        _buildDrawerItem(Icons.settings, "Settings", Routes.settingsScreen),
       ];
     } else {
       // Regular employee
@@ -227,6 +238,7 @@ class _AppDrawerState extends State<AppDrawer> {
           "My Profile",
           Routes.profileScreen,
         ),
+        _buildDrawerItem(Icons.settings, "Settings", Routes.settingsScreen),
       ];
     }
   }
@@ -285,7 +297,10 @@ class _AppDrawerState extends State<AppDrawer> {
                           ? ThemeClass.errorColor
                           : isActive
                           ? ThemeClass.primaryGreen
-                          : Colors.white70,
+                          : (Theme.of(
+                                  context,
+                                ).iconTheme.color?.withOpacity(0.7) ??
+                                Colors.grey),
                       size: 22.sp,
                     ),
                     SizedBox(width: 16.w),
@@ -296,7 +311,7 @@ class _AppDrawerState extends State<AppDrawer> {
                             ? ThemeClass.errorColor
                             : isActive
                             ? ThemeClass.primaryGreen
-                            : Colors.white,
+                            : Theme.of(context).textTheme.bodyLarge?.color,
                         fontSize: 15.sp,
                         fontWeight: isActive
                             ? FontWeight.bold

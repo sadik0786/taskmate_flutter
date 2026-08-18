@@ -1,7 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:task_mate/core/theme.dart';
 
 class CustomDropdownField<T> extends StatefulWidget {
   final String? labelText;
@@ -14,7 +13,7 @@ class CustomDropdownField<T> extends StatefulWidget {
   final T? value;
   final bool isLoading;
   final bool isEnabled;
-  final Color fillColor;
+  final Color? fillColor;
   final Function(T?)? onChanged;
   final String? Function(T?)? validator;
 
@@ -32,7 +31,7 @@ class CustomDropdownField<T> extends StatefulWidget {
     this.validator,
     this.isLoading = false,
     this.isEnabled = true,
-    this.fillColor = ThemeClass.textBlack,
+    this.fillColor,
   });
 
   @override
@@ -110,92 +109,107 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
           ),
           SizedBox(height: 6.h),
         ],
-        DropdownButtonFormField2<T>(
-          isExpanded: true,
-          valueListenable: _valueNotifier,
-          hint: Text(
-            widget.hintText,
-            style: TextStyle(
-              color: widget.isEnabled == false
-                  ? ThemeClass.textWhite
-                  : ThemeClass.textWhite.withAlpha(80),
-              fontSize: 16.sp,
-            ),
-          ),
-          items: widget.items.map((item) {
-            return DropdownItem<T>(
-              value: item[widget.valueKey] as T,
-              child: Text(
-                item[widget.labelKey].toString(),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return DropdownButtonFormField2<T>(
+              isExpanded: true,
+              valueListenable: _valueNotifier,
+              hint: Text(
+                widget.hintText,
                 style: TextStyle(
-                  color: widget.isEnabled
-                      ? ThemeClass.textWhite
-                      : ThemeClass.textBlack,
-                  fontSize: 16.sp,
+                  color: widget.isEnabled == false
+                      ? Theme.of(context).disabledColor
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
+                  fontSize: 14.sp,
                 ),
               ),
-            );
-          }).toList(),
-          onMenuStateChange: (isOpen) {
-            // 🔹 Listen for open/close events
-            setState(() => _isDropdownOpen = isOpen);
-          },
-          onChanged: widget.isEnabled ? widget.onChanged : null,
-          validator:
-              widget.validator ??
-              (val) {
-                if (widget.isRequired && val == null) {
-                  return "Please select ${widget.labelText?.toLowerCase() ?? 'a value'}";
-                }
-                return null;
+              items: widget.items.map((item) {
+                return DropdownItem<T>(
+                  value: item[widget.valueKey] as T,
+                  child: Text(
+                    item[widget.labelKey].toString(),
+                    style: TextStyle(
+                      color: widget.isEnabled
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).disabledColor,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onMenuStateChange: (isOpen) {
+                // 🔹 Listen for open/close events
+                setState(() => _isDropdownOpen = isOpen);
               },
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              widget.prefixIcon,
-              color: widget.isEnabled
-                  ? ThemeClass.textWhite
-                  : ThemeClass.textBlack,
-            ),
-            filled: true,
-            fillColor: widget.isEnabled
-                ? widget.fillColor
-                : ThemeClass.textBlack,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              vertical: 12.h,
-              horizontal: 12.w,
-            ),
-          ),
-          iconStyleData: IconStyleData(
-            icon: AnimatedRotation(
-              turns: _isDropdownOpen ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                Icons.keyboard_arrow_down,
-                color: widget.isEnabled
-                    ? ThemeClass.textWhite
-                    : ThemeClass.textBlack,
-                size: 24.sp,
+              onChanged: widget.isEnabled ? widget.onChanged : null,
+              validator:
+                  widget.validator ??
+                  (val) {
+                    if (widget.isRequired && val == null) {
+                      return "Please select ${widget.labelText?.toLowerCase() ?? 'a value'}";
+                    }
+                    return null;
+                  },
+              decoration: InputDecoration(
+                prefixIconConstraints: BoxConstraints(
+                  minWidth: 48.w,
+                  minHeight: 48.h,
+                ),
+                prefixIcon: SizedBox(
+                  width: 48.w,
+                  child: Icon(
+                    widget.prefixIcon,
+                    color: widget.isEnabled
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : Theme.of(context).disabledColor,
+                  ),
+                ),
+                filled: true,
+                fillColor: widget.isEnabled
+                    ? (widget.fillColor ??
+                          Theme.of(context).inputDecorationTheme.fillColor)
+                    : Theme.of(context).disabledColor.withOpacity(0.1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 12.h,
+                  horizontal: 12.w,
+                ),
               ),
-            ),
-          ),
-          dropdownStyleData: DropdownStyleData(
-            maxHeight: 300.h,
-            width: MediaQuery.of(context).size.width - 35.w,
-            decoration: BoxDecoration(
-              color: widget.isEnabled
-                  ? ThemeClass.textBlack
-                  : ThemeClass.textBlack,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-          ),
-          buttonStyleData: FormFieldButtonStyleData(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            height: 28.h,
-            width: double.infinity,
-          ),
+              iconStyleData: IconStyleData(
+                icon: AnimatedRotation(
+                  turns: _isDropdownOpen ? 0.5 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: widget.isEnabled
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : Theme.of(context).disabledColor,
+                    size: 24.sp,
+                  ),
+                ),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 300.h,
+                width: constraints.maxWidth,
+                offset: Offset(
+                  -33.w,
+                  0.h,
+                ), // Negative offset shifts list to the left to cover prefixIcon
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+              buttonStyleData: FormFieldButtonStyleData(
+                padding: EdgeInsets.zero,
+                height: 28.h,
+              ),
+            );
+          },
         ),
       ],
     );

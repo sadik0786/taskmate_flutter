@@ -10,8 +10,6 @@ class CustomSnackBar {
     IconData? icon,
     int durationInSeconds = 3,
   }) {
-    final isDark = Get.isDarkMode;
-
     Get.snackbar(
       title ?? '',
       message,
@@ -25,16 +23,18 @@ class CustomSnackBar {
               ),
             ),
       snackPosition: SnackPosition.TOP,
-      backgroundColor:
-          backgroundColor ??
-          (isDark ? ThemeClass.darkCardColor : ThemeClass.lightCardColor),
-      colorText: isDark ? ThemeClass.textWhite : ThemeClass.textWhite,
+      backgroundColor: backgroundColor ?? Get.theme.cardColor,
+      colorText: backgroundColor != null
+          ? Colors.white
+          : Get.theme.textTheme.bodyLarge?.color,
       margin: const EdgeInsets.all(12),
       borderRadius: 12,
       duration: Duration(seconds: durationInSeconds),
       icon: Icon(
         icon,
-        color: isDark ? ThemeClass.textWhite : ThemeClass.textWhite,
+        color: backgroundColor != null
+            ? Colors.white
+            : Get.theme.iconTheme.color,
       ),
       shouldIconPulse: true,
     );
@@ -79,11 +79,10 @@ class CustomSnackBar {
 
   /// ℹ️ Info Snackbar (Blue)
   static void info(String message, {String? title = "Info"}) {
-    final isDark = Get.isDarkMode;
     show(
       title: title,
       message: message,
-      backgroundColor: isDark ? ThemeClass.darkBlue : ThemeClass.darkBlue,
+      backgroundColor: Colors.blue.shade700,
       icon: Icons.info_outline,
     );
   }

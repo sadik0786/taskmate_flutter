@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_mate/controllers/hrms/leave_controller.dart';
+import 'package:task_mate/controllers/hrms/regularization_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/page_loader.dart';
@@ -19,13 +19,13 @@ class RegularizationRequestScreen extends StatefulWidget {
 
 class _RegularizationRequestScreenState
     extends State<RegularizationRequestScreen> {
-  final LeaveController leaveController = Get.find<LeaveController>();
+  final RegularizationController controller = Get.put(RegularizationController());
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      leaveController.fetchMyRegularizations();
+      controller.fetchMyRegularizations();
     });
   }
 
@@ -192,12 +192,11 @@ class _RegularizationRequestScreenState
                         }
 
                         final navigator = Navigator.of(ctx);
-                        final success = await leaveController
-                            .applyRegularization(
-                              targetDateStr,
-                              reasonController.text,
-                              checkInStr,
-                              checkOutStr,
+                        final success = await controller.applyRegularization(
+                              targetDate: targetDateStr,
+                              reason: reasonController.text,
+                              reqIn: checkInStr,
+                              reqOut: checkOutStr,
                             );
 
                         if (success) {
@@ -294,7 +293,7 @@ class _RegularizationRequestScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("My Regularizations"),
         backgroundColor: ThemeClass.primaryGreen,
@@ -332,12 +331,12 @@ class _RegularizationRequestScreenState
         label: const Text("Request", style: TextStyle(color: Colors.white)),
       ),
       body: Obx(() {
-        if (leaveController.isLoading.value &&
-            leaveController.myRegularizations.isEmpty) {
+        if (controller.isLoading.value &&
+            controller.myRegularizations.isEmpty) {
           return const PageLoader();
         }
 
-        if (leaveController.myRegularizations.isEmpty) {
+        if (controller.myRegularizations.isEmpty) {
           return const NoTasksWidget(
             message: "No regularization requests found.",
           );
@@ -345,9 +344,9 @@ class _RegularizationRequestScreenState
 
         return ListView.builder(
           padding: EdgeInsets.all(16.w),
-          itemCount: leaveController.myRegularizations.length,
+          itemCount: controller.myRegularizations.length,
           itemBuilder: (context, index) {
-            final item = leaveController.myRegularizations[index];
+            final item = controller.myRegularizations[index];
             return _buildHistoryCard(item);
           },
         );
