@@ -107,3 +107,22 @@ The Flutter codebase is modularized cleanly:
 - **No Automatic Schema Changes**: Database table schemas must not be altered automatically by AI without explicit user permission.
 - **Desktop First**: While responsive, the UI design places a premium on looking good and functioning well on Desktop layouts.
 - **Modular Code**: Large monolithic files (like `ApiHrmsService` and `hrmsController.js`) have been broken down into domain-specific files (Attendance, Leaves, Regularization) to ensure the project remains scalable as new features are added.
+
+---
+
+## 8. Database Tables Used
+All core tables in the application follow the strict convention of ending with `TaskMateApp` to ensure they are easily identifiable and isolated in the database.
+
+- **`UserTaskMateApp`**: Stores user accounts, credentials, hierarchical reporting structure, and profile details.
+- **`RoleTaskMateApp`**: Defines user roles (e.g., Admin, HR, Employee, Manager, CEO).
+- **`HolidayTaskMateApp`**: Contains the yearly holiday calendar for the organization.
+- **`AttendanceTaskMateApp`**: Tracks daily employee attendance durations (TotalWorkedMinutes, TotalBreakMinutes) and status.
+- **`AttendanceLogsTaskMateApp`**: Logs precise timestamps of individual punch-in/out and break-in/out events.
+- **`PayslipTaskMateApp`**: Stores generated or uploaded payslip data for employees by month/year.
+- **`FinancialYearTaskMateApp`**: Manages active and past financial years, controlling leave carry-forward boundaries.
+- **`LeaveTypeTaskMateApp`**: Defines available leave categories (e.g., Sick, Casual, Privilege) and their total count.
+- **`ApplyLeaveTaskMateApp`**: Logs individual leave requests, approval status (Approved/Pending/Rejected), and dates.
+- **`LeaveCarryForwardTaskMateApp`**: Tracks exact leave balances carried over from previous financial years.
+- **`DailyTaskMateApp`**: Stores task records assigned to or created by employees, including status and due dates.
+- **`ProjectTaskMateApp`**: Lists main projects available for assigning tasks against.
+- **`SubProjectTaskMateApp`**: Lists sub-projects linked to the main projects.
