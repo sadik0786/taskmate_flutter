@@ -4,7 +4,7 @@ class UserRequestModel {
   final String name;
   final String email;
   final String? mobile;
-  final String passwordHash;
+  final String? passwordHash;
   final int? roleId;
   final int? reportingId;
   final String? createdAt;
@@ -18,7 +18,7 @@ class UserRequestModel {
     required this.name,
     required this.email,
     this.mobile,
-    required this.passwordHash,
+    this.passwordHash,
     this.roleId,
     this.reportingId,
     this.createdAt,

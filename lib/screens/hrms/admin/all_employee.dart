@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/model/leave_request_model.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
@@ -40,17 +41,59 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 16.h),
-          Text(
-            "All Leaves Report",
-            style: Theme.of(context).textTheme.titleLarge,
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Obx(() {
+                if (controller.financialYears.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Container(
+                  height: 35.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: ThemeClass.primaryGreen.withOpacity(0.3),
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      value: controller.selectedFinancialYearId.value,
+                      isDense: true,
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: ThemeClass.primaryGreen,
+                      ),
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      items: controller.financialYears.map((year) {
+                        return DropdownMenuItem<int>(
+                          value: year["Id"],
+                          child: Text(year["YearString"]),
+                        );
+                      }).toList(),
+                      onChanged: (int? newValue) {
+                        if (newValue != null) {
+                          controller.changeFinancialYear(newValue);
+                        }
+                      },
+                    ),
+                  ),
+                );
+              }),
+            ],
           ),
           SizedBox(height: 12.h),
-
           // Who is on leave today
           Obx(() {
             if (controller.todayLeaves.isEmpty) {
@@ -149,6 +192,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
+              spacing: 8.w,
               children: ["All", "PENDING", "APPROVED", "REJECTED"].map((
                 String status,
               ) {
@@ -166,7 +210,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
               }).toList(),
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
 
           // List of Leaves
           Expanded(
@@ -207,118 +251,183 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 6.h),
-      padding: EdgeInsets.all(12.w),
+      margin: EdgeInsets.only(bottom: 6.h),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              dense: true,
+              visualDensity: const VisualDensity(vertical: -4),
+              tilePadding: EdgeInsets.only(left: 6.w, right: 10.w),
+              leading: Container(
+                width: 55.w,
+                padding: EdgeInsets.symmetric(vertical: 0.h),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      leave.employeeName,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Text(
-                      "${leave.employeeRole} | ${leave.leaveTypeName}",
+                      DateFormat('dd').format(DateTime.parse(leave.fromDate)),
                       style: TextStyle(
                         fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    Text(
+                      DateFormat(
+                        'EEE, MMM',
+                      ).format(DateTime.parse(leave.fromDate)),
+                      style: TextStyle(
+                        fontSize: 9.sp,
+                        color: Theme.of(context).primaryColor.withOpacity(0.8),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: statusColor.withOpacity(0.5)),
-                ),
-                child: Text(
-                  leave.status.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.bold,
-                    color: statusColor,
-                  ),
+              title: Text(
+                leave.employeeName,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.h),
-            child: const Divider(height: 1),
-          ),
-          Row(
-            children: [
-              Icon(Icons.calendar_month, size: 16.sp, color: Colors.grey),
-              SizedBox(width: 4.w),
-              Text(
-                "${formatDate(leave.fromDate)}  to  ${formatDate(leave.toDate)}",
-                style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade700),
-              ),
-              const Spacer(),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  "${leave.totalDays} Days",
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
+              subtitle: Text(
+                "${leave.employeeRole} | ${leave.leaveTypeName}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ],
-          ),
-          if (leave.reason != null && leave.reason!.isNotEmpty) ...[
-            SizedBox(height: 8.h),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              childrenPadding: EdgeInsets.only(
+                left: 16.w,
+                right: 16.w,
+                bottom: 16.h,
+              ),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.subject, size: 16.sp, color: Colors.grey),
-                SizedBox(width: 4.w),
-                Expanded(
-                  child: Text(
-                    leave.reason!,
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.grey.shade600,
+                Divider(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                SizedBox(height: 4.h),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.date_range,
+                      size: 14.sp,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      "${formatDate(leave.fromDate)} to ${formatDate(leave.toDate)} (${leave.totalDays} Days)",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
                 ),
+                if (leave.reason != null && leave.reason!.isNotEmpty) ...[
+                  SizedBox(height: 6.h),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.notes,
+                        size: 14.sp,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      SizedBox(width: 6.w),
+                      Expanded(
+                        child: Text(
+                          leave.reason!,
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (leave.approvedBy != null && leave.status != 'PENDING') ...[
+                  SizedBox(height: 6.h),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.person,
+                        size: 14.sp,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      SizedBox(width: 6.w),
+                      Expanded(
+                        child: Text(
+                          "${leave.approvedBy!} has ${leave.status.toLowerCase()} this leave.",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
-          ],
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                leave.status,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8.sp,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

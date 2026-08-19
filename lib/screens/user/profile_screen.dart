@@ -41,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List allTasks = [];
   bool isDarkMode = false;
   bool _isLoading = true;
+  Map<String, dynamic> userData = {};
 
   final ImagePicker _picker = ImagePicker();
 
@@ -97,27 +98,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Map<String, dynamic>? userFromServer;
     try {
       // ✅ Try fetching latest user from server
-      userFromServer =
-          (await UserService.getCurrentUserRole()) as Map<String, dynamic>?;
+      userFromServer = (await UserService.getCurrentUserRole());
       if (userFromServer != null) {
         // Update local cache for offline usage
-        await prefs.setInt("userId", userFromServer["ID"]);
-        await prefs.setString("name", userFromServer["Name"] ?? "");
-        await prefs.setString("email", userFromServer["Email"] ?? "");
-        await prefs.setString("mobile", userFromServer["Mobile"] ?? "");
-        await prefs.setString("role", userFromServer["RoleName"] ?? "");
-        if (userFromServer["ProfileImage"] != null) {
-          await prefs.setString("avatarUrl", userFromServer["ProfileImage"]);
+        final int uId = userFromServer["id"] ?? 0;
+        await prefs.setInt("userId", uId);
+        await prefs.setString("name", userFromServer["name"] ?? "");
+        await prefs.setString("email", userFromServer["email"] ?? "");
+        await prefs.setString("mobile", userFromServer["mobile"] ?? "");
+        await prefs.setString("role", userFromServer["roleName"] ?? "");
+        if (userFromServer["profileImage"] != null) {
+          await prefs.setString("avatarUrl", userFromServer["profileImage"]);
         }
       }
     } catch (e) {
       CustomSnackBar.warning("Offline - Showing cached data");
     }
     setState(() {
-      userID = userFromServer?["ID"] ?? prefs.getInt("userId") ?? 0;
-      userName = userFromServer?["Name"] ?? prefs.getString("name") ?? "";
-      email = userFromServer?["Email"] ?? prefs.getString("email") ?? "";
-      mobile = userFromServer?["Mobile"] ?? prefs.getString("mobile") ?? "";
+      userData = userFromServer ?? {};
+      userID = userData["id"] ?? prefs.getInt("userId") ?? 0;
+      userName = userData["name"] ?? prefs.getString("name") ?? "";
+      email = userData["email"] ?? prefs.getString("email") ?? "";
+      mobile = userData["mobile"] ?? prefs.getString("mobile") ?? "";
 
       final localPath = prefs.getString("localAvatarPath");
       if (localPath != null && localPath.isNotEmpty) {
@@ -295,8 +297,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await saveAndLaunchFile(excel.encode()!, "${userName}_tasks.xlsx");
   }
 
+  String formatDate(String? dateString) {
+    if (dateString == null ||
+        dateString.isEmpty ||
+        dateString == "Not specified") {
+      return "Not specified";
+    }
+    try {
+      final d = DateTime.parse(dateString);
+      return DateFormat('dd-MMM-yyyy').format(d);
+    } catch (_) {
+      return dateString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Data Extraction (with fallbacks)
+    final String reportingTo = userData["addedByName"]?.toString() ?? "None";
+    final String empId =
+        userData["employeeID"]?.toString() ??
+        "EMP-${userID.toString().padLeft(4, '0')}";
+    final String gender = userData["gender"]?.toString() ?? "Not specified";
+    final String dob = formatDate(userData["dateOfBirth"]?.toString());
+    final String bloodGroup =
+        userData["bloodGroup"]?.toString() ?? "Not specified";
+    final String emergencyContact =
+        userData["emergencyContact"]?.toString() ?? "Not specified";
+    final String address = userData["address"]?.toString() ?? "Not specified";
+
+    final String department =
+        userData["department"]?.toString() ?? "Not specified";
+    final String role =
+        userData["roleName"]?.toString().toUpperCase() ?? "UNKNOWN";
+    final String designation = role;
+    final String doj = formatDate(userData["dateOfJoining"]?.toString());
+    final String employmentType =
+        userData["employmentType"]?.toString() ?? "Full-time";
+    final String officeLocation =
+        userData["officeLocation"]?.toString() ?? "Head Office";
+
+    final String aadhaar =
+        userData["aadhaarNumber"]?.toString() ?? "Not specified";
+    final String pan = userData["panNumber"]?.toString() ?? "Not specified";
+    final String bankDetails =
+        userData["bankDetails"]?.toString() ?? "Not specified";
+    final String salary = userData["salary"]?.toString() ?? "Not specified";
+    final String profileStatus =
+        userData["profileStatus"]?.toString() ?? "Active";
+
     return BaseLayout(
       title: "My Profile",
       customActions: [
@@ -309,121 +358,219 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
       child: _isLoading
           ? const PageLoader()
-          : Column(
-              children: [
-                SizedBox(height: 30.h),
-                // Avatar
-                Center(
-                  child: GestureDetector(
-                    onTap: _uploadPhoto,
-                    child: CircleAvatar(
-                      radius: 60.r,
-                      backgroundColor: ThemeClass.primaryGreen,
-                      backgroundImage: localAvatar != null
-                          ? FileImage(localAvatar!)
-                          : (avatarUrl != null
-                                ? NetworkImage(avatarUrl!)
-                                : null),
-                      child: (localAvatar == null && avatarUrl == null)
-                          ? Text(
-                              userName != null && userName!.isNotEmpty
-                                  ? userName![0].toUpperCase()
-                                  : "?",
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall!.copyWith(fontSize: 80.sp),
-                            )
-                          : null,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                // Info card
-                SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                    color: ThemeClass.tealGreen,
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 8.h,
-                    ),
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
+          : SingleChildScrollView(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Header Card
+                  Container(
+                    padding: EdgeInsets.all(20.w),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16.r),
-                      side: BorderSide(color: Colors.white, width: 1.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 16.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildInfoItem(context, "Name", userName),
-                          _buildInfoItem(context, "Email", email),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: _buildInfoItem(
-                                  context,
-                                  "Mobile",
-                                  mobile,
-                                  isMobile: true,
+                    child: Column(
+                      children: [
+                        Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Center(
+                              child: GestureDetector(
+                                onTap: _uploadPhoto,
+                                child: CircleAvatar(
+                                  radius: 50.r,
+                                  backgroundColor: ThemeClass.primaryGreen
+                                      .withOpacity(0.1),
+                                  backgroundImage: localAvatar != null
+                                      ? FileImage(localAvatar!)
+                                      : (avatarUrl != null
+                                            ? NetworkImage(avatarUrl!)
+                                            : null),
+                                  child:
+                                      (localAvatar == null && avatarUrl == null)
+                                      ? Text(
+                                          userName != null &&
+                                                  userName!.isNotEmpty
+                                              ? userName![0].toUpperCase()
+                                              : "?",
+                                          style: TextStyle(
+                                            fontSize: 36.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: ThemeClass.primaryGreen,
+                                          ),
+                                        )
+                                      : null,
                                 ),
                               ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  size: 25.sp,
-                                  color: ThemeClass.warningColor,
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: profileStatus.toLowerCase() == 'active'
+                                    ? Colors.green.shade100
+                                    : Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(20.r),
+                              ),
+                              child: Text(
+                                profileStatus,
+                                style: TextStyle(
+                                  color: profileStatus.toLowerCase() == 'active'
+                                      ? Colors.green.shade800
+                                      : Colors.red.shade800,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10.sp,
                                 ),
-                                onPressed: _showUpdateMobileBottomSheet,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          userName ?? "Not specified",
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          designation,
+                          style: TextStyle(
+                            color: ThemeClass.primaryGreen,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  // Compact details in categories
+                  _buildSectionCard(context, "Personal Information", [
+                    _buildCompactRow(
+                      context,
+                      "Employee ID",
+                      empId,
+                      "Gender",
+                      gender,
+                    ),
+                    const Divider(height: 16),
+                    _buildCompactRow(
+                      context,
+                      "Date of Birth",
+                      dob,
+                      "Blood Group",
+                      bloodGroup,
+                    ),
+                  ]),
+                  SizedBox(height: 16.h),
+
+                  _buildSectionCard(context, "Contact & Address", [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildInfoItem(context, "Mobile", mobile ?? ""),
+                              SizedBox(height: 4.h),
+                              GestureDetector(
+                                onTap: _showUpdateMobileBottomSheet,
+                                child: Text(
+                                  "Edit Mobile",
+                                  style: TextStyle(
+                                    color: ThemeClass.warningColor,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: _buildInfoItem(context, "Email", email ?? ""),
+                        ),
+                      ],
                     ),
+                    const Divider(height: 16),
+                    _buildCompactRow(
+                      context,
+                      "Emergency",
+                      emergencyContact,
+                      "Address",
+                      address,
+                    ),
+                  ]),
+                  SizedBox(height: 16.h),
+
+                  _buildSectionCard(context, "Professional Details", [
+                    _buildCompactRow(
+                      context,
+                      "Department",
+                      department,
+                      "Reporting Manager",
+                      reportingTo,
+                    ),
+                    const Divider(height: 16),
+                    _buildCompactRow(
+                      context,
+                      "Date of Joining",
+                      doj,
+                      "Employment Type",
+                      employmentType,
+                    ),
+                    const Divider(height: 16),
+                    _buildCompactRow(
+                      context,
+                      "Office Location",
+                      officeLocation,
+                      "",
+                      "",
+                    ),
+                  ]),
+                  SizedBox(height: 16.h),
+
+                  _buildSectionCard(context, "Identity & Financial", [
+                    _buildCompactRow(
+                      context,
+                      "Aadhaar Number",
+                      aadhaar,
+                      "PAN Number",
+                      pan,
+                    ),
+                    const Divider(height: 16),
+                    _buildCompactRow(
+                      context,
+                      "Bank Details",
+                      bankDetails,
+                      "Salary",
+                      salary,
+                    ),
+                  ]),
+                  SizedBox(height: 24.h),
+
+                  CustomButton(
+                    backgroundColor: ThemeClass.errorColor,
+                    icon: Icons.logout,
+                    text: "Logout",
+                    onPressed: _logOut,
                   ),
-                ),
-                Spacer(),
-                // log out card
-                SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                    color: ThemeClass.tealGreen,
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 8.h,
-                    ),
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r),
-                      side: BorderSide(color: Colors.white, width: 1.2),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 16.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CustomButton(
-                            backgroundColor: ThemeClass.errorColor,
-                            icon: Icons.logout,
-                            text: "Logout",
-                            onPressed: _logOut,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.h),
-              ],
+                  SizedBox(height: 20.h),
+                ],
+              ),
             ),
     );
   }
@@ -504,36 +651,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildInfoItem(
+  Widget _buildSectionCard(
     BuildContext context,
-    String label,
-    String? value, {
-    bool isMobile = false,
-  }) {
-    final displayValue = (value != null && value.isNotEmpty)
-        ? (isMobile ? "+91 $value" : value)
-        : "-";
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
+    String title,
+    List<Widget> children,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w400),
+            title,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+            ),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            displayValue,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
-          ),
+          SizedBox(height: 12.h),
+          ...children,
         ],
       ),
+    );
+  }
+
+  Widget _buildCompactRow(
+    BuildContext context,
+    String title1,
+    String value1,
+    String title2,
+    String value2,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: _buildInfoItem(context, title1, value1)),
+        if (title2.isNotEmpty) ...[
+          SizedBox(width: 16.w),
+          Expanded(child: _buildInfoItem(context, title2, value2)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildInfoItem(BuildContext context, String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(
+              context,
+            ).textTheme.bodySmall?.color?.withOpacity(0.7),
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          value,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

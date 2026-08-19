@@ -8,7 +8,6 @@ import 'package:task_mate/screens/hrms/admin/all_employee.dart'; // File kept th
 import 'package:task_mate/screens/hrms/user/apply_leave.dart';
 import 'package:task_mate/screens/hrms/admin/approve_leave.dart';
 import 'package:task_mate/screens/hrms/user/dashboard.dart';
-import 'package:task_mate/screens/hrms/shared/payslips_screen.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/widgets/responsive_layout.dart';
 import 'package:task_mate/widgets/custom_appbar.dart';
@@ -49,22 +48,13 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
       pages.add(const ApplyLeave());
     }
 
-    if (role == "hr" ||
-        role == "superadmin" ||
-        role == "ceo" ||
-        role == "manager") {
+    if (role == "hr" || role == "ceo" || role == "manager") {
       pages.add(const ApproveLeave());
     }
 
-    if (role == "hr" ||
-        role == "superadmin" ||
-        role == "ceo" ||
-        role == "manager") {
+    if (role == "hr" || role == "ceo" || role == "manager") {
       pages.add(const AllLeavesReport()); // Changed from AllEmployee
     }
-
-    // Add Payslips for everyone
-    pages.add(const PayslipsScreen());
 
     if (_selectedIndex >= 0 && _selectedIndex < pages.length) {
       return pages[_selectedIndex];
@@ -80,21 +70,13 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
       titles.add("Apply Leave");
     }
 
-    if (role == "hr" ||
-        role == "superadmin" ||
-        role == "ceo" ||
-        role == "manager") {
+    if (role == "hr" || role == "ceo" || role == "manager") {
       titles.add("Approve Leave");
     }
 
-    if (role == "hr" ||
-        role == "superadmin" ||
-        role == "ceo" ||
-        role == "manager") {
+    if (role == "hr" || role == "ceo" || role == "manager") {
       titles.add("Leave Report");
     }
-
-    titles.add("My Payslips");
 
     if (_selectedIndex >= 0 && _selectedIndex < titles.length) {
       return titles[_selectedIndex];
@@ -116,11 +98,9 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
       IconButton(
         icon: const Icon(Icons.home, color: Colors.white),
         onPressed: () {
-          if (role == "superadmin") {
+          if (role == "hr" || role == "ceo" || role == "manager") {
             Get.offAllNamed('/adminDashboard');
-          } else if (role == "hr" || role == "ceo" || role == "manager") {
-            Get.offAllNamed('/adminDashboard');
-          } else if (role == "employee") {
+          } else if (role == "admin" || role == "employee") {
             Get.offAllNamed('/homeScreen');
           }
         },
@@ -158,26 +138,16 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
             icon: Icon(Icons.add),
             label: 'Apply Leave',
           ),
-        if (role == "hr" ||
-            role == "superadmin" ||
-            role == "ceo" ||
-            role == "manager")
+        if (role == "hr" || role == "ceo" || role == "manager")
           const BottomNavigationBarItem(
             icon: Icon(Icons.check_circle),
             label: 'Approve Leave',
           ),
-        if (role == "hr" ||
-            role == "superadmin" ||
-            role == "ceo" ||
-            role == "manager")
+        if (role == "hr" || role == "ceo" || role == "manager")
           const BottomNavigationBarItem(
             icon: Icon(Icons.analytics_outlined),
             label: 'Leave Report',
           ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.request_quote),
-          label: 'Payslips',
-        ),
       ],
       currentIndex: _selectedIndex,
       selectedItemColor: ThemeClass.primaryGreen,

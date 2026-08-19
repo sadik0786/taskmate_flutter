@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:task_mate/model/leave_request_model.dart';
 import 'package:task_mate/services/hrms/attendance_service.dart';
 import 'package:task_mate/services/hrms/leave_service.dart';
+import 'package:task_mate/services/hrms/misc_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 
 class AdminHrmsController extends GetxController {
@@ -10,13 +11,43 @@ class AdminHrmsController extends GetxController {
   var filteredLeaveReport = <LeaveRequestModel>[].obs;
   var otherLeavesRequest = <LeaveRequestModel>[].obs;
   var todayLeaves = <LeaveRequestModel>[].obs;
-  
+
+  RxList<dynamic> financialYears = <dynamic>[].obs;
+  Rxn<int> selectedFinancialYearId = Rxn<int>();
+
   RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchFinancialYears();
     getOtherLeaveRequest();
+    fetchTodayLeaves();
+  }
+
+  Future<void> fetchFinancialYears() async {
+    try {
+      final data = await MiscService.fetchFinancialYears();
+      financialYears.assignAll(data);
+      if (financialYears.isNotEmpty) {
+        final current = financialYears.firstWhere(
+          (e) => e["IsCurrent"] == true,
+          orElse: () => financialYears.first,
+        );
+        selectedFinancialYearId.value = current["Id"];
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  void changeFinancialYear(int id) {
+    selectedFinancialYearId.value = id;
+    fetchAllLeaveReport();
   }
 
   Future<void> fetchAdminAttendanceReport(String? date) async {
@@ -34,7 +65,9 @@ class AdminHrmsController extends GetxController {
   Future<void> getOtherLeaveRequest() async {
     try {
       isLoading.value = true;
-      final data = await LeaveService.fetchOtherLeaveRequest();
+      final data = await LeaveService.fetchOtherLeaveRequest(
+        financialYearId: selectedFinancialYearId.value,
+      );
       otherLeavesRequest.assignAll(data);
     } catch (e) {
       CustomSnackBar.error("Failed to fetch other requests: $e");
@@ -74,7 +107,9 @@ class AdminHrmsController extends GetxController {
   Future<void> fetchAllLeaveReport() async {
     try {
       isLoading.value = true;
-      final data = await LeaveService.fetchAllLeaveReport();
+      final data = await LeaveService.fetchAllLeaveReport(
+        financialYearId: selectedFinancialYearId.value,
+      );
       allLeaveReport.assignAll(data);
       filteredLeaveReport.assignAll(data);
     } catch (e) {
@@ -88,17 +123,22 @@ class AdminHrmsController extends GetxController {
     List<LeaveRequestModel> temp = allLeaveReport.toList();
 
     if (status != 'All') {
-      temp = temp.where((l) => l.status.toUpperCase() == status.toUpperCase()).toList();
+      temp = temp
+          .where((l) => l.status.toUpperCase() == status.toUpperCase())
+          .toList();
     }
-    
+
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
-      temp = temp.where((l) => 
-        l.employeeName.toLowerCase().contains(q) ||
-        l.leaveTypeName.toLowerCase().contains(q)
-      ).toList();
+      temp = temp
+          .where(
+            (l) =>
+                l.employeeName.toLowerCase().contains(q) ||
+                l.leaveTypeName.toLowerCase().contains(q),
+          )
+          .toList();
     }
-    
+
     filteredLeaveReport.assignAll(temp);
   }
 

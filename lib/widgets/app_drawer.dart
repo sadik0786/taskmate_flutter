@@ -16,6 +16,7 @@ class AppDrawer extends StatefulWidget {
 
 class _AppDrawerState extends State<AppDrawer> {
   String? userName;
+  String? userEmail;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _AppDrawerState extends State<AppDrawer> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       userName = prefs.getString("name") ?? "Employee";
+      userEmail = prefs.getString("email");
     });
   }
 
@@ -53,52 +55,68 @@ class _AppDrawerState extends State<AppDrawer> {
               vertical: 30.h,
             ).copyWith(top: 60.h),
             decoration: const BoxDecoration(color: ThemeClass.primaryGreen),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 25.r,
-                  child: Text(
-                    userName?.isNotEmpty == true
-                        ? userName![0].toUpperCase()
-                        : "?",
-                    style: TextStyle(
-                      color: ThemeClass.primaryGreen,
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName ?? "User",
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 25.r,
+                      child: Text(
+                        userName?.isNotEmpty == true
+                            ? userName![0].toUpperCase()
+                            : "?",
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
+                          color: ThemeClass.primaryGreen,
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        widget.role.toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userName ?? "User",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          SizedBox(height: 4.h),
+                          Text(
+                            widget.role.toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+                if (userEmail != null && userEmail!.isNotEmpty) ...[
+                  SizedBox(height: 10.h),
+                  Text(
+                    userEmail!,
+                    style: TextStyle(color: Colors.white70, fontSize: 13.sp),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),
+
           Expanded(
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),

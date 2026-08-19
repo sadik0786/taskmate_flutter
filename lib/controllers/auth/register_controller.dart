@@ -85,8 +85,9 @@ class RegisterController extends GetxController {
     try {
       String? loggedRole = currentUserRole.value;
       if (loggedRole.isEmpty) {
-        loggedRole = await UserService.getCurrentUserRole();
-        if (loggedRole != null) {
+        final userMap = await UserService.getCurrentUserRole();
+        if (userMap != null && userMap["roleName"] != null) {
+          loggedRole = userMap["roleName"].toString();
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString("role", loggedRole);
           currentUserRole.value = loggedRole;
@@ -101,7 +102,7 @@ class RegisterController extends GetxController {
         var allRoles = List<Map<String, dynamic>>.from(res["data"]);
 
         // Filter roles based on logged-in role
-        final roleLower = (loggedRole ?? "").toLowerCase();
+        final roleLower = (loggedRole).toLowerCase();
 
         if (roleLower == "ceo") {
           allRoles = allRoles.where((r) {

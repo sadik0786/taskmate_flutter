@@ -45,4 +45,13 @@ class MiscService {
     }
     throw Exception(data["message"] ?? "Failed to fetch holidays");
   }
+
+  static Future<List<dynamic>> fetchFinancialYears() async {
+    final res = await BaseApiService.request("/hrms/financial-years");
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 && data["success"] == true) {
+      return data["data"] as List;
+    }
+    throw Exception(data["message"] ?? "Failed to fetch financial years");
+  }
 }

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:task_mate/model/leave_type_model.dart';
 import 'package:task_mate/model/leave_apply_request_model.dart';
 import 'package:task_mate/model/leave_request_model.dart';
+import 'package:task_mate/model/financial_year_model.dart';
 import 'package:task_mate/services/hrms/leave_service.dart';
 import 'package:task_mate/services/hrms/misc_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
@@ -9,6 +10,7 @@ import 'package:task_mate/widgets/custom_snackbar.dart';
 class LeaveController extends GetxController {
   RxList<LeaveTypeModel> leaveTypes = <LeaveTypeModel>[].obs;
   RxList<LeaveRequestModel> myLeaves = <LeaveRequestModel>[].obs;
+  RxList<FinancialYearModel> financialYears = <FinancialYearModel>[].obs;
 
   var holidays = <dynamic>[].obs;
   var myPayslips = <dynamic>[].obs;
@@ -20,10 +22,17 @@ class LeaveController extends GetxController {
   RxInt pendingLeave = 0.obs;
   RxInt approvedLeave = 0.obs;
   RxInt totalApplyLeave = 0.obs;
+  
+  Rxn<int> selectedFinancialYearId = Rxn<int>();
 
   @override
   void onInit() {
     super.onInit();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchFinancialYears();
     fetchLeaveTypes();
     fetchMyLeaves();
     fetchHolidays();
@@ -31,10 +40,34 @@ class LeaveController extends GetxController {
     fetchTodayEvents();
   }
 
+  Future<void> fetchFinancialYears() async {
+    try {
+      final data = await MiscService.fetchFinancialYears();
+      financialYears.assignAll(
+        data.map((e) => FinancialYearModel.fromJson(e)).toList(),
+      );
+      if (financialYears.isNotEmpty) {
+        // default to current year if exists, else first
+        final current = financialYears.firstWhere((e) => e.isCurrent == true, orElse: () => financialYears.first);
+        selectedFinancialYearId.value = current.id;
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  void changeFinancialYear(int id) {
+    selectedFinancialYearId.value = id;
+    fetchLeaveTypes();
+    fetchMyLeaves();
+  }
+
   Future<void> fetchLeaveTypes() async {
     try {
       isLoading.value = true;
-      final data = await LeaveService.fetchAllLeaveTypes();
+      final data = await LeaveService.fetchAllLeaveTypes(
+        financialYearId: selectedFinancialYearId.value,
+      );
       leaveTypes.assignAll(
         data.map((e) => LeaveTypeModel.fromJson(e)).toList(),
       );
@@ -49,7 +82,9 @@ class LeaveController extends GetxController {
   Future<void> fetchMyLeaves() async {
     try {
       isLoading.value = true;
-      final data = await LeaveService.fetchMyLeaves();
+      final data = await LeaveService.fetchMyLeaves(
+        financialYearId: selectedFinancialYearId.value,
+      );
       myLeaves.assignAll(data);
       _calculateMyStats();
       myLeaves.refresh();

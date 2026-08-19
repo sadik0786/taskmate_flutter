@@ -11,6 +11,8 @@ class LeaveRequestModel {
   final String? reason;
   final String status;
 
+  final String? approvedBy;
+
   LeaveRequestModel({
     required this.id,
     required this.userId,
@@ -23,6 +25,7 @@ class LeaveRequestModel {
     required this.sessionDay,
     this.reason,
     required this.status,
+    this.approvedBy,
   });
 
   factory LeaveRequestModel.fromJson(Map<String, dynamic> json) {
@@ -38,9 +41,10 @@ class LeaveRequestModel {
       sessionDay: json['SessionDay'] ?? 0,
       reason: json['Reason'] ?? '',
       status: json['Status'],
+      approvedBy: json['ApprovedByName'],
     );
   }
-  LeaveRequestModel copyWith({String? status}) {
+  LeaveRequestModel copyWith({String? status, String? approvedBy}) {
     return LeaveRequestModel(
       id: id,
       userId: userId,
@@ -53,6 +57,7 @@ class LeaveRequestModel {
       sessionDay: sessionDay,
       reason: reason,
       status: status ?? this.status,
+      approvedBy: approvedBy ?? this.approvedBy,
     );
   }
 }

@@ -30,7 +30,7 @@ class UserService {
   }
 
   // Get current logged-in user's role via profile endpoint
-  static Future<String?> getCurrentUserRole() async {
+  static Future<Map<String, dynamic>?> getCurrentUserRole() async {
     try {
       final token = await BaseApiService.getToken();
       if (token == null) return null;
@@ -46,7 +46,7 @@ class UserService {
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
         if (data["success"] == true && data["user"] != null) {
-          return data["user"];
+          return data["user"] as Map<String, dynamic>;
         }
       }
       return null;
