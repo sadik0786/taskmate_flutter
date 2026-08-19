@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,23 +66,31 @@ class BaseApiService {
             uri,
             headers: headers,
             body: body != null ? jsonEncode(body) : null,
-          );
+          ).timeout(const Duration(seconds: 15));
           break;
         case "PUT":
           response = await http.put(
             uri,
             headers: headers,
             body: body != null ? jsonEncode(body) : null,
-          );
+          ).timeout(const Duration(seconds: 15));
           break;
         case "DELETE":
-          response = await http.delete(uri, headers: headers);
+          response = await http.delete(uri, headers: headers).timeout(const Duration(seconds: 15));
           break;
         default:
-          response = await http.get(uri, headers: headers);
+          response = await http.get(uri, headers: headers).timeout(const Duration(seconds: 15));
       }
     } catch (e) {
-      rethrow;
+      if (e is SocketException) {
+        throw ApiException("Unable to connect to the server. Please check your internet connection or server status.");
+      } else if (e is TimeoutException) {
+        throw ApiException("The connection timed out. Please try again later.");
+      } else if (e is http.ClientException) {
+        throw ApiException("Network connection failed. The server might be unreachable.");
+      } else {
+        throw ApiException("An unexpected error occurred. Please try again.");
+      }
     }
     if (response.statusCode == 401) {
       final prefs = await SharedPreferences.getInstance();
@@ -90,4 +99,12 @@ class BaseApiService {
     }
     return response;
   }
+}
+
+class ApiException implements Exception {
+  final String message;
+  ApiException(this.message);
+  
+  @override
+  String toString() => message;
 }
