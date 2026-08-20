@@ -113,11 +113,14 @@ class LoginController extends GetxController
         switch (role) {
           case "ceo":
           case "hr":
+          case "manager":
             Get.offNamed('/adminDashboard');
             break;
           case "superadmin":
           case "admin":
           case "employee":
+          case "accountant":
+          case "officesupport":
             Get.offNamed('/homeScreen');
             break;
           default:
