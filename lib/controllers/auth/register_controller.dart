@@ -279,7 +279,7 @@ class RegisterController extends GetxController {
             route.isFirst,
       );
     } else {
-      CustomSnackBar.error("Failed to add employee");
+      CustomSnackBar.error(response.message ?? "Failed to add employee");
     }
   }
 }

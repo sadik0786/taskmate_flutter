@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:task_mate/model/auth/login_request_model.dart';
 import 'package:task_mate/model/auth/login_response_model.dart';
@@ -98,7 +100,33 @@ class AuthService {
       final data = jsonDecode(res.body);
       return RegisterResponseModel.fromJson(data);
     } catch (e) {
-      return RegisterResponseModel(success: false);
+      String errorStr = e.toString().toLowerCase();
+      String errorMessage =
+          "Network error: An unexpected error occurred. ($errorStr)";
+
+      if (e is SocketException ||
+          errorStr.contains("socketexception") ||
+          errorStr.contains("connection refused") ||
+          errorStr.contains("failed host lookup")) {
+        errorMessage =
+            "Unable to connect to the server. Please check your internet connection or server status.";
+      } else if (e is TimeoutException || errorStr.contains("timeout")) {
+        errorMessage = "The connection timed out. Please try again later.";
+      } else if (e is FormatException ||
+          errorStr.contains("formatexception") ||
+          errorStr.contains("doctype") ||
+          errorStr.contains("syntaxerror") ||
+          errorStr.contains("unexpected character")) {
+        errorMessage =
+            "Server is currently offline or returning invalid data. Please try again later.";
+      } else if (e is http.ClientException ||
+          errorStr.contains("xmlhttprequest") ||
+          errorStr.contains("clientexception")) {
+        errorMessage =
+            "Network connection failed. The server might be unreachable.";
+      }
+
+      return RegisterResponseModel(success: false, message: errorMessage);
     }
   }
 
@@ -160,10 +188,33 @@ class AuthService {
         );
       }
     } catch (e) {
-      return LoginResponseModel(
-        success: false,
-        message: "Network error: ${e.toString()}",
-      );
+      String errorStr = e.toString().toLowerCase();
+      String errorMessage =
+          "Network error: An unexpected error occurred. ($errorStr)";
+
+      if (e is SocketException ||
+          errorStr.contains("socketexception") ||
+          errorStr.contains("connection refused") ||
+          errorStr.contains("failed host lookup")) {
+        errorMessage =
+            "Unable to connect to the server. Please check your internet connection or server status.";
+      } else if (e is TimeoutException || errorStr.contains("timeout")) {
+        errorMessage = "The connection timed out. Please try again later.";
+      } else if (e is FormatException ||
+          errorStr.contains("formatexception") ||
+          errorStr.contains("doctype") ||
+          errorStr.contains("syntaxerror") ||
+          errorStr.contains("unexpected character")) {
+        errorMessage =
+            "Server is currently offline or returning invalid data. Please try again later.";
+      } else if (e is http.ClientException ||
+          errorStr.contains("xmlhttprequest") ||
+          errorStr.contains("clientexception")) {
+        errorMessage =
+            "Network connection failed. The server might be unreachable.";
+      }
+
+      return LoginResponseModel(success: false, message: errorMessage);
     }
   }
 
