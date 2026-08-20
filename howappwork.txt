@@ -99,6 +99,7 @@ The Flutter codebase is modularized cleanly:
   - Recently modularized (e.g., `attendanceController.js`, `leaveController.js` instead of one massive file).
   - Queries are written directly (e.g., `SELECT TOP 1 PunchType FROM AttendanceLogsTaskMateApp`).
 - **`create_hrms_tables.js`**: A utility script to initialize database tables and insert mock data if the database is fresh.
+- **`clear_all_tables.sql`**: A handy SQL script to safely clear all table data and reset IDs (using DELETE and RESEED) without causing foreign key constraint errors. Ideal for resetting the environment.
 
 ---
 
@@ -114,6 +115,7 @@ The Flutter codebase is modularized cleanly:
 All core tables in the application follow the strict convention of ending with `TaskMateApp` to ensure they are easily identifiable and isolated in the database.
 
 - **`UserTaskMateApp`**: Stores user accounts, credentials, hierarchical reporting structure, and profile details.
+- **`EmployeeDetailsTaskMateApp`**: Stores extended HR profile details for employees (e.g., exact biometric EmployeeID, salary, department, bank details).
 - **`RoleTaskMateApp`**: Defines user roles (e.g., Admin, HR, Employee, Manager, CEO).
 - **`HolidayTaskMateApp`**: Contains the yearly holiday calendar for the organization.
 - **`AttendanceTaskMateApp`**: Tracks daily employee attendance durations (TotalWorkedMinutes, TotalBreakMinutes) and status.
@@ -126,3 +128,11 @@ All core tables in the application follow the strict convention of ending with `
 - **`DailyTaskMateApp`**: Stores task records assigned to or created by employees, including status and due dates.
 - **`ProjectTaskMateApp`**: Lists main projects available for assigning tasks against.
 - **`SubProjectTaskMateApp`**: Lists sub-projects linked to the main projects.
+
+---
+
+## 9. Stored Procedures Used
+While most of the application uses direct raw SQL queries, the authentication flow relies on the following stored procedures (Procs) to securely handle login and registration logic on the database side:
+
+- **`dbo.Usp_PostRegisterEmployeeTaskMateAppApi`**: Used for registering new users/employees.
+- **`dbo.Usp_PostLoginUserTaskMateAppApi`**: Used for authenticating users during the login process.
