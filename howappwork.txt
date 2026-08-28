@@ -115,11 +115,13 @@ The Flutter codebase is modularized cleanly:
 All core tables in the application follow the strict convention of ending with `TaskMateApp` to ensure they are easily identifiable and isolated in the database.
 
 - **`UserTaskMateApp`**: Stores user accounts, credentials, hierarchical reporting structure, and profile details.
+- **`EmailTaskMateApp`**: Acts as a whitelist of pre-approved or authorized employee email addresses allowed to register in the system.
 - **`EmployeeDetailsTaskMateApp`**: Stores extended HR profile details for employees (e.g., exact biometric EmployeeID, salary, department, bank details).
 - **`RoleTaskMateApp`**: Defines user roles (e.g., Admin, HR, Employee, Manager, CEO).
 - **`HolidayTaskMateApp`**: Contains the yearly holiday calendar for the organization.
 - **`AttendanceTaskMateApp`**: Tracks daily employee attendance durations (TotalWorkedMinutes, TotalBreakMinutes) and status.
 - **`AttendanceLogsTaskMateApp`**: Logs precise timestamps of individual punch-in/out and break-in/out events.
+- **`AttendanceRegularizationTaskMateApp`**: Stores employee requests to correct missing punches or attendance discrepancies, including the proposed check-in/out times, user reason, and HR approval/rejection status.
 - **`PayslipTaskMateApp`**: Stores generated or uploaded payslip data for employees by month/year.
 - **`FinancialYearTaskMateApp`**: Manages active and past financial years, controlling leave carry-forward boundaries.
 - **`LeaveTypeTaskMateApp`**: Defines available leave categories (e.g., Sick, Casual, Privilege) and their total count.
@@ -136,3 +138,24 @@ While most of the application uses direct raw SQL queries, the authentication fl
 
 - **`dbo.Usp_PostRegisterEmployeeTaskMateAppApi`**: Used for registering new users/employees.
 - **`dbo.Usp_PostLoginUserTaskMateAppApi`**: Used for authenticating users during the login process.
+
+## 10. all table
+select * from UserTaskMateApp
+select * from EmployeeDetailsTaskMateApp
+select * from RoleTaskMateApp
+select * from HolidayTaskMateApp
+select * from AttendanceTaskMateApp
+select * from AttendanceLogsTaskMateApp
+select * from PayslipTaskMateApp
+select * from FinancialYearTaskMateApp
+select * from LeaveTypeTaskMateApp
+select * from ApplyLeaveTaskMateApp
+select * from LeaveCarryForwardTaskMateApp
+select * from DailyTaskMateApp
+select * from ProjectTaskMateApp
+select * from SubProjectTaskMateApp
+
+select * from EmailTaskMateApp
+select * from AttendanceRegularizationTaskMateApp
+select * from CompaniesTaskMateApp
+select * from PlansTaskMateApp
