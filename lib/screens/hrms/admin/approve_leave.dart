@@ -81,8 +81,8 @@ class _ApproveLeaveState extends State<ApproveLeave> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${leave.employeeName} (${leave.employeeRole})",
-                  style: Theme.of(context).textTheme.titleMedium,
+                  leave.employeeName,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 _statusChip("${leave.totalDays} days"),
               ],
@@ -93,19 +93,27 @@ class _ApproveLeaveState extends State<ApproveLeave> {
               children: [
                 Text(
                   leave.leaveTypeName,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 Text(
                   "${CommonFn.formatDate(leave.fromDate)} to ${CommonFn.formatDate(leave.toDate)}",
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
               ],
             ),
-            SizedBox(height: 6.h),
+            SizedBox(height: 2.h),
             if (leave.reason != null && leave.reason!.isNotEmpty)
-              Text(
-                leave.reason ?? "",
-                style: Theme.of(context).textTheme.titleMedium,
+              Row(
+                children: [
+                  Text(
+                    "Reason: ",
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  Text(
+                    "${leave.reason}",
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                ],
               ),
             SizedBox(height: isHr && canApprove ? 0.h : 10.h),
 

@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           Text(
-                            "Employee Task Management",
+                            "Complete Employee Hub",
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ],
@@ -73,11 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         key: loginController.formKey,
                         child: Column(
                           children: [
-                            Text(
-                              "Access Account",
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            SizedBox(height: 20.h),
+                            SizedBox(height: 10.h),
                             CustomTextField(
                               isEnabled: true,
                               labelText: "Email ID",

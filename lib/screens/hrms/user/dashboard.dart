@@ -48,7 +48,7 @@ class _DashboardState extends State<Dashboard> {
         splashColor: Colors.transparent,
       ),
       child: PopupMenuButton<int>(
-        offset: const Offset(0, -120),
+        offset: Offset(0, _userRole == 'hr' ? -120 : -70),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
         ),
@@ -67,20 +67,21 @@ class _DashboardState extends State<Dashboard> {
               ],
             ),
           ),
-          PopupMenuItem(
-            value: 2,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.forward_to_inbox,
-                  color: ThemeClass.primaryGreen,
-                  size: 20.sp,
-                ),
-                SizedBox(width: 8.w),
-                const Text("Carry Forward"),
-              ],
+          if (_userRole == 'hr')
+            PopupMenuItem(
+              value: 2,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.forward_to_inbox,
+                    color: ThemeClass.primaryGreen,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  const Text("Carry Forward"),
+                ],
+              ),
             ),
-          ),
         ],
         onSelected: (val) {
           if (val == 1) Get.to(() => const EmployeeLeaveBalanceView());

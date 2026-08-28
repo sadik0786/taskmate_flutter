@@ -94,7 +94,7 @@ class AdminHrmsController extends GetxController {
         getOtherLeaveRequest(); // refresh list
         return true;
       } else {
-        throw res["message"] ?? "Failed to update status";
+        throw res["error"] ?? res["message"] ?? "Failed to update status";
       }
     } catch (err) {
       CustomSnackBar.error("Error: $err");

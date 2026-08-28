@@ -123,24 +123,43 @@ class LeaveService {
     String status, {
     String? hrReason,
   }) async {
+    dynamic response;
     try {
       final token = await BaseApiService.getToken();
       if (token == null) {
         return {"success": false, "error": "No token found"};
       }
 
-      final res = await BaseApiService.request(
+      response = await BaseApiService.request(
         "/hrms/update-leave-status",
         method: "PUT",
         body: {"leaveId": leaveId, "status": status, "hrReason": hrReason},
       );
 
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200 && data["success"] == true) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data["success"] == true) {
         return data;
       }
       throw Exception(data["message"] ?? "Failed to update status");
     } catch (e) {
+      String errorStr = e.toString().toLowerCase();
+      if (e is FormatException ||
+          errorStr.contains("formatexception") ||
+          errorStr.contains("doctype") ||
+          errorStr.contains("syntaxerror") ||
+          errorStr.contains("unexpected character")) {
+        String snippet = "";
+        if (response != null && response.body != null) {
+          String bodyStr = response.body.toString();
+          snippet = bodyStr.length > 50 ? "${bodyStr.substring(0, 50)}..." : bodyStr;
+          snippet = snippet.replaceAll('\n', ' ').replaceAll('\r', '');
+        }
+        return {
+          "success": false,
+          "error":
+              "Server returned HTML (e.g. 502 Bad Gateway or 404). Snippet: $snippet",
+        };
+      }
       return {"success": false, "error": e.toString()};
     }
   }
