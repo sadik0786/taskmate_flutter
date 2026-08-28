@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/services/admin/user_service.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/custom_button.dart';
@@ -158,8 +159,8 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
         Get.snackbar(
           "Success",
           "Details updated successfully!",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          backgroundColor: ThemeClass.successColor,
+          colorText: ThemeClass.textWhite,
           snackPosition: SnackPosition.BOTTOM,
         );
       });
@@ -167,8 +168,8 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
       Get.snackbar(
         "Error",
         "Failed to update details.",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        backgroundColor: ThemeClass.errorColor,
+        colorText: ThemeClass.textWhite,
         snackPosition: SnackPosition.BOTTOM,
       );
     }

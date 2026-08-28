@@ -39,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: ThemeClass.darkBlue,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -64,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 keyboardType: TextInputType.number,
                 isObscure: true,
                 maxLength: 4,
-                fillColor: ThemeClass.darkBlue,
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
                 validator: (value) {
                   if (value == null || value.isEmpty) return "PIN required";
                   if (value.length != 4) return "PIN must be 4 digits";
@@ -78,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 keyboardType: TextInputType.number,
                 isObscure: true,
                 maxLength: 4,
-                fillColor: ThemeClass.darkBlue,
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
                 validator: (value) {
                   if (value == null || value.isEmpty) return "Confirm your PIN";
                   if (value != pinController.text) return "PINs do not match";
@@ -87,8 +87,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SizedBox(height: 20.h),
               CustomButton(
-                txtColor: ThemeClass.textBlack,
-                backgroundColor: ThemeClass.textWhite,
                 text: _savedPin == null ? "Save PIN" : "Update PIN",
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
@@ -180,10 +178,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             onChanged: (value) {
                               themeController.toggleTheme();
                             },
-                            activeColor: Colors.white,
-                            activeTrackColor: ThemeClass.primaryGreen,
-                            inactiveThumbColor: Colors.grey.shade400,
-                            inactiveTrackColor: Colors.grey.shade300,
+                            activeColor: ThemeClass.textWhite,
+                            activeTrackColor: Theme.of(context).primaryColor,
+                            inactiveThumbColor: Theme.of(context).disabledColor,
+                            inactiveTrackColor: Theme.of(context).colorScheme.surfaceVariant,
                           ),
                         ),
                       ],
@@ -242,8 +240,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Get.snackbar(
                           "Info",
                           "Notifications setting coming soon!",
-                          backgroundColor: ThemeClass.primaryGreen,
-                          colorText: Colors.white,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          colorText: ThemeClass.textWhite,
                         );
                       },
                     ),
@@ -265,8 +263,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Get.snackbar(
                           "App Info",
                           "Task Mate v1.0.0",
-                          backgroundColor: ThemeClass.primaryGreen,
-                          colorText: Colors.white,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          colorText: ThemeClass.textWhite,
                         );
                       },
                     ),

@@ -27,7 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: "Add Employee",
       customActions: [
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () {
             Get.until(
               (route) =>
@@ -85,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       : "No permission"}",
                                   style: Theme.of(context).textTheme.titleSmall
                                       ?.copyWith(
-                                        color: Colors.grey[400],
+                                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
                                         fontWeight: FontWeight.w400,
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -325,7 +325,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: CircularProgressIndicator(strokeWidth: 2.w),
             ),
             SizedBox(width: 12.h),
-            Text("Loading roles...", style: TextStyle(fontSize: 16.sp)),
+            Text("Loading roles...", style: Theme.of(context).textTheme.bodyLarge),
           ],
         ),
       );

@@ -273,13 +273,13 @@ class AddTaskScreenState extends State<AddTaskScreen> {
       title: widget.task == null ? "Add Task" : "Edit Task",
       customActions: [
         IconButton(
-          icon: const Icon(Icons.add, color: Colors.white),
+          icon: const Icon(Icons.add),
           onPressed: () {
             Get.toNamed(Routes.projectScreen);
           },
         ),
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () {
             Get.back();
           },

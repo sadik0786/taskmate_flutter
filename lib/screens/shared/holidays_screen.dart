@@ -8,6 +8,7 @@ import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/utils/common_fn.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/page_loader.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class HolidaysScreen extends StatefulWidget {
   const HolidaysScreen({super.key});
@@ -29,39 +30,32 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text("Company Holidays"),
-        backgroundColor: ThemeClass.primaryGreen,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Get.back(),
+
+    return BaseLayout(
+      title: "Company Holidays",
+      showBackButton: true,
+      customActions: [
+        IconButton(
+          icon: const Icon(Icons.home),
+          onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            final role = prefs.getString("role")?.toLowerCase() ?? "employee";
+            final adminRoles = [
+              "superadmin",
+              "admin",
+              "hr",
+              "ceo",
+              "manager",
+            ];
+            if (adminRoles.contains(role)) {
+              Get.offAllNamed(Routes.adminDashboard);
+            } else {
+              Get.offAllNamed(Routes.homeScreen);
+            }
+          },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              final role = prefs.getString("role")?.toLowerCase() ?? "employee";
-              final adminRoles = [
-                "superadmin",
-                "admin",
-                "hr",
-                "ceo",
-                "manager",
-              ];
-              if (adminRoles.contains(role)) {
-                Get.offAllNamed(Routes.adminDashboard);
-              } else {
-                Get.offAllNamed(Routes.homeScreen);
-              }
-            },
-          ),
-        ],
-      ),
-      body: Padding(
+      ],
+      child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -11,6 +11,8 @@ class BaseLayout extends StatefulWidget {
   final String title;
   final List<Widget>? customActions;
   final bool showBackButton;
+  final Widget? floatingActionButton;
+  final Widget? bottomNavigationBar;
 
   const BaseLayout({
     super.key,
@@ -18,6 +20,8 @@ class BaseLayout extends StatefulWidget {
     required this.title,
     this.customActions,
     this.showBackButton = false,
+    this.floatingActionButton,
+    this.bottomNavigationBar,
   });
 
   @override
@@ -87,6 +91,8 @@ class _BaseLayoutState extends State<BaseLayout> {
             ),
           ],
         ),
+        floatingActionButton: widget.floatingActionButton,
+        bottomNavigationBar: widget.bottomNavigationBar,
       );
     }
 
@@ -102,6 +108,8 @@ class _BaseLayoutState extends State<BaseLayout> {
       ),
       drawer: AppDrawer(role: role),
       body: SafeArea(child: widget.child),
+      floatingActionButton: widget.floatingActionButton,
+      bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 }

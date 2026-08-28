@@ -109,7 +109,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
       toDate = null;
       CustomSnackBar.show(
         message: "Leave applied successfully",
-        backgroundColor: Colors.green,
+        backgroundColor: ThemeClass.successColor,
         icon: Icons.done,
       );
       Get.toNamed(Routes.hrmsDashboard);
@@ -151,7 +151,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     final selected = selectedLeave();
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: ThemeClass.darkBgColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         child: SingleChildScrollView(
@@ -253,10 +253,10 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     bool isTotalDay = false,
   }) {
     return Card(
-      color: ThemeClass.darkCardColor,
+      color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
       elevation: 3,
-      shadowColor: Colors.white54,
+      shadowColor: Theme.of(context).shadowColor.withOpacity(0.54),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
         child: Column(

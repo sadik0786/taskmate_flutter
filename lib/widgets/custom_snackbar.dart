@@ -82,7 +82,7 @@ class CustomSnackBar {
     show(
       title: title,
       message: message,
-      backgroundColor: Colors.blue.shade700,
+      backgroundColor: Get.theme.primaryColor,
       icon: Icons.info_outline,
     );
   }

@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           Text(
-                            "Complete Employee Hub",
+                            "Smart Attendance & Leave Manager",
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ],

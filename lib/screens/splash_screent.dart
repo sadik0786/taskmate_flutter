@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/services/base_api_service.dart';
 import 'package:task_mate/services/admin/user_service.dart';
 import 'package:task_mate/core/theme.dart';
+import 'package:task_mate/core/routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -59,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (token == null || token.isEmpty) {
       await prefs.clear();
-      Get.offNamed('/login');
+      Get.offNamed(Routes.login);
       return;
     }
     // Check internet first
@@ -80,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (res["success"] != true || res["user"] == null) {
         await prefs.clear();
-        Get.offNamed('/login');
+        Get.offNamed(Routes.login);
         return;
       }
 
@@ -100,16 +101,16 @@ class _SplashScreenState extends State<SplashScreen>
       switch (role) {
         case "ceo":
         case "hr":
-          Get.offNamed('/adminDashboard');
+          Get.offNamed(Routes.adminDashboard);
           break;
         case "superadmin":
         case "admin":
         case "employee":
-          Get.offNamed('/homeScreen');
+          Get.offNamed(Routes.homeScreen);
           break;
         default:
           await prefs.clear();
-          Get.offNamed('/login');
+          Get.offNamed(Routes.login);
       }
     } catch (e) {
       if (mounted) {
@@ -131,14 +132,19 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF1a1a1a), Color(0xFF2d2d2d)],
+            colors: isDark
+                ? [const Color(0xFF1a1a1a), const Color(0xFF2d2d2d)]
+                : [Colors.white, const Color(0xFFF0F2F5)],
           ),
         ),
         child: Center(
@@ -185,19 +191,16 @@ class _SplashScreenState extends State<SplashScreen>
                       children: [
                         Text(
                           "Task Mate",
-                          style: TextStyle(
-                            fontSize: 32.sp,
-                            fontWeight: FontWeight.bold,
-                            color: ThemeClass.textWhite,
+                          style: theme.textTheme.displayMedium?.copyWith(
+                            color: isDark ? ThemeClass.textWhite : ThemeClass.textBlack,
                             letterSpacing: 1.5,
                           ),
                         ),
                         SizedBox(height: 8.h),
                         Text(
                           "Employee Task Management System",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: ThemeClass.textWhite.withOpacity(0.7),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: (isDark ? ThemeClass.textWhite : ThemeClass.textBlack).withOpacity(0.7),
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -237,9 +240,8 @@ class _SplashScreenState extends State<SplashScreen>
                   opacity: _fadeAnimation.value,
                   child: Text(
                     "Loading...",
-                    style: TextStyle(
-                      color: ThemeClass.textWhite.withOpacity(0.7),
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: (isDark ? ThemeClass.textWhite : ThemeClass.textBlack).withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -307,8 +309,8 @@ class _SplashScreenState extends State<SplashScreen>
                         obscureText: true,
                         cursorHeight: 30.sp,
                         cursorWidth: 2,
-                        cursorColor: Colors.blueAccent,
-                        style: TextStyle(
+                        cursorColor: ThemeClass.primaryGreen,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontSize: 30.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -349,13 +351,13 @@ class _SplashScreenState extends State<SplashScreen>
                         Get.snackbar(
                           "Reset",
                           "PIN cleared, set a new one from profile",
-                          backgroundColor: Colors.redAccent,
-                          colorText: Colors.white,
+                          backgroundColor: ThemeClass.errorColor,
+                          colorText: ThemeClass.textWhite,
                         );
                       },
                       child: Text(
                         "Reset PIN?",
-                        style: TextStyle(color: Colors.red, fontSize: 18.sp),
+                        style: TextStyle(color: ThemeClass.errorColor, fontSize: 16.sp),
                       ),
                     ),
                     ElevatedButton(
@@ -376,11 +378,12 @@ class _SplashScreenState extends State<SplashScreen>
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 24.w),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        backgroundColor: Colors.red,
+                        backgroundColor: ThemeClass.primaryGreen,
+                        foregroundColor: ThemeClass.textWhite,
                       ),
                       child: const Text("Unlock"),
                     ),

@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/screens/hrms/admin/all_employee.dart'; // File kept the same name, but we will rename the widget inside
 
 import 'package:task_mate/screens/hrms/user/apply_leave.dart';
 import 'package:task_mate/screens/hrms/admin/approve_leave.dart';
 import 'package:task_mate/screens/hrms/user/dashboard.dart';
-import 'package:task_mate/controllers/theme_controller.dart';
-import 'package:task_mate/widgets/responsive_layout.dart';
-import 'package:task_mate/widgets/custom_appbar.dart';
-import 'package:task_mate/widgets/app_drawer.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class HrmsDashboard extends StatefulWidget {
   const HrmsDashboard({super.key});
@@ -93,10 +89,9 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = ResponsiveLayout.isDesktop(context);
     final customActions = [
       IconButton(
-        icon: const Icon(Icons.home, color: Colors.white),
+        icon: const Icon(Icons.home),
         onPressed: () {
           if (role == "hr" || role == "ceo" || role == "manager") {
             Get.offAllNamed('/adminDashboard');
@@ -107,27 +102,9 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
       ),
     ];
 
-    final desktopAppBar = DesktopAppBar(
-      title: _getPageTitle(),
-      userName: userName,
-      onLogout: () {},
-      isDarkMode: Get.find<ThemeController>().isDarkMode,
-      onToggleTheme: Get.find<ThemeController>().toggleTheme,
-      customActions: customActions,
-    );
-
-    final mobileAppBar = MobileAppBar(
-      title: _getPageTitle(),
-      userName: userName,
-      onLogout: () {},
-      isDarkMode: Get.find<ThemeController>().isDarkMode,
-      onToggleTheme: Get.find<ThemeController>().toggleTheme,
-      customActions: customActions,
-    );
-
     final bottomNavBar = BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      backgroundColor: ThemeClass.darkBgColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       items: <BottomNavigationBarItem>[
         const BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
@@ -150,52 +127,19 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
           ),
       ],
       currentIndex: _selectedIndex,
-      selectedItemColor: ThemeClass.primaryGreen,
-      unselectedItemColor: Colors.white60,
+      selectedItemColor: Theme.of(context).primaryColor,
+      unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
       onTap: _onItemTapped,
     );
 
     final content = _buildBody();
 
-    if (isDesktop) {
-      return Scaffold(
-        backgroundColor: ThemeClass.darkBgColor,
-        body: Row(
-          children: [
-            AppDrawer(role: role ?? "employee"),
-            Expanded(
-              child: Column(
-                children: [
-                  desktopAppBar,
-                  Expanded(
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1200),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24.0,
-                            vertical: 16.0,
-                          ),
-                          child: content,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        bottomNavigationBar: bottomNavBar,
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
-      appBar: mobileAppBar,
-      body: SafeArea(child: content),
-      drawer: AppDrawer(role: role ?? "employee"),
+    return BaseLayout(
+      title: _getPageTitle(),
+      showBackButton: false,
+      customActions: customActions,
       bottomNavigationBar: bottomNavBar,
+      child: content,
     );
   }
 }

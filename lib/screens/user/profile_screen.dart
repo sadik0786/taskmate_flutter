@@ -350,7 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       title: "My Profile",
       customActions: [
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () async {
             _checkAuthAndNavigate();
           },
@@ -371,7 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Theme.of(context).shadowColor.withOpacity(0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -418,16 +418,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: profileStatus.toLowerCase() == 'active'
-                                    ? Colors.green.shade100
-                                    : Colors.red.shade100,
+                                    ? ThemeClass.successColor.withOpacity(0.2)
+                                    : ThemeClass.errorColor.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(20.r),
                               ),
                               child: Text(
                                 profileStatus,
                                 style: TextStyle(
                                   color: profileStatus.toLowerCase() == 'active'
-                                      ? Colors.green.shade800
-                                      : Colors.red.shade800,
+                                      ? ThemeClass.successColor
+                                      : ThemeClass.errorColor,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 10.sp,
                                 ),
@@ -584,7 +584,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: ThemeClass.darkBlue,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -608,7 +608,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 keyboardType: TextInputType.number,
                 controller: controller,
                 maxLength: 10,
-                fillColor: ThemeClass.darkBlue,
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
               ),
               // TextFormField(
               //   controller: controller,
@@ -632,8 +632,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // ),
               SizedBox(height: 20.h),
               CustomButton(
-                txtColor: ThemeClass.textBlack,
-                backgroundColor: ThemeClass.textWhite,
                 text: "Update",
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
@@ -663,7 +661,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

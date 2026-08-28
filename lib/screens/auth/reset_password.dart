@@ -114,13 +114,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       title: "Reset Password",
       customActions: [
         IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Get.back();
           },
         ),
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () {
             Get.until(
               (route) =>
@@ -182,7 +182,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       children: [
         _buildProgressStep(1, "Verify Email", _emailVerified),
         Expanded(
-          child: Divider(thickness: 2.w, color: Colors.grey),
+          child: Divider(thickness: 2.w, color: Theme.of(context).dividerColor),
         ),
         _buildProgressStep(2, "Set Password", false),
       ],
@@ -198,12 +198,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           decoration: BoxDecoration(
             color: isCompleted
                 ? Theme.of(context).primaryColor
-                : Colors.grey[300],
+                : Theme.of(context).dividerColor,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: isCompleted
-                ? Icon(Icons.check, color: Colors.white, size: 18.sp)
+                ? Icon(Icons.check, color: ThemeClass.textWhite, size: 18.sp)
                 : Text(
                     stepNumber.toString(),
                     style: TextStyle(

@@ -152,7 +152,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
       title: userRole == "admin" ? "Manage Projects" : "Add Sub Projects",
       customActions: [
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () {
             if (userRole == "admin") {
               Get.until(
@@ -356,7 +356,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: ThemeClass.darkBlue,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -376,7 +376,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 ),
                 SizedBox(height: 20.h),
                 CustomDropdownField<int>(
-                  fillColor: ThemeClass.darkBlue,
+                  // fillColor: ThemeClass.darkBlue,
                   // isLoading: adminLoading,
                   labelText: "Select Main Project",
                   isRequired: true,
@@ -417,7 +417,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   isRequired: true,
                   keyboardType: TextInputType.text,
                   maxLength: 50,
-                  fillColor: ThemeClass.darkBlue,
+                  // fillColor: ThemeClass.darkBlue,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Subproject is required";
@@ -427,8 +427,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 ),
                 SizedBox(height: 12.h),
                 CustomButton(
-                  txtColor: ThemeClass.textBlack,
-                  backgroundColor: ThemeClass.textWhite,
+                  txtColor: Theme.of(context).colorScheme.onPrimary,
+                  backgroundColor: Theme.of(context).primaryColor,
                   text: "Add Sub Project",
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {

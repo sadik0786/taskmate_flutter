@@ -89,7 +89,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       customActions: isHR
           ? [
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white),
+                icon: const Icon(Icons.edit),
                 onPressed: () async {
                   final updatedData = await Get.toNamed(
                     Routes.employeeUpdateScreen,
@@ -160,16 +160,16 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: profileStatus.toLowerCase() == 'active'
-                              ? Colors.green.shade100
-                              : Colors.red.shade100,
+                              ? ThemeClass.successColor.withOpacity(0.2)
+                              : ThemeClass.errorColor.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Text(
                           profileStatus,
                           style: TextStyle(
                             color: profileStatus.toLowerCase() == 'active'
-                                ? Colors.green.shade800
-                                : Colors.red.shade800,
+                                ? ThemeClass.successColor
+                                : ThemeClass.errorColor,
                             fontWeight: FontWeight.w600,
                             fontSize: 10.sp,
                           ),

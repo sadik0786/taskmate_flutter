@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/core/routes.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/services/auth/auth_service.dart';
+import 'package:task_mate/controllers/theme_controller.dart';
+import 'package:task_mate/widgets/custom_appbar.dart';
 import 'package:get/get.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -89,7 +92,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red.shade600,
+        backgroundColor: ThemeClass.errorColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -100,7 +103,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.green.shade600,
+        backgroundColor: ThemeClass.successColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -129,24 +132,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeController = Get.isRegistered<ThemeController>()
+        ? Get.find<ThemeController>()
+        : Get.put(ThemeController());
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        title: Text(
-          "Forgot Password",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).appBarTheme.foregroundColor),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-        actions: [
+      appBar: MobileAppBar(
+        title: "Forgot Password",
+        userName: null,
+        onLogout: () {},
+        isDarkMode: themeController.isDarkMode,
+        onToggleTheme: themeController.toggleTheme,
+        customActions: [
           IconButton(
-            icon: Icon(Icons.home, color: Theme.of(context).appBarTheme.foregroundColor),
+            icon: const Icon(Icons.home),
             onPressed: _navigateToHome,
           ),
         ],
@@ -200,7 +200,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           "Reset Your Password",
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            color: Colors.grey[800],
             fontSize: 28.sp,
           ),
         ),
@@ -208,7 +207,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Text(
           "Enter your email address and we'll help you reset your password",
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.grey[600],
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
             height: 1.5.h,
           ),
         ),
@@ -233,7 +232,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ],
                     )
                   : LinearGradient(
-                      colors: [Colors.grey.shade300, Colors.grey.shade300],
+                      colors: [Theme.of(context).dividerColor, Theme.of(context).dividerColor],
                     ),
               borderRadius: BorderRadius.circular(2.r),
             ),
@@ -253,12 +252,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           decoration: BoxDecoration(
             color: isCompleted
                 ? Theme.of(context).primaryColor
-                : Colors.grey.shade300,
+                : Theme.of(context).dividerColor,
             shape: BoxShape.circle,
             border: Border.all(
               color: isCompleted
                   ? Theme.of(context).primaryColor
-                  : Colors.grey.shade400,
+                  : Theme.of(context).disabledColor,
               width: 2.w,
             ),
           ),
@@ -281,7 +280,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           style: TextStyle(
             color: isCompleted
                 ? Theme.of(context).primaryColor
-                : Colors.grey.shade600,
+                : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
             fontSize: 12.sp,
             fontWeight: isCompleted ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -298,7 +297,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           "Step 1: Verify Your Identity",
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
           ),
         ),
         SizedBox(height: 8.h),
@@ -306,7 +304,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           "Enter the email address associated with your account",
           style: Theme.of(
             context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          ).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7)
+          ),
         ),
         SizedBox(height: 24.h),
 
@@ -410,7 +410,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           "Step 2: Create New Password",
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
           ),
         ),
         SizedBox(height: 8.h),
@@ -418,7 +417,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           "Create a strong password to secure your account",
           style: Theme.of(
             context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          ).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7)
+          ),
         ),
         SizedBox(height: 24.h),
 
@@ -499,7 +500,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: ElevatedButton(
             onPressed: _loading ? null : _changePassword,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
+              backgroundColor: ThemeClass.successColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.r),
               ),
@@ -542,7 +543,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Text(
           "Password must:",
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey.shade600,
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -553,15 +554,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               _newPassword.text.length >= 6 ? Icons.check_circle : Icons.circle,
               size: 14.sp,
               color: _newPassword.text.length >= 6
-                  ? Colors.green
-                  : Colors.grey.shade400,
+                  ? ThemeClass.successColor
+                  : Theme.of(context).disabledColor,
             ),
             const SizedBox(width: 6),
             Text(
               "Be at least 6 characters long",
               style: Theme.of(
                 context,
-              ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+              ).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7)
+              ),
             ),
           ],
         ),
@@ -577,15 +580,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               color:
                   _newPassword.text.isNotEmpty &&
                       _newPassword.text == _confirmPassword.text
-                  ? Colors.green
-                  : Colors.grey.shade400,
+                  ? ThemeClass.successColor
+                  : Theme.of(context).disabledColor,
             ),
             SizedBox(width: 6.w),
             Text(
               "Passwords must match",
               style: Theme.of(
                 context,
-              ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+              ).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7)
+              ),
             ),
           ],
         ),

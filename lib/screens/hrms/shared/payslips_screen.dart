@@ -91,12 +91,12 @@ class _PayslipsScreenState extends State<PayslipsScreen> {
                         Container(
                           padding: EdgeInsets.all(12.w),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Theme.of(context).primaryColor.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.request_quote,
-                            color: Colors.blue,
+                            color: Theme.of(context).primaryColor,
                             size: 24.sp,
                           ),
                         ),

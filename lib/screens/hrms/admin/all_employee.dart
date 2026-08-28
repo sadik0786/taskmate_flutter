@@ -107,7 +107,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade700,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -142,7 +142,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                                     ? leave.employeeName[0].toUpperCase()
                                     : "?",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: ThemeClass.textWhite,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -163,7 +163,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                                   leave.leaveTypeName,
                                   style: TextStyle(
                                     fontSize: 10.sp,
-                                    color: Colors.grey.shade600,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -261,7 +261,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -420,7 +420,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
               child: Text(
                 leave.status,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: ThemeClass.textWhite,
                   fontSize: 8.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -436,13 +436,13 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
       case "APPROVED":
-        return Colors.green;
+        return ThemeClass.successColor;
       case "REJECTED":
-        return Colors.red;
+        return ThemeClass.errorColor;
       case "PENDING":
-        return Colors.orange;
+        return ThemeClass.warningColor;
       default:
-        return Colors.black;
+        return Theme.of(context).colorScheme.onSurface;
     }
   }
 }

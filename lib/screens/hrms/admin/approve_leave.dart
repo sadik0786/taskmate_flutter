@@ -26,7 +26,7 @@ class _ApproveLeaveState extends State<ApproveLeave> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeClass.darkBgColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: EdgeInsets.all(16.w),
         child: Obx(() {
@@ -66,10 +66,13 @@ class _ApproveLeaveState extends State<ApproveLeave> {
 
     return Card(
       margin: EdgeInsets.only(bottom: 14.h),
-      color: ThemeClass.tealGreen,
+      color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
-        side: BorderSide(color: Colors.white, width: 1.2),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          width: 1.2,
+        ),
       ),
       elevation: 5,
       child: Padding(
@@ -134,8 +137,10 @@ class _ApproveLeaveState extends State<ApproveLeave> {
                       scale: 0.8,
                       child: Checkbox(
                         value: hrApprovalMap[leave.id] ?? false,
-                        checkColor: Colors.white,
-                        side: const BorderSide(color: Colors.white),
+                        checkColor: Theme.of(context).colorScheme.onPrimary,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         visualDensity: VisualDensity(
                           horizontal: -4.w,
@@ -151,7 +156,9 @@ class _ApproveLeaveState extends State<ApproveLeave> {
                     ),
                     Text(
                       "Approve as HR with reason",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ],
                 ),
@@ -166,7 +173,7 @@ class _ApproveLeaveState extends State<ApproveLeave> {
                 child: Text(
                   "Read Only - You cannot approve this role.",
                   style: TextStyle(
-                    color: Colors.yellow,
+                    color: ThemeClass.warningColor,
                     fontStyle: FontStyle.italic,
                     fontSize: 13.sp,
                   ),
@@ -181,15 +188,15 @@ class _ApproveLeaveState extends State<ApproveLeave> {
   /// ---------------- STATUS CHIP ----------------
   Widget _statusChip(String status) {
     Color color = switch (status) {
-      "APPROVED" => Colors.green,
-      "REJECTED" => Colors.red,
-      _ => Colors.orange,
+      "APPROVED" => ThemeClass.successColor,
+      "REJECTED" => ThemeClass.errorColor,
+      _ => ThemeClass.warningColor,
     };
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
@@ -210,9 +217,9 @@ class _ApproveLeaveState extends State<ApproveLeave> {
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.all(16.w),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -278,9 +285,9 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
       decoration: BoxDecoration(
         color: isCompleted
             ? (dragPosition == 1.0
-                  ? Colors.green.shade200
-                  : Colors.red.shade200)
-            : Colors.grey.shade200,
+                  ? ThemeClass.successColor.withOpacity(0.5)
+                  : ThemeClass.errorColor.withOpacity(0.5))
+            : Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(30.r),
       ),
       child: Stack(
@@ -294,7 +301,9 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                   ? (dragPosition == -1.0 ? "REJECT" : "APPROVE")
                   : "REJECT",
               style: TextStyle(
-                color: isCompleted ? Colors.green : Colors.red,
+                color: isCompleted
+                    ? ThemeClass.successColor
+                    : ThemeClass.errorColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -308,7 +317,9 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                   ? (dragPosition == 1.0 ? "APPROVE" : "REJECT")
                   : "APPROVE",
               style: TextStyle(
-                color: isCompleted ? Colors.red : Colors.green,
+                color: isCompleted
+                    ? ThemeClass.errorColor
+                    : ThemeClass.successColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -366,18 +377,21 @@ class _SwipeApproveRejectState extends State<SwipeApproveReject> {
                 width: 100.w,
                 height: 35.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   borderRadius: BorderRadius.circular(20.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: Theme.of(context).shadowColor.withOpacity(0.12),
                       blurRadius: 4,
                       offset: Offset(0, 2),
                     ),
                   ],
                 ),
                 alignment: Alignment.center,
-                child: Icon(Icons.swap_horiz, color: Colors.black),
+                child: Icon(
+                  Icons.swap_horiz,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ),
           ),

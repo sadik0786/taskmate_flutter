@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/controllers/hrms/attendance_controller.dart';
 import 'package:task_mate/core/routes.dart';
-import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/no_data.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 
 class AttendanceHistoryScreen extends StatefulWidget {
@@ -214,33 +214,29 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text("Attendance History"),
-        backgroundColor: ThemeClass.primaryGreen,
-        foregroundColor: Colors.white,
-        actions: [
+    return BaseLayout(
+      title: "Attendance History",
+      showBackButton: true,
+      customActions: [
           TextButton.icon(
             onPressed: () {
               Get.toNamed(Routes.regularizationRequest);
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.edit_calendar,
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               size: 18,
             ),
-            label: const Text(
+            label: Text(
               "Regularize",
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
         ],
-      ),
-      body: SafeArea(
+      child: SafeArea(
         child: Column(
           children: [
             // Premium Filter Header
@@ -251,7 +247,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 gradient: LinearGradient(
                   colors: [
                     Theme.of(context).primaryColor.withOpacity(0.05),
-                    Colors.white,
+                    Theme.of(context).cardColor,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -262,7 +258,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Theme.of(context).shadowColor.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -295,7 +291,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                             "Date Range",
                             style: TextStyle(
                               fontSize: 10.sp,
-                              color: Colors.grey.shade500,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -339,14 +335,14 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                           Icon(
                             Icons.filter_list,
                             size: 16.sp,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           SizedBox(width: 6.w),
                           Text(
                             "Filter",
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -567,7 +563,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.02),
+                                  color: Theme.of(context).shadowColor.withOpacity(0.05),
                                   blurRadius: 2,
                                   offset: const Offset(0, 1),
                                 ),
@@ -874,7 +870,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                                     child: Text(
                                       statusText,
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Theme.of(context).colorScheme.onError,
                                         fontSize: 8.sp,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,

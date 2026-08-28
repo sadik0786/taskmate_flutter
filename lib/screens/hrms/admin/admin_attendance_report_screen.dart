@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
 import 'package:task_mate/core/theme.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 
 class AdminAttendanceReportScreen extends StatefulWidget {
@@ -38,14 +39,10 @@ class _AdminAttendanceReportScreenState
       lastDate: DateTime.now(),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
               primary: ThemeClass.primaryGreen,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
             ),
-            dialogBackgroundColor: Colors.white,
           ),
           child: child!,
         );
@@ -61,23 +58,19 @@ class _AdminAttendanceReportScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text("Attendance Report"),
-        backgroundColor: ThemeClass.primaryGreen,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
+    return BaseLayout(
+      title: "Attendance Report",
+      showBackButton: true,
+      child: Column(
         children: [
           // Filter Header
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Theme.of(context).shadowColor.withOpacity(0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -91,7 +84,7 @@ class _AdminAttendanceReportScreenState
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: ThemeClass.textBlack,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 InkWell(
@@ -141,7 +134,7 @@ class _AdminAttendanceReportScreenState
                 return Center(
                   child: Text(
                     "No attendance data found for this date.",
-                    style: TextStyle(color: Colors.grey.shade500),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 );
               }
@@ -151,7 +144,7 @@ class _AdminAttendanceReportScreenState
                 itemCount: controller.adminAttendanceReport.length,
                 itemBuilder: (context, index) {
                   final record = controller.adminAttendanceReport[index];
-                  return _buildEmployeeCard(record);
+                  return _buildEmployeeCard(record, context);
                 },
               );
             }),
@@ -161,12 +154,12 @@ class _AdminAttendanceReportScreenState
     );
   }
 
-  Widget _buildEmployeeCard(dynamic item) {
+  Widget _buildEmployeeCard(dynamic item, BuildContext context) {
     final String status = item["Status"] ?? "ABSENT";
-    Color statusColor = Colors.grey;
-    if (status == "PRESENT") statusColor = Colors.green;
-    if (status == "LATE") statusColor = Colors.orange;
-    if (status == "ABSENT") statusColor = Colors.red;
+    Color statusColor = Theme.of(context).colorScheme.onSurfaceVariant;
+    if (status == "PRESENT") statusColor = ThemeClass.primaryGreen;
+    if (status == "LATE") statusColor = Colors.orange; // Keeps logical warning semantics
+    if (status == "ABSENT") statusColor = ThemeClass.errorColor;
 
     String checkIn = "--:--";
     if (item["CheckInTime"] != null) {
@@ -190,11 +183,11 @@ class _AdminAttendanceReportScreenState
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -215,7 +208,7 @@ class _AdminAttendanceReportScreenState
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                        color: ThemeClass.textBlack,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -225,7 +218,7 @@ class _AdminAttendanceReportScreenState
                       item["Email"] ?? "",
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.grey.shade500,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -255,14 +248,14 @@ class _AdminAttendanceReportScreenState
             Row(
               children: [
                 Expanded(
-                  child: _buildTimeCol("Punch In", checkIn, Icons.login, Colors.blue),
+                  child: _buildTimeCol("Punch In", checkIn, Icons.login, Colors.blue, context),
                 ),
                 Expanded(
-                  child: _buildTimeCol("Punch Out", checkOut, Icons.logout, Colors.orange),
+                  child: _buildTimeCol("Punch Out", checkOut, Icons.logout, Colors.orange, context),
                 ),
                 if (hoursText.isNotEmpty)
                   Expanded(
-                    child: _buildTimeCol("Worked", hoursText, Icons.timer, Colors.green),
+                    child: _buildTimeCol("Worked", hoursText, Icons.timer, ThemeClass.primaryGreen, context),
                   ),
               ],
             ),
@@ -272,7 +265,7 @@ class _AdminAttendanceReportScreenState
     );
   }
 
-  Widget _buildTimeCol(String label, String time, IconData icon, Color color) {
+  Widget _buildTimeCol(String label, String time, IconData icon, Color color, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -284,7 +277,7 @@ class _AdminAttendanceReportScreenState
               label,
               style: TextStyle(
                 fontSize: 10.sp,
-                color: Colors.grey.shade500,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -296,7 +289,7 @@ class _AdminAttendanceReportScreenState
           style: TextStyle(
             fontSize: 13.sp,
             fontWeight: FontWeight.bold,
-            color: ThemeClass.textBlack,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],

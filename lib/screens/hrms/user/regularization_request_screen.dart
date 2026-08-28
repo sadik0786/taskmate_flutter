@@ -8,6 +8,7 @@ import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/widgets/no_data.dart';
+import 'package:task_mate/widgets/base_layout.dart';
 
 class RegularizationRequestScreen extends StatefulWidget {
   const RegularizationRequestScreen({super.key});
@@ -62,7 +63,7 @@ class _RegularizationRequestScreenState
                       width: 40.w,
                       height: 4.h,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: Theme.of(context).colorScheme.outlineVariant,
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                     ),
@@ -73,7 +74,7 @@ class _RegularizationRequestScreenState
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
-                      color: ThemeClass.textBlack,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   SizedBox(height: 20.h),
@@ -233,7 +234,7 @@ class _RegularizationRequestScreenState
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -246,11 +247,11 @@ class _RegularizationRequestScreenState
               style: TextStyle(
                 fontSize: 14.sp,
                 color: selected != null
-                    ? ThemeClass.textBlack
-                    : Colors.grey.shade600,
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            Icon(Icons.calendar_today, size: 18.sp, color: Colors.grey),
+            Icon(Icons.calendar_today, size: 18.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -268,7 +269,7 @@ class _RegularizationRequestScreenState
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -279,11 +280,11 @@ class _RegularizationRequestScreenState
               style: TextStyle(
                 fontSize: 14.sp,
                 color: selected != null
-                    ? ThemeClass.textBlack
-                    : Colors.grey.shade600,
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            Icon(Icons.access_time, size: 18.sp, color: Colors.grey),
+            Icon(Icons.access_time, size: 18.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -292,45 +293,31 @@ class _RegularizationRequestScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text("My Regularizations"),
-        backgroundColor: ThemeClass.primaryGreen,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Get.back(),
+    return BaseLayout(
+      title: "My Regularizations",
+      showBackButton: true,
+      customActions: [
+        IconButton(
+          icon: Icon(Icons.home, color: Theme.of(context).appBarTheme.iconTheme?.color ?? Colors.white),
+          onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            final role = prefs.getString("role")?.toLowerCase() ?? "employee";
+            final adminRoles = ["superadmin", "admin", "hr", "ceo", "manager"];
+            if (adminRoles.contains(role)) {
+              Get.offAllNamed(Routes.adminDashboard);
+            } else {
+              Get.offAllNamed(Routes.homeScreen);
+            }
+          },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              final role = prefs.getString("role")?.toLowerCase() ?? "employee";
-              final adminRoles = [
-                "superadmin",
-                "admin",
-                "hr",
-                "ceo",
-                "manager",
-              ];
-              if (adminRoles.contains(role)) {
-                Get.offAllNamed(Routes.adminDashboard);
-              } else {
-                Get.offAllNamed(Routes.homeScreen);
-              }
-            },
-          ),
-        ],
-      ),
+      ],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showApplyModal,
         backgroundColor: ThemeClass.primaryGreen,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text("Request", style: TextStyle(color: Colors.white)),
       ),
-      body: Obx(() {
+      child: Obx(() {
         if (controller.isLoading.value &&
             controller.myRegularizations.isEmpty) {
           return const PageLoader();
@@ -347,18 +334,18 @@ class _RegularizationRequestScreenState
           itemCount: controller.myRegularizations.length,
           itemBuilder: (context, index) {
             final item = controller.myRegularizations[index];
-            return _buildHistoryCard(item);
+            return _buildHistoryCard(item, context);
           },
         );
       }),
     );
   }
 
-  Widget _buildHistoryCard(dynamic item) {
+  Widget _buildHistoryCard(dynamic item, BuildContext context) {
     final status = item["Status"] ?? "Pending";
     Color statusColor = Colors.orange;
-    if (status == "Approved") statusColor = Colors.green;
-    if (status == "Rejected") statusColor = Colors.red;
+    if (status == "Approved") statusColor = ThemeClass.primaryGreen;
+    if (status == "Rejected") statusColor = ThemeClass.errorColor;
 
     final date = DateTime.tryParse(item["TargetDate"] ?? "");
     final dateStr = date != null
@@ -381,9 +368,9 @@ class _RegularizationRequestScreenState
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +383,7 @@ class _RegularizationRequestScreenState
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
-                  color: ThemeClass.textBlack,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               Container(
@@ -420,7 +407,7 @@ class _RegularizationRequestScreenState
           Row(
             children: [
               Expanded(
-                child: _buildTimeCol("Req In", reqIn, Icons.login, Colors.blue),
+                child: _buildTimeCol("Req In", reqIn, Icons.login, Colors.blue, context),
               ),
               Expanded(
                 child: _buildTimeCol(
@@ -428,6 +415,7 @@ class _RegularizationRequestScreenState
                   reqOut,
                   Icons.logout,
                   Colors.orange,
+                  context,
                 ),
               ),
             ],
@@ -438,13 +426,13 @@ class _RegularizationRequestScreenState
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.grey.shade600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             item["Reason"] ?? "-",
-            style: TextStyle(fontSize: 13.sp, color: ThemeClass.textBlack),
+            style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface),
           ),
           if (item["HrReason"] != null &&
               item["HrReason"].toString().isNotEmpty) ...[
@@ -454,7 +442,7 @@ class _RegularizationRequestScreenState
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade600,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             SizedBox(height: 4.h),
@@ -468,7 +456,7 @@ class _RegularizationRequestScreenState
     );
   }
 
-  Widget _buildTimeCol(String label, String time, IconData icon, Color color) {
+  Widget _buildTimeCol(String label, String time, IconData icon, Color color, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -480,7 +468,7 @@ class _RegularizationRequestScreenState
               label,
               style: TextStyle(
                 fontSize: 10.sp,
-                color: Colors.grey.shade500,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -492,7 +480,7 @@ class _RegularizationRequestScreenState
           style: TextStyle(
             fontSize: 13.sp,
             fontWeight: FontWeight.bold,
-            color: ThemeClass.textBlack,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],

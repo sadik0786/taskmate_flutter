@@ -93,15 +93,15 @@ class _DashboardState extends State<Dashboard> {
           decoration: BoxDecoration(
             color: ThemeClass.primaryGreen,
             shape: BoxShape.circle,
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Colors.black26,
+                color: Theme.of(context).shadowColor.withOpacity(0.1),
                 blurRadius: 4,
                 offset: Offset(0, 2),
               ),
             ],
           ),
-          child: const Icon(Icons.menu, color: Colors.white),
+          child: Icon(Icons.menu, color: ThemeClass.textWhite),
         ),
       ),
     );
@@ -187,7 +187,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   _compactSummaryCard(
                     title: "Total",
-                    color: Colors.blue,
+                    color: Theme.of(context).primaryColor,
                     value: leaveController.totalApplyLeave.value,
                   ),
                 ],
@@ -336,10 +336,10 @@ class _DashboardState extends State<Dashboard> {
     final bool isRejected = leave.status == "REJECTED";
 
     final Color statusColor = isApproved
-        ? Colors.green
+        ? ThemeClass.successColor
         : isRejected
-        ? Colors.red
-        : Colors.orange;
+        ? ThemeClass.errorColor
+        : ThemeClass.warningColor;
 
     return Container(
       margin: EdgeInsets.only(bottom: 6.h),
@@ -352,7 +352,7 @@ class _DashboardState extends State<Dashboard> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -524,11 +524,11 @@ class _DashboardState extends State<Dashboard> {
                                   leaveController.cancelLeave(leave.id);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: ThemeClass.errorColor,
                                 ),
-                                child: const Text(
+                                child: Text(
                                   "Yes, Cancel",
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: ThemeClass.textWhite),
                                 ),
                               ),
                             ],
@@ -541,14 +541,16 @@ class _DashboardState extends State<Dashboard> {
                           vertical: 8.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red.shade50,
+                          color: ThemeClass.errorColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: Colors.red.shade200),
+                          border: Border.all(
+                            color: ThemeClass.errorColor.withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           "Cancel Leave",
                           style: TextStyle(
-                            color: Colors.red.shade700,
+                            color: ThemeClass.errorColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 12.sp,
                           ),
@@ -574,7 +576,7 @@ class _DashboardState extends State<Dashboard> {
               child: Text(
                 leave.status,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: ThemeClass.textWhite,
                   fontSize: 8.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,

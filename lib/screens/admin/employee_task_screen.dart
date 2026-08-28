@@ -2,6 +2,7 @@
 
 import 'package:excel/excel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/utils/file_download.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -208,8 +209,8 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                               DateFormat.MMM().format(DateTime(0, month)),
                               style: TextStyle(
                                 color: isFutureMonth
-                                    ? Colors.grey
-                                    : Colors.black,
+                                    ? Theme.of(context).disabledColor
+                                    : Theme.of(context).textTheme.bodyMedium?.color,
                                 fontWeight: tempMonth == month
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -220,10 +221,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                 ? null
                                 : (_) =>
                                       setDialogState(() => tempMonth = month),
-                            selectedColor: Colors.green.shade400,
+                            selectedColor: ThemeClass.successColor.withOpacity(0.8),
                             backgroundColor: isFutureMonth
-                                ? Colors.grey.shade300
-                                : Colors.grey.shade200,
+                                ? Theme.of(context).disabledColor.withOpacity(0.2)
+                                : Theme.of(context).disabledColor.withOpacity(0.1),
                           );
                         },
                       ),
@@ -384,12 +385,12 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
       customActions: [
         if (allTasks.isNotEmpty)
           IconButton(
-            icon: const Icon(Icons.download, color: Colors.white),
+            icon: const Icon(Icons.download),
             tooltip: "Export to Excel",
             onPressed: _exportToExcel,
           ),
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () {
             Get.back();
           },
@@ -691,8 +692,8 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                                   .copyWith(
                                                     color:
                                                         t["status"] == "Working"
-                                                        ? Colors.orange
-                                                        : Colors.green,
+                                                        ? ThemeClass.warningColor
+                                                        : ThemeClass.successColor,
                                                   ),
                                             ),
                                           ],

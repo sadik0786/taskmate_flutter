@@ -77,7 +77,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       title: "Employees",
       customActions: [
         IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: const Icon(Icons.home),
           onPressed: () {
             Get.until(
               (route) =>
@@ -172,14 +172,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 background: ClipRRect(
                                   borderRadius: BorderRadius.circular(14.r),
                                   child: Container(
-                                    color: Colors.redAccent,
+                                    color: ThemeClass.errorColor,
                                     alignment: Alignment.centerRight,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 20.w,
                                     ),
                                     child: Icon(
                                       Icons.delete,
-                                      color: Colors.white,
+                                      color: ThemeClass.textWhite,
                                     ),
                                   ),
                                 ),
@@ -202,7 +202,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                         Center(
                                           child: AlertDialog(
                                             backgroundColor:
-                                                ThemeClass.darkBlue,
+                                                Theme.of(context).scaffoldBackgroundColor,
                                             title: Text(
                                               "Confirm Delete",
                                               style: Theme.of(
@@ -242,7 +242,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                     Navigator.pop(ctx, false),
                                                 style: TextButton.styleFrom(
                                                   backgroundColor:
-                                                      Colors.grey.shade300,
+                                                      Theme.of(context).colorScheme.surfaceVariant,
                                                   padding: EdgeInsets.symmetric(
                                                     horizontal: 20.w,
                                                     vertical: 10.h,
@@ -257,7 +257,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                 child: Text(
                                                   "Cancel",
                                                   style: TextStyle(
-                                                    color: ThemeClass.textBlack,
+                                                    color: Theme.of(context).colorScheme.onSurface,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 16.sp,
                                                   ),
@@ -268,7 +268,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                     Navigator.pop(ctx, true),
                                                 style: TextButton.styleFrom(
                                                   backgroundColor:
-                                                      Colors.redAccent,
+                                                      ThemeClass.errorColor,
                                                   padding: EdgeInsets.symmetric(
                                                     horizontal: 20.w,
                                                     vertical: 10.h,
@@ -305,16 +305,16 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                       Get.snackbar(
                                         "$name",
                                         "Deleted successfully",
-                                        backgroundColor: Colors.green,
-                                        colorText: Colors.white,
+                                        backgroundColor: ThemeClass.successColor,
+                                        colorText: ThemeClass.textWhite,
                                       );
                                       return true; // actually remove item from the list
                                     } else {
                                       Get.snackbar(
                                         "$name",
                                         "Failed to delete employee",
-                                        backgroundColor: Colors.redAccent,
-                                        colorText: Colors.white,
+                                        backgroundColor: ThemeClass.errorColor,
+                                        colorText: ThemeClass.textWhite,
                                       );
                                       return false; // keep the item
                                     }
@@ -473,8 +473,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
-                                                Colors.blueAccent,
-                                                Colors.blue.shade700,
+                                                Theme.of(context).primaryColor,
+                                                Theme.of(context).primaryColor.withOpacity(0.8),
                                               ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,

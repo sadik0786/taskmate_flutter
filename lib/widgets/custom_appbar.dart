@@ -31,10 +31,8 @@ class DesktopAppBar extends StatelessWidget {
         color: theme.scaffoldBackgroundColor,
         border: Border(
           bottom: BorderSide(
-            color: isDarkMode.value
-                ? Colors.grey.shade800
-                : Colors.grey.shade200,
-            width: 1,
+                color: theme.dividerColor.withOpacity(0.2),
+                width: 1,
           ),
         ),
       ),
@@ -55,9 +53,7 @@ class DesktopAppBar extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: isDarkMode.value
-                    ? Colors.grey.shade800
-                    : Colors.grey.shade100,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Row(
@@ -115,12 +111,14 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AppBar(
-      backgroundColor: ThemeClass.primaryGreen,
+      backgroundColor: isDarkMode.value ? theme.scaffoldBackgroundColor : ThemeClass.primaryGreen,
+      iconTheme: const IconThemeData(color: Colors.white),
       title: Text(
         title,
         style: theme.textTheme.titleLarge!.copyWith(
           fontWeight: FontWeight.w700,
           fontSize: 18.sp,
+          color: Colors.white,
         ),
       ),
       actions: [
