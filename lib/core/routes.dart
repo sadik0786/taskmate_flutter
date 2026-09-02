@@ -59,15 +59,13 @@ class Routes {
   static const String regularizationRequest = "/regularizationRequest";
 }
 
-const Duration transitionDuration = Duration(
-  milliseconds: AppConstants.transitionDuration,
-);
+Duration get transitionDuration =>
+    Duration(milliseconds: AppConstants.transitionDuration);
 
 GetPage _getPage(String name, Widget page) => GetPage(
   name: name,
   page: () => page,
   transition: AppConstants.transition,
-  fullscreenDialog: true,
   transitionDuration: transitionDuration,
 );
 

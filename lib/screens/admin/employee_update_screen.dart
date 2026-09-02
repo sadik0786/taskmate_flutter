@@ -9,6 +9,7 @@ import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class EmployeeUpdateScreen extends StatefulWidget {
   const EmployeeUpdateScreen({super.key});
@@ -181,113 +182,115 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
       title: "Update Employee Details",
       child: _isLoading
           ? const PageLoader()
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16.w),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _buildSection("Personal Information", [
-                      _buildTextField("Employee ID", _empIdCtrl),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 12.h),
-                        child: CustomDropdownField<String>(
-                          labelText: "Gender",
-                          hintText: "Select Gender",
-                          prefixIcon: Icons.person_outline,
-                          items: const [
-                            {"val": "Male", "lbl": "Male"},
-                            {"val": "Female", "lbl": "Female"},
-                            {"val": "Other", "lbl": "Other"},
-                          ],
-                          valueKey: "val",
-                          labelKey: "lbl",
-                          value: _genderCtrl.text.isEmpty
-                              ? "Male"
-                              : _genderCtrl.text,
-                          onChanged: (val) {
-                            if (val != null) _genderCtrl.text = val;
-                          },
+          : ResponsiveFormWrapper(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(16.w),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      _buildSection("Personal Information", [
+                        _buildTextField("Employee ID", _empIdCtrl),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 12.h),
+                          child: CustomDropdownField<String>(
+                            labelText: "Gender",
+                            hintText: "Select Gender",
+                            prefixIcon: Icons.person_outline,
+                            items: const [
+                              {"val": "Male", "lbl": "Male"},
+                              {"val": "Female", "lbl": "Female"},
+                              {"val": "Other", "lbl": "Other"},
+                            ],
+                            valueKey: "val",
+                            labelKey: "lbl",
+                            value: _genderCtrl.text.isEmpty
+                                ? "Male"
+                                : _genderCtrl.text,
+                            onChanged: (val) {
+                              if (val != null) _genderCtrl.text = val;
+                            },
+                          ),
                         ),
-                      ),
-                      _buildDateField("Date of Birth (dd-MMM-yyyy)", _dobCtrl),
-                      _buildTextField("Blood Group", _bloodGroupCtrl),
-                    ]),
-                    SizedBox(height: 16.h),
-                    _buildSection("Contact & Address", [
-                      _buildTextField("Emergency Contact", _emergencyCtrl),
-                      _buildTextField("Address", _addressCtrl, maxLines: 3),
-                    ]),
-                    SizedBox(height: 16.h),
-                    _buildSection("Professional Details", [
-                      _buildTextField("Department", _departmentCtrl),
-                      _buildDateField(
-                        "Date of Joining (dd-MMM-yyyy)",
-                        _dojCtrl,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 12.h),
-                        child: CustomDropdownField<String>(
-                          labelText: "Employment Type",
-                          hintText: "Select Type",
-                          prefixIcon: Icons.work_outline,
-                          items: const [
-                            {"val": "Full-time", "lbl": "Full-time"},
-                            {"val": "Part-time", "lbl": "Part-time"},
-                            {"val": "Contract", "lbl": "Contract"},
-                            {"val": "Intern", "lbl": "Intern"},
-                            {"val": "Freelance", "lbl": "Freelance"},
-                          ],
-                          valueKey: "val",
-                          labelKey: "lbl",
-                          value: _empTypeCtrl.text.isEmpty
-                              ? "Full-time"
-                              : _empTypeCtrl.text,
-                          onChanged: (val) {
-                            if (val != null) _empTypeCtrl.text = val;
-                          },
+                        _buildDateField("Date of Birth (dd-MMM-yyyy)", _dobCtrl),
+                        _buildTextField("Blood Group", _bloodGroupCtrl),
+                      ]),
+                      SizedBox(height: 16.h),
+                      _buildSection("Contact & Address", [
+                        _buildTextField("Emergency Contact", _emergencyCtrl),
+                        _buildTextField("Address", _addressCtrl, maxLines: 3),
+                      ]),
+                      SizedBox(height: 16.h),
+                      _buildSection("Professional Details", [
+                        _buildTextField("Department", _departmentCtrl),
+                        _buildDateField(
+                          "Date of Joining (dd-MMM-yyyy)",
+                          _dojCtrl,
                         ),
-                      ),
-                      _buildTextField("Office Location", _locationCtrl),
-                    ]),
-                    SizedBox(height: 16.h),
-                    _buildSection("Identity & Financial", [
-                      _buildTextField("Aadhaar Number", _aadhaarCtrl),
-                      _buildTextField("PAN Number", _panCtrl),
-                      _buildTextField("Bank Details", _bankCtrl, maxLines: 3),
-                      _buildTextField(
-                        "Salary",
-                        _salaryCtrl,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ]),
-                    SizedBox(height: 16.h),
-                    _buildSection("Status", [
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 12.h),
-                        child: CustomDropdownField<String>(
-                          labelText: "Profile Status",
-                          hintText: "Select Status",
-                          prefixIcon: Icons.toggle_on_outlined,
-                          items: const [
-                            {"val": "Active", "lbl": "Active"},
-                            {"val": "Inactive", "lbl": "Inactive"},
-                          ],
-                          valueKey: "val",
-                          labelKey: "lbl",
-                          value: _statusCtrl.text.isEmpty
-                              ? "Active"
-                              : _statusCtrl.text,
-                          onChanged: (val) {
-                            if (val != null) _statusCtrl.text = val;
-                          },
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 12.h),
+                          child: CustomDropdownField<String>(
+                            labelText: "Employment Type",
+                            hintText: "Select Type",
+                            prefixIcon: Icons.work_outline,
+                            items: const [
+                              {"val": "Full-time", "lbl": "Full-time"},
+                              {"val": "Part-time", "lbl": "Part-time"},
+                              {"val": "Contract", "lbl": "Contract"},
+                              {"val": "Intern", "lbl": "Intern"},
+                              {"val": "Freelance", "lbl": "Freelance"},
+                            ],
+                            valueKey: "val",
+                            labelKey: "lbl",
+                            value: _empTypeCtrl.text.isEmpty
+                                ? "Full-time"
+                                : _empTypeCtrl.text,
+                            onChanged: (val) {
+                              if (val != null) _empTypeCtrl.text = val;
+                            },
+                          ),
                         ),
-                      ),
-                    ]),
-                    SizedBox(height: 24.h),
-                    CustomButton(text: "Save Details", onPressed: _submit),
-                    SizedBox(height: 24.h),
-                  ],
+                        _buildTextField("Office Location", _locationCtrl),
+                      ]),
+                      SizedBox(height: 16.h),
+                      _buildSection("Identity & Financial", [
+                        _buildTextField("Aadhaar Number", _aadhaarCtrl),
+                        _buildTextField("PAN Number", _panCtrl),
+                        _buildTextField("Bank Details", _bankCtrl, maxLines: 3),
+                        _buildTextField(
+                          "Salary",
+                          _salaryCtrl,
+                          keyboardType: TextInputType.number,
+                        ),
+                      ]),
+                      SizedBox(height: 16.h),
+                      _buildSection("Status", [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 12.h),
+                          child: CustomDropdownField<String>(
+                            labelText: "Profile Status",
+                            hintText: "Select Status",
+                            prefixIcon: Icons.toggle_on_outlined,
+                            items: const [
+                              {"val": "Active", "lbl": "Active"},
+                              {"val": "Inactive", "lbl": "Inactive"},
+                            ],
+                            valueKey: "val",
+                            labelKey: "lbl",
+                            value: _statusCtrl.text.isEmpty
+                                ? "Active"
+                                : _statusCtrl.text,
+                            onChanged: (val) {
+                              if (val != null) _statusCtrl.text = val;
+                            },
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 24.h),
+                      CustomButton(text: "Save Details", onPressed: _submit),
+                      SizedBox(height: 24.h),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,9 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/screens/hrms/admin/carry_forward_view.dart';
 import 'package:task_mate/screens/hrms/admin/employee_leave_balance_view.dart';
+import 'package:task_mate/widgets/custom_dropdown_field.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
+import 'package:task_mate/widgets/responsive_layout.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -115,173 +119,227 @@ class _DashboardState extends State<Dashboard> {
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         child: Obx(() {
           // Show loading for entire page
-          if (leaveController.isLoading.value) {
-            return Center(child: PageLoader());
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 12.h),
-
-              // Financial Year Dropdown
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Overview",
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Container(
-                    height: 35.h,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(
-                        color: ThemeClass.primaryGreen.withOpacity(0.3),
-                      ),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<int>(
-                        value: leaveController.selectedFinancialYearId.value,
-                        isDense: true,
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: ThemeClass.primaryGreen,
-                        ),
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        items: leaveController.financialYears.map((year) {
-                          return DropdownMenuItem<int>(
-                            value: year.id,
-                            child: Text(year.yearString ?? ""),
-                          );
-                        }).toList(),
-                        onChanged: (int? newValue) {
-                          if (newValue != null) {
-                            leaveController.changeFinancialYear(newValue);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-
-              // Leave Summary
-              Row(
-                children: [
-                  _compactSummaryCard(
-                    title: "Pending",
-                    color: ThemeClass.warningColor,
-                    value: leaveController.pendingLeave.value,
-                  ),
-                  _compactSummaryCard(
-                    title: "Approve",
-                    color: ThemeClass.primaryGreen,
-                    value: leaveController.approvedLeave.value,
-                  ),
-                  _compactSummaryCard(
-                    title: "Total",
-                    color: Theme.of(context).primaryColor,
-                    value: leaveController.totalApplyLeave.value,
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 10.h),
-
-              // Leave Balances
-              if (leaveController.leaveTypes.isNotEmpty) ...[
-                Text(
-                  "Leave Balances",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                SizedBox(height: 8.h),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: leaveController.leaveTypes.map((type) {
-                      return Container(
-                        margin: EdgeInsets.only(right: 8.w),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).dividerColor.withOpacity(0.1),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(
-                                context,
-                              ).shadowColor.withOpacity(0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: leaveController.isLoading.value
+                ? const Center(child: PageLoader())
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Financial Year Dropdown (Mobile only, Desktop moved to hrms_dashboard tab bar)
+                      if (!ResponsiveLayout.isDesktop(context)) ...[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 180.w,
+                            child: CustomDropdownField<int>(
+                              hintText: "Financial Year",
+                              prefixIcon: Icons.calendar_today_rounded,
+                              items: leaveController.financialYears
+                                  .map(
+                                    (year) => {
+                                      'id': year.id,
+                                      'year': year.yearString ?? "",
+                                    },
+                                  )
+                                  .toList(),
+                              valueKey: 'id',
+                              labelKey: 'year',
+                              value:
+                                  leaveController.selectedFinancialYearId.value,
+                              onChanged: (int? newValue) {
+                                if (newValue != null) {
+                                  leaveController.changeFinancialYear(newValue);
+                                }
+                              },
                             ),
-                          ],
+                          ),
                         ),
-                        child: Column(
+                        SizedBox(height: 16.h),
+                      ],
+
+                      // Desktop: Side by Side, Mobile: Stacked
+                      if (ResponsiveLayout.isDesktop(context))
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Overview",
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Row(
+                                    children: [
+                                      _buildModernSummaryCard(
+                                        title: "Pending",
+                                        color: const Color(0xFFF59E0B),
+                                        icon: Icons.pending_actions_rounded,
+                                        value:
+                                            leaveController.pendingLeave.value,
+                                      ),
+                                      _buildModernSummaryCard(
+                                        title: "Approved",
+                                        color: const Color(0xFF10B981),
+                                        icon:
+                                            Icons.check_circle_outline_rounded,
+                                        value:
+                                            leaveController.approvedLeave.value,
+                                      ),
+                                      _buildModernSummaryCard(
+                                        title: "Total",
+                                        color: const Color(0xFF3B82F6),
+                                        icon: Icons.list_alt_rounded,
+                                        value: leaveController
+                                            .totalApplyLeave
+                                            .value,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 24.w),
+                            if (leaveController.leaveTypes.isNotEmpty)
+                              Expanded(
+                                flex: 5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Leave Balances",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    ScrollConfiguration(
+                                      behavior: ScrollConfiguration.of(context)
+                                          .copyWith(
+                                            dragDevices: {
+                                              ui.PointerDeviceKind.touch,
+                                              ui.PointerDeviceKind.mouse,
+                                              ui.PointerDeviceKind.trackpad,
+                                            },
+                                          ),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: leaveController.leaveTypes
+                                              .map(
+                                                (type) => Padding(
+                                                  padding: EdgeInsets.only(
+                                                    bottom: 8.h,
+                                                  ),
+                                                  child: _buildLeaveBalanceChip(
+                                                    type,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        )
+                      else
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              type.leaveName ?? "",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
+                              "Overview",
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
-                            SizedBox(height: 2.h),
-                            Text(
-                              "${type.remainingLeaves ?? 0} Remaining",
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                            SizedBox(height: 8.h),
+                            Row(
+                              children: [
+                                _buildModernSummaryCard(
+                                  title: "Pending",
+                                  color: const Color(0xFFF59E0B),
+                                  icon: Icons.pending_actions_rounded,
+                                  value: leaveController.pendingLeave.value,
+                                ),
+                                _buildModernSummaryCard(
+                                  title: "Approved",
+                                  color: const Color(0xFF10B981),
+                                  icon: Icons.check_circle_outline_rounded,
+                                  value: leaveController.approvedLeave.value,
+                                ),
+                                _buildModernSummaryCard(
+                                  title: "Total",
+                                  color: const Color(0xFF3B82F6),
+                                  icon: Icons.list_alt_rounded,
+                                  value: leaveController.totalApplyLeave.value,
+                                ),
+                              ],
                             ),
+
+                            if (leaveController.leaveTypes.isNotEmpty) ...[
+                              Text(
+                                "Leave Balances",
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              SizedBox(height: 8.h),
+                              ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(context)
+                                    .copyWith(
+                                      dragDevices: {
+                                        ui.PointerDeviceKind.touch,
+                                        ui.PointerDeviceKind.mouse,
+                                        ui.PointerDeviceKind.trackpad,
+                                      },
+                                    ),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: leaveController.leaveTypes
+                                        .map(
+                                          (type) =>
+                                              _buildLeaveBalanceChip(type),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                SizedBox(height: 10.h),
-              ],
 
-              // Leave List
-              Text(
-                "My Leave Requests",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+                      SizedBox(height: 24.h),
 
-              SizedBox(height: 8.h),
-
-              Expanded(
-                child: leaveController.myLeaves.isEmpty
-                    ? NoTasksWidget(message: "No Leaves Found")
-                    : ListView.builder(
-                        itemCount: leaveController.myLeaves.length,
-                        itemBuilder: (context, index) {
-                          final leave = leaveController.myLeaves[index];
-                          // print("hellow ${leave}");
-                          return _leaveCard(leave);
-                        },
+                      // Leave List
+                      Text(
+                        "My Leave Requests",
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-              ),
-            ],
+
+                      SizedBox(height: 8.h),
+
+                      Expanded(
+                        child: leaveController.myLeaves.isEmpty
+                            ? NoTasksWidget(message: "No Leaves Found")
+                            : ResponsiveGridListWrapper(
+                                itemCount: leaveController.myLeaves.length,
+                                desktopChildAspectRatio: 3.5,
+                                allowDynamicHeight: true,
+                                itemBuilder: (context, index) {
+                                  final leave = leaveController.myLeaves[index];
+                                  // print("hellow ${leave}");
+                                  return _leaveCard(leave);
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
           );
         }),
       ),
@@ -289,44 +347,159 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _compactSummaryCard({
+  Widget _buildLeaveBalanceChip(dynamic type) {
+    return Container(
+      margin: EdgeInsets.only(right: 10.w, top: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).primaryColor.withOpacity(0.05),
+            Theme.of(context).primaryColor.withOpacity(0.15),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).primaryColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.pie_chart_rounded,
+            size: ResponsiveLayout.isDesktop(context) ? 30.sp : 24.sp,
+            color: Theme.of(context).primaryColor,
+          ),
+          SizedBox(width: 10.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                type.leaveName ?? "",
+                style: TextStyle(
+                  fontSize: ResponsiveLayout.isDesktop(context) ? 14.sp : 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(height: 5.h),
+              Text(
+                "${type.remainingLeaves ?? 0} Left",
+                style: TextStyle(
+                  fontSize: ResponsiveLayout.isDesktop(context) ? 18.sp : 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernSummaryCard({
     required String title,
     required int value,
     required Color color,
+    required IconData icon,
   }) {
+    bool isHovered = false;
     return Expanded(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 4.w),
-        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(color: color.withOpacity(0.3), width: 1),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              value.toString(),
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => isHovered = true),
+            onExit: (_) => setState(() => isHovered = false),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+              padding: EdgeInsets.all(12.w),
+              transform: Matrix4.identity()
+                ..translate(0.0, isHovered ? -4.0 : 0.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(
+                  color: isHovered
+                      ? color.withOpacity(0.5)
+                      : Theme.of(context).dividerColor.withOpacity(0.05),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isHovered
+                        ? color.withOpacity(0.15)
+                        : Theme.of(context).shadowColor.withOpacity(0.03),
+                    blurRadius: isHovered ? 16 : 8,
+                    offset: Offset(0, isHovered ? 8 : 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: ResponsiveLayout.isDesktop(context) ? 32.sp : 28.sp,
+                      color: color,
+                    ),
+                  ),
+                  SizedBox(
+                    width: ResponsiveLayout.isDesktop(context) ? 12.w : 10.w,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: ResponsiveLayout.isDesktop(context)
+                                ? 14.sp
+                                : 12.sp,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          value.toString(),
+                          style: TextStyle(
+                            fontSize: ResponsiveLayout.isDesktop(context)
+                                ? 28.sp
+                                : 24.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            height: 1.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 4.h),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: color,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -430,12 +603,14 @@ class _DashboardState extends State<Dashboard> {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     SizedBox(width: 6.w),
-                    Text(
-                      "${CommonFn.formatDate(leave.fromDate)} to ${CommonFn.formatDate(leave.toDate)}",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12.sp,
+                    Expanded(
+                      child: Text(
+                        "${CommonFn.formatDate(leave.fromDate)} to ${CommonFn.formatDate(leave.toDate)}",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12.sp,
+                        ),
                       ),
                     ),
                   ],

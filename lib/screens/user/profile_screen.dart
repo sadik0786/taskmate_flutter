@@ -10,7 +10,6 @@ import 'package:task_mate/utils/file_download.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/page_loader.dart';
@@ -22,6 +21,7 @@ import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -356,222 +356,248 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         ),
       ],
-      child: _isLoading
-          ? const PageLoader()
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Header Card
-                  Container(
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).shadowColor.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Center(
-                              child: GestureDetector(
-                                onTap: _uploadPhoto,
-                                child: CircleAvatar(
-                                  radius: 50.r,
-                                  backgroundColor: ThemeClass.primaryGreen
-                                      .withOpacity(0.1),
-                                  backgroundImage: localAvatar != null
-                                      ? FileImage(localAvatar!)
-                                      : (avatarUrl != null
-                                            ? NetworkImage(avatarUrl!)
-                                            : null),
-                                  child:
-                                      (localAvatar == null && avatarUrl == null)
-                                      ? Text(
-                                          userName != null &&
-                                                  userName!.isNotEmpty
-                                              ? userName![0].toUpperCase()
-                                              : "?",
-                                          style: TextStyle(
-                                            fontSize: 36.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: ThemeClass.primaryGreen,
-                                          ),
-                                        )
-                                      : null,
-                                ),
-                              ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _isLoading
+            ? const Center(child: PageLoader())
+            : ResponsiveFormWrapper(
+                maxWidth: 800,
+                padding: EdgeInsets.zero,
+                wrapInCardOnDesktop: false,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Header Card
+                      Container(
+                        padding: EdgeInsets.all(20.w),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(16.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(
+                                context,
+                              ).shadowColor.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
                             ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                                vertical: 4.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: profileStatus.toLowerCase() == 'active'
-                                    ? ThemeClass.successColor.withOpacity(0.2)
-                                    : ThemeClass.errorColor.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                              child: Text(
-                                profileStatus,
-                                style: TextStyle(
-                                  color: profileStatus.toLowerCase() == 'active'
-                                      ? ThemeClass.successColor
-                                      : ThemeClass.errorColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 10.sp,
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                Center(
+                                  child: GestureDetector(
+                                    onTap: _uploadPhoto,
+                                    child: CircleAvatar(
+                                      radius: 50.r,
+                                      backgroundColor: ThemeClass.primaryGreen
+                                          .withOpacity(0.1),
+                                      backgroundImage: localAvatar != null
+                                          ? FileImage(localAvatar!)
+                                          : (avatarUrl != null
+                                                ? NetworkImage(avatarUrl!)
+                                                : null),
+                                      child:
+                                          (localAvatar == null &&
+                                              avatarUrl == null)
+                                          ? Text(
+                                              userName != null &&
+                                                      userName!.isNotEmpty
+                                                  ? userName![0].toUpperCase()
+                                                  : "?",
+                                              style: TextStyle(
+                                                fontSize: 36.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: ThemeClass.primaryGreen,
+                                              ),
+                                            )
+                                          : null,
+                                    ),
+                                  ),
                                 ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w,
+                                    vertical: 4.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        profileStatus.toLowerCase() == 'active'
+                                        ? ThemeClass.successColor.withOpacity(
+                                            0.2,
+                                          )
+                                        : ThemeClass.errorColor.withOpacity(
+                                            0.2,
+                                          ),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                  child: Text(
+                                    profileStatus,
+                                    style: TextStyle(
+                                      color:
+                                          profileStatus.toLowerCase() ==
+                                              'active'
+                                          ? ThemeClass.successColor
+                                          : ThemeClass.errorColor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10.sp,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16.h),
+                            Text(
+                              userName ?? "Not specified",
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              designation,
+                              style: TextStyle(
+                                color: ThemeClass.primaryGreen,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          userName ?? "Not specified",
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          designation,
-                          style: TextStyle(
-                            color: ThemeClass.primaryGreen,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
+                      ),
+                      SizedBox(height: 16.h),
 
-                  // Compact details in categories
-                  _buildSectionCard(context, "Personal Information", [
-                    _buildCompactRow(
-                      context,
-                      "Employee ID",
-                      empId,
-                      "Gender",
-                      gender,
-                    ),
-                    const Divider(height: 16),
-                    _buildCompactRow(
-                      context,
-                      "Date of Birth",
-                      dob,
-                      "Blood Group",
-                      bloodGroup,
-                    ),
-                  ]),
-                  SizedBox(height: 16.h),
+                      // Compact details in categories
+                      _buildSectionCard(context, "Personal Information", [
+                        _buildCompactRow(
+                          context,
+                          "Employee ID",
+                          empId,
+                          "Gender",
+                          gender,
+                        ),
+                        const Divider(height: 16),
+                        _buildCompactRow(
+                          context,
+                          "Date of Birth",
+                          dob,
+                          "Blood Group",
+                          bloodGroup,
+                        ),
+                      ]),
+                      SizedBox(height: 16.h),
 
-                  _buildSectionCard(context, "Contact & Address", [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildInfoItem(context, "Mobile", mobile ?? ""),
-                              SizedBox(height: 4.h),
-                              GestureDetector(
-                                onTap: _showUpdateMobileBottomSheet,
-                                child: Text(
-                                  "Edit Mobile",
-                                  style: TextStyle(
-                                    color: ThemeClass.warningColor,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.bold,
+                      _buildSectionCard(context, "Contact & Address", [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildInfoItem(
+                                    context,
+                                    "Mobile",
+                                    mobile ?? "",
                                   ),
-                                ),
+                                  SizedBox(height: 4.h),
+                                  GestureDetector(
+                                    onTap: _showUpdateMobileBottomSheet,
+                                    child: Text(
+                                      "Edit Mobile",
+                                      style: TextStyle(
+                                        color: ThemeClass.warningColor,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(width: 16.w),
+                            Expanded(
+                              child: _buildInfoItem(
+                                context,
+                                "Email",
+                                email ?? "",
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 16.w),
-                        Expanded(
-                          child: _buildInfoItem(context, "Email", email ?? ""),
+                        const Divider(height: 16),
+                        _buildCompactRow(
+                          context,
+                          "Emergency",
+                          emergencyContact,
+                          "Address",
+                          address,
                         ),
-                      ],
-                    ),
-                    const Divider(height: 16),
-                    _buildCompactRow(
-                      context,
-                      "Emergency",
-                      emergencyContact,
-                      "Address",
-                      address,
-                    ),
-                  ]),
-                  SizedBox(height: 16.h),
+                      ]),
+                      SizedBox(height: 16.h),
 
-                  _buildSectionCard(context, "Professional Details", [
-                    _buildCompactRow(
-                      context,
-                      "Department",
-                      department,
-                      "Reporting Manager",
-                      reportingTo,
-                    ),
-                    const Divider(height: 16),
-                    _buildCompactRow(
-                      context,
-                      "Date of Joining",
-                      doj,
-                      "Employment Type",
-                      employmentType,
-                    ),
-                    const Divider(height: 16),
-                    _buildCompactRow(
-                      context,
-                      "Office Location",
-                      officeLocation,
-                      "",
-                      "",
-                    ),
-                  ]),
-                  SizedBox(height: 16.h),
+                      _buildSectionCard(context, "Professional Details", [
+                        _buildCompactRow(
+                          context,
+                          "Department",
+                          department,
+                          "Reporting Manager",
+                          reportingTo,
+                        ),
+                        const Divider(height: 16),
+                        _buildCompactRow(
+                          context,
+                          "Date of Joining",
+                          doj,
+                          "Employment Type",
+                          employmentType,
+                        ),
+                        const Divider(height: 16),
+                        _buildCompactRow(
+                          context,
+                          "Office Location",
+                          officeLocation,
+                          "",
+                          "",
+                        ),
+                      ]),
+                      SizedBox(height: 16.h),
 
-                  _buildSectionCard(context, "Identity & Financial", [
-                    _buildCompactRow(
-                      context,
-                      "Aadhaar Number",
-                      aadhaar,
-                      "PAN Number",
-                      pan,
-                    ),
-                    const Divider(height: 16),
-                    _buildCompactRow(
-                      context,
-                      "Bank Details",
-                      bankDetails,
-                      "Salary",
-                      salary,
-                    ),
-                  ]),
-                  SizedBox(height: 24.h),
+                      _buildSectionCard(context, "Identity & Financial", [
+                        _buildCompactRow(
+                          context,
+                          "Aadhaar Number",
+                          aadhaar,
+                          "PAN Number",
+                          pan,
+                        ),
+                        const Divider(height: 16),
+                        _buildCompactRow(
+                          context,
+                          "Bank Details",
+                          bankDetails,
+                          "Salary",
+                          salary,
+                        ),
+                      ]),
+                      SizedBox(height: 24.h),
 
-                  CustomButton(
-                    backgroundColor: ThemeClass.errorColor,
-                    icon: Icons.logout,
-                    text: "Logout",
-                    onPressed: _logOut,
+                      CustomButton(
+                        backgroundColor: ThemeClass.errorColor,
+                        icon: Icons.logout,
+                        text: "Logout",
+                        onPressed: _logOut,
+                      ),
+                      SizedBox(height: 20.h),
+                    ],
                   ),
-                  SizedBox(height: 20.h),
-                ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
@@ -592,57 +618,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
           right: 16.w,
           top: 16.h,
         ),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(height: 10.h),
-              Text("Update Number", style: Theme.of(ctx).textTheme.bodySmall),
-              SizedBox(height: 20.h),
-              CustomTextField(
-                labelText: "Add Your Number",
-                isRequired: false,
-                hintText: "Enter number",
-                prefixIcon: Icons.phone,
-                keyboardType: TextInputType.number,
-                controller: controller,
-                maxLength: 10,
-                fillColor: Theme.of(context).scaffoldBackgroundColor,
-              ),
-              // TextFormField(
-              //   controller: controller,
-              //   keyboardType: TextInputType.phone,
-              //   maxLength: 10,
-              //   decoration: const InputDecoration(
-              //     border: OutlineInputBorder(),
-              //     labelText: "Mobile Number",
-              //     prefixText: "+91 ",
-              //     counterText: "",
-              //   ),
-              //   validator: (value) {
-              //     if (value == null || value.trim().isEmpty) {
-              //       return "Mobile number is required";
-              //     }
-              //     if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
-              //       return "Enter a valid 10-digit number";
-              //     }
-              //     return null;
-              //   },
-              // ),
-              SizedBox(height: 20.h),
-              CustomButton(
-                text: "Update",
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    final newMobile = controller.text.trim();
-                    Navigator.pop(ctx); // close modal
-                    _updateMobile(newMobile);
-                  }
-                },
-              ),
-              SizedBox(height: 30.h),
-            ],
+        child: ResponsiveFormWrapper(
+          maxWidth: 600,
+          padding: EdgeInsets.zero,
+          wrapInCardOnDesktop: false,
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 10.h),
+                Text("Update Number", style: Theme.of(ctx).textTheme.bodySmall),
+                SizedBox(height: 20.h),
+                CustomTextField(
+                  labelText: "Add Your Number",
+                  isRequired: false,
+                  hintText: "Enter number",
+                  prefixIcon: Icons.phone,
+                  keyboardType: TextInputType.number,
+                  controller: controller,
+                  maxLength: 10,
+                  fillColor: Theme.of(context).scaffoldBackgroundColor,
+                ),
+                SizedBox(height: 20.h),
+                CustomButton(
+                  text: "Update",
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      final newMobile = controller.text.trim();
+                      Navigator.pop(ctx); // close modal
+                      _updateMobile(newMobile);
+                    }
+                  },
+                ),
+                SizedBox(height: 30.h),
+              ],
+            ),
           ),
         ),
       ),

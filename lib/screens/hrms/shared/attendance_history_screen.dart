@@ -8,6 +8,7 @@ import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/page_loader.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class AttendanceHistoryScreen extends StatefulWidget {
   const AttendanceHistoryScreen({super.key});
@@ -218,24 +219,24 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
       title: "Attendance History",
       showBackButton: true,
       customActions: [
-          TextButton.icon(
-            onPressed: () {
-              Get.toNamed(Routes.regularizationRequest);
-            },
-            icon: Icon(
-              Icons.edit_calendar,
+        TextButton.icon(
+          onPressed: () {
+            Get.toNamed(Routes.regularizationRequest);
+          },
+          icon: Icon(
+            Icons.edit_calendar,
+            color: Theme.of(context).primaryColor,
+            size: 18,
+          ),
+          label: Text(
+            "Regularize",
+            style: TextStyle(
               color: Theme.of(context).primaryColor,
-              size: 18,
-            ),
-            label: Text(
-              "Regularize",
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.w600,
-              ),
+              fontWeight: FontWeight.w600,
             ),
           ),
-        ],
+        ),
+      ],
       child: SafeArea(
         child: Column(
           children: [
@@ -291,7 +292,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                             "Date Range",
                             style: TextStyle(
                               fontSize: 10.sp,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -441,12 +444,13 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                       totalHoursStr,
                     ),
                     Expanded(
-                      child: ListView.builder(
+                      child: ResponsiveGridListWrapper(
                         padding: EdgeInsets.symmetric(
                           horizontal: 12.w,
                           vertical: 12.h,
                         ),
                         itemCount: allDates.length,
+                        desktopChildAspectRatio: 5.0,
                         itemBuilder: (context, index) {
                           final date = allDates[index];
                           final dateString = DateFormat(
@@ -563,7 +567,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Theme.of(context).shadowColor.withOpacity(0.05),
+                                  color: Theme.of(
+                                    context,
+                                  ).shadowColor.withOpacity(0.05),
                                   blurRadius: 2,
                                   offset: const Offset(0, 1),
                                 ),
@@ -870,7 +876,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
                                     child: Text(
                                       statusText,
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onError,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onError,
                                         fontSize: 8.sp,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,

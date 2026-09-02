@@ -13,6 +13,7 @@ import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 final GlobalKey<AddTaskScreenState> addTaskKey =
     GlobalKey<AddTaskScreenState>();
@@ -285,153 +286,155 @@ class AddTaskScreenState extends State<AddTaskScreen> {
           },
         ),
       ],
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          children: [
-            CustomDropdownField<int>(
-              // fillColor: ThemeClass.darkBlue,
-              labelText: "Select Main Project",
-              isRequired: true,
-              hintText: "Select Main Project",
-              prefixIcon: Icons.work,
-              items: _projects
-                  .map(
-                    (p) => {
-                      "ID": p["ProjectId"],
-                      "Name": p["ProjectName"] ?? "",
-                    },
-                  )
-                  .toList(),
-              valueKey: "ID",
-              labelKey: "Name",
-              value: _selectedProjectId,
-              isEnabled: true,
-              onChanged: _onProjectChanged,
-            ),
-            SizedBox(height: 10.h),
-            CustomDropdownField<int>(
-              // fillColor: ThemeClass.darkBlue,
-              labelText: _selectedProjectId == null
-                  ? "Select Project First"
-                  : "Select Sub Project",
-              isRequired: true,
-              hintText: "Select Sub Project",
-              prefixIcon: Icons.work,
-              items: _filteredSubprojects
-                  .map(
-                    (sp) => {
-                      "ID": sp["SubProjectId"],
-                      "Name": sp["SubProjectName"] ?? "Unknown",
-                    },
-                  )
-                  .toList(),
-              valueKey: "ID",
-              labelKey: "Name",
-              value: _selectedSubProjectId,
-              isEnabled: _selectedProjectId != null,
-              onChanged: _onSubProjectChanged,
-            ),
-            SizedBox(height: 10.h),
-            CustomDropdownField<String>(
-              // fillColor: ThemeClass.darkBlue,
-              labelText: "Task Type",
-              isRequired: true,
-              hintText: "Select Task Mode",
-              prefixIcon: Icons.code,
-              items: _modes.map((m) => {"ID": m, "Name": m}).toList(),
-              valueKey: "ID",
-              labelKey: "Name",
-              value: _selectedMode,
-              isEnabled: true,
-              onChanged: (v) {
-                setState(() => _selectedMode = v);
-              },
-            ),
-            SizedBox(height: 10.h),
-            CustomTextField(
-              labelText: "Task Title",
-              isRequired: true,
-              hintText: "Enter Task Title",
-              prefixIcon: Icons.title,
-              keyboardType: TextInputType.text,
-              controller: _title,
-              // fillColor: ThemeClass.darkBlue,
-            ),
-            SizedBox(height: 10.h),
-            CustomTextField(
-              labelText: "Task Details",
-              isRequired: true,
-              hintText: "Enter Task Details",
-              prefixIcon: Icons.description,
-              keyboardType: TextInputType.text,
-              controller: _desc,
-              maxLines: 2,
-              // fillColor: ThemeClass.darkBlue,
-            ),
-            SizedBox(height: 10.h),
-            CustomDropdownField<String>(
-              // fillColor: ThemeClass.darkBlue,
-              labelText: "Task Status",
-              isRequired: true,
-              hintText: "Select Task Status",
-              prefixIcon: Icons.check_circle_outline,
-              items: _statuses.map((s) => {"ID": s, "Name": s}).toList(),
-              valueKey: "ID",
-              labelKey: "Name",
-              value: _selectedStatus,
-              isEnabled: true,
-              onChanged: (v) => setState(() => _selectedStatus = v),
-            ),
-            SizedBox(height: 10.h),
-            CustomDateField(
-              selectedDate: _selectedDate,
-              onTap: _pickDate,
-              labelText: "Select Date",
-              isRequired: true,
-              prefixIcon: Icons.calendar_today,
-              hintText: "Select Date",
-              // fillColor: ThemeClass.darkBlue,
-            ),
-            SizedBox(height: 10.h),
-            Row(
-              children: [
-                Flexible(
-                  child: CustomTimeField(
-                    // fillColor: ThemeClass.darkBlue,
-                    selectedTime: _startTime,
-                    onTap: _pickStartTime,
-                    labelText: "Start Time",
-                    isRequired: true,
-                    prefixIcon: Icons.access_time,
-                    hintText: "Start Time",
-                    validator: (time) {
-                      if (time == null) return "Start time is required";
-                      return null;
-                    },
+      child: ResponsiveFormWrapper(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            children: [
+              CustomDropdownField<int>(
+                // fillColor: ThemeClass.darkBlue,
+                labelText: "Select Main Project",
+                isRequired: true,
+                hintText: "Select Main Project",
+                prefixIcon: Icons.work,
+                items: _projects
+                    .map(
+                      (p) => {
+                        "ID": p["ProjectId"],
+                        "Name": p["ProjectName"] ?? "",
+                      },
+                    )
+                    .toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedProjectId,
+                isEnabled: true,
+                onChanged: _onProjectChanged,
+              ),
+              SizedBox(height: 10.h),
+              CustomDropdownField<int>(
+                // fillColor: ThemeClass.darkBlue,
+                labelText: _selectedProjectId == null
+                    ? "Select Project First"
+                    : "Select Sub Project",
+                isRequired: true,
+                hintText: "Select Sub Project",
+                prefixIcon: Icons.work,
+                items: _filteredSubprojects
+                    .map(
+                      (sp) => {
+                        "ID": sp["SubProjectId"],
+                        "Name": sp["SubProjectName"] ?? "Unknown",
+                      },
+                    )
+                    .toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedSubProjectId,
+                isEnabled: _selectedProjectId != null,
+                onChanged: _onSubProjectChanged,
+              ),
+              SizedBox(height: 10.h),
+              CustomDropdownField<String>(
+                // fillColor: ThemeClass.darkBlue,
+                labelText: "Task Type",
+                isRequired: true,
+                hintText: "Select Task Mode",
+                prefixIcon: Icons.code,
+                items: _modes.map((m) => {"ID": m, "Name": m}).toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedMode,
+                isEnabled: true,
+                onChanged: (v) {
+                  setState(() => _selectedMode = v);
+                },
+              ),
+              SizedBox(height: 10.h),
+              CustomTextField(
+                labelText: "Task Title",
+                isRequired: true,
+                hintText: "Enter Task Title",
+                prefixIcon: Icons.title,
+                keyboardType: TextInputType.text,
+                controller: _title,
+                // fillColor: ThemeClass.darkBlue,
+              ),
+              SizedBox(height: 10.h),
+              CustomTextField(
+                labelText: "Task Details",
+                isRequired: true,
+                hintText: "Enter Task Details",
+                prefixIcon: Icons.description,
+                keyboardType: TextInputType.text,
+                controller: _desc,
+                maxLines: 2,
+                // fillColor: ThemeClass.darkBlue,
+              ),
+              SizedBox(height: 10.h),
+              CustomDropdownField<String>(
+                // fillColor: ThemeClass.darkBlue,
+                labelText: "Task Status",
+                isRequired: true,
+                hintText: "Select Task Status",
+                prefixIcon: Icons.check_circle_outline,
+                items: _statuses.map((s) => {"ID": s, "Name": s}).toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedStatus,
+                isEnabled: true,
+                onChanged: (v) => setState(() => _selectedStatus = v),
+              ),
+              SizedBox(height: 10.h),
+              CustomDateField(
+                selectedDate: _selectedDate,
+                onTap: _pickDate,
+                labelText: "Select Date",
+                isRequired: true,
+                prefixIcon: Icons.calendar_today,
+                hintText: "Select Date",
+                // fillColor: ThemeClass.darkBlue,
+              ),
+              SizedBox(height: 10.h),
+              Row(
+                children: [
+                  Flexible(
+                    child: CustomTimeField(
+                      // fillColor: ThemeClass.darkBlue,
+                      selectedTime: _startTime,
+                      onTap: _pickStartTime,
+                      labelText: "Start Time",
+                      isRequired: true,
+                      prefixIcon: Icons.access_time,
+                      hintText: "Start Time",
+                      validator: (time) {
+                        if (time == null) return "Start time is required";
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                SizedBox(width: 20.w),
-                Flexible(
-                  child: CustomTimeField(
-                    // fillColor: ThemeClass.darkBlue,
-                    selectedTime: _endTime,
-                    onTap: _pickEndTime,
-                    labelText: "End Time",
-                    isRequired: true,
-                    prefixIcon: Icons.timer_off,
-                    hintText: "End Time",
-                    validator: (time) {
-                      if (time == null) return "End time is required";
-                      return null;
-                    },
+                  SizedBox(width: 20.w),
+                  Flexible(
+                    child: CustomTimeField(
+                      // fillColor: ThemeClass.darkBlue,
+                      selectedTime: _endTime,
+                      onTap: _pickEndTime,
+                      labelText: "End Time",
+                      isRequired: true,
+                      prefixIcon: Icons.timer_off,
+                      hintText: "End Time",
+                      validator: (time) {
+                        if (time == null) return "End time is required";
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 24.h),
-            CustomButton(icon: Icons.save, text: "Save Task", onPressed: _save),
-          ],
+                ],
+              ),
+              SizedBox(height: 24.h),
+              CustomButton(icon: Icons.save, text: "Save Task", onPressed: _save),
+            ],
+          ),
         ),
       ),
     );

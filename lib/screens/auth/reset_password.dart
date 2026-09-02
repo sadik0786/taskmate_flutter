@@ -9,6 +9,7 @@ import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -129,22 +130,25 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           },
         ),
       ],
-      child: Padding(
-        padding: EdgeInsets.all(24.w),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Header Section
-              _buildHeaderSection(),
-              SizedBox(height: 40.h),
-              // Progress Indicator
-              _buildProgressIndicator(),
-              SizedBox(height: 40.h),
-              // Content based on step
-              if (!_emailVerified) _buildEmailVerificationStep(),
-              if (_emailVerified) _buildPasswordResetStep(),
-            ],
+      child: ResponsiveFormWrapper(
+        maxWidth: 500,
+        child: Padding(
+          padding: EdgeInsets.all(24.w),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                // Header Section
+                _buildHeaderSection(),
+                SizedBox(height: 40.h),
+                // Progress Indicator
+                _buildProgressIndicator(),
+                SizedBox(height: 40.h),
+                // Content based on step
+                if (!_emailVerified) _buildEmailVerificationStep(),
+                if (_emailVerified) _buildPasswordResetStep(),
+              ],
+            ),
           ),
         ),
       ),

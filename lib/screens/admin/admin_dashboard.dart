@@ -81,15 +81,17 @@ class AdminDashboardState extends State<AdminDashboard> {
     loadSummaryData();
   }
 
+  List<Color> _getGradient(Color baseColor) {
+    return [baseColor, baseColor.withOpacity(0.7)];
+  }
+
   List<_DashboardItem> _getMenuItems(BuildContext context) {
-    final primaryColor = Theme.of(context).primaryColor;
-    final standardGradient = [primaryColor, primaryColor.withOpacity(0.8)];
     if (role == "ceo" || role == "hr") {
       return [
         _DashboardItem(
           title: 'Add Employee',
-          icon: Icons.person_add,
-          gradient: standardGradient,
+          icon: Icons.person_add_rounded,
+          gradient: _getGradient(const Color(0xFF8B5CF6)), // Purple
           onTap: () async {
             await Get.toNamed(Routes.registerScreen);
             loadSummaryData();
@@ -97,8 +99,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Employee',
-          icon: Icons.people,
-          gradient: standardGradient,
+          icon: Icons.people_rounded,
+          gradient: _getGradient(const Color(0xFF3B82F6)), // Blue
           onTap: () async {
             await Get.toNamed(Routes.employeeScreen);
             loadSummaryData();
@@ -106,8 +108,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'My Profile',
-          icon: Icons.account_circle,
-          gradient: standardGradient,
+          icon: Icons.account_circle_rounded,
+          gradient: _getGradient(const Color(0xFF14B8A6)), // Teal
           onTap: () async {
             await Get.toNamed(Routes.profileScreen);
             loadSummaryData();
@@ -115,16 +117,16 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Holidays',
-          icon: Icons.celebration,
-          gradient: standardGradient,
+          icon: Icons.celebration_rounded,
+          gradient: _getGradient(const Color(0xFFF59E0B)), // Amber
           onTap: () {
             Get.to(() => const HolidaysScreen());
           },
         ),
         _DashboardItem(
           title: 'View Timeline',
-          icon: Icons.history,
-          gradient: standardGradient,
+          icon: Icons.history_rounded,
+          gradient: _getGradient(const Color(0xFF6366F1)), // Indigo
           onTap: () {
             Get.to(() => const AttendanceHistoryScreen());
           },
@@ -135,8 +137,8 @@ class AdminDashboardState extends State<AdminDashboard> {
       return [
         _DashboardItem(
           title: 'Add Employee',
-          icon: Icons.person_add,
-          gradient: standardGradient,
+          icon: Icons.person_add_rounded,
+          gradient: _getGradient(const Color(0xFF8B5CF6)),
           onTap: () async {
             await Get.toNamed(Routes.registerScreen);
             loadSummaryData();
@@ -144,8 +146,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Employee',
-          icon: Icons.people,
-          gradient: standardGradient,
+          icon: Icons.people_rounded,
+          gradient: _getGradient(const Color(0xFF3B82F6)),
           onTap: () async {
             await Get.toNamed(Routes.employeeScreen);
             loadSummaryData();
@@ -153,8 +155,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Task Details',
-          icon: Icons.task,
-          gradient: standardGradient,
+          icon: Icons.task_rounded,
+          gradient: _getGradient(const Color(0xFF10B981)), // Green
           onTap: () async {
             await Get.toNamed(Routes.employeeTaskScreen);
             loadSummaryData();
@@ -162,8 +164,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Reset Password',
-          icon: Icons.password_sharp,
-          gradient: standardGradient,
+          icon: Icons.lock_reset_rounded,
+          gradient: _getGradient(const Color(0xFFEF4444)), // Red
           onTap: () async {
             await Get.toNamed(Routes.resetPasswordPage);
             loadSummaryData();
@@ -171,8 +173,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'My Profile',
-          icon: Icons.account_circle,
-          gradient: standardGradient,
+          icon: Icons.account_circle_rounded,
+          gradient: _getGradient(const Color(0xFF14B8A6)),
           onTap: () async {
             await Get.toNamed(Routes.profileScreen);
             loadSummaryData();
@@ -180,8 +182,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Manage Leave',
-          icon: Icons.manage_history,
-          gradient: standardGradient,
+          icon: Icons.manage_history_rounded,
+          gradient: _getGradient(const Color(0xFF06B6D4)), // Cyan
           onTap: () async {
             await Get.toNamed(Routes.hrmsDashboard);
             loadSummaryData();
@@ -189,32 +191,32 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Attendance Report',
-          icon: Icons.assignment_ind,
-          gradient: standardGradient,
+          icon: Icons.assignment_ind_rounded,
+          gradient: _getGradient(const Color(0xFF8B5CF6)),
           onTap: () {
             Get.toNamed(Routes.adminAttendanceReport);
           },
         ),
         _DashboardItem(
           title: 'Regularization',
-          icon: Icons.edit_calendar,
-          gradient: standardGradient,
+          icon: Icons.edit_calendar_rounded,
+          gradient: _getGradient(const Color(0xFFF43F5E)), // Rose
           onTap: () {
             Get.toNamed(Routes.adminRegularizationRequests);
           },
         ),
         _DashboardItem(
           title: 'Company Holidays',
-          icon: Icons.celebration,
-          gradient: standardGradient,
+          icon: Icons.celebration_rounded,
+          gradient: _getGradient(const Color(0xFFF59E0B)),
           onTap: () {
             Get.to(() => const HolidaysScreen());
           },
         ),
         _DashboardItem(
           title: 'View Timeline',
-          icon: Icons.history,
-          gradient: standardGradient,
+          icon: Icons.history_rounded,
+          gradient: _getGradient(const Color(0xFF6366F1)),
           onTap: () {
             Get.to(() => const AttendanceHistoryScreen());
           },
@@ -224,8 +226,8 @@ class AdminDashboardState extends State<AdminDashboard> {
       return [
         _DashboardItem(
           title: 'Add Employee',
-          icon: Icons.person_add,
-          gradient: standardGradient,
+          icon: Icons.person_add_rounded,
+          gradient: _getGradient(const Color(0xFF8B5CF6)),
           onTap: () async {
             await Get.toNamed(Routes.registerScreen);
             loadSummaryData();
@@ -233,24 +235,24 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Attendance Report',
-          icon: Icons.assignment_ind,
-          gradient: standardGradient,
+          icon: Icons.assignment_ind_rounded,
+          gradient: _getGradient(const Color(0xFF8B5CF6)),
           onTap: () {
             Get.toNamed(Routes.adminAttendanceReport);
           },
         ),
         _DashboardItem(
           title: 'Regularization',
-          icon: Icons.edit_calendar,
-          gradient: standardGradient,
+          icon: Icons.edit_calendar_rounded,
+          gradient: _getGradient(const Color(0xFFF43F5E)),
           onTap: () {
             Get.toNamed(Routes.adminRegularizationRequests);
           },
         ),
         _DashboardItem(
           title: 'Employee',
-          icon: Icons.people,
-          gradient: standardGradient,
+          icon: Icons.people_rounded,
+          gradient: _getGradient(const Color(0xFF3B82F6)),
           onTap: () async {
             await Get.toNamed(Routes.employeeScreen);
             loadSummaryData();
@@ -258,8 +260,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Add Project',
-          icon: Icons.library_add,
-          gradient: standardGradient,
+          icon: Icons.library_add_rounded,
+          gradient: _getGradient(const Color(0xFFEC4899)), // Pink
           onTap: () async {
             await Get.toNamed(Routes.projectScreen);
             loadSummaryData();
@@ -267,8 +269,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Add Task',
-          icon: Icons.add_task,
-          gradient: standardGradient,
+          icon: Icons.add_task_rounded,
+          gradient: _getGradient(const Color(0xFF06B6D4)),
           onTap: () async {
             await Get.toNamed(Routes.addTaskScreen);
             loadSummaryData();
@@ -276,8 +278,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Task Details',
-          icon: Icons.task,
-          gradient: standardGradient,
+          icon: Icons.task_rounded,
+          gradient: _getGradient(const Color(0xFF10B981)),
           onTap: () async {
             await Get.toNamed(Routes.taskScreen);
             loadSummaryData();
@@ -285,8 +287,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'My Profile',
-          icon: Icons.account_circle,
-          gradient: standardGradient,
+          icon: Icons.account_circle_rounded,
+          gradient: _getGradient(const Color(0xFF14B8A6)),
           onTap: () async {
             await Get.toNamed(Routes.profileScreen);
             loadSummaryData();
@@ -294,16 +296,16 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
         _DashboardItem(
           title: 'Company Holidays',
-          icon: Icons.celebration,
-          gradient: standardGradient,
+          icon: Icons.celebration_rounded,
+          gradient: _getGradient(const Color(0xFFF59E0B)),
           onTap: () {
             Get.to(() => const HolidaysScreen());
           },
         ),
         _DashboardItem(
           title: 'View Timeline',
-          icon: Icons.history,
-          gradient: standardGradient,
+          icon: Icons.history_rounded,
+          gradient: _getGradient(const Color(0xFF6366F1)),
           onTap: () {
             Get.to(() => const AttendanceHistoryScreen());
           },
@@ -320,95 +322,86 @@ class AdminDashboardState extends State<AdminDashboard> {
     required IconData icon,
     required Color color,
   }) {
+    bool isHovered = false;
     return StatefulBuilder(
       builder: (context, setState) {
         return MouseRegion(
           cursor: SystemMouseCursors.click,
-          onEnter: (_) => setState(() {}),
-          onExit: (_) => setState(() {}),
-          child: AnimatedScale(
-            scale: 1.0,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutBack,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color.withOpacity(0.8), color.withOpacity(1.0)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.4),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            margin: EdgeInsets.symmetric(horizontal: 6.w, vertical: 8.h),
+            padding: EdgeInsets.all(24.w),
+            transform: Matrix4.identity()
+              ..translate(0.0, isHovered ? -6.0 : 0.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: isHovered
+                    ? color.withOpacity(0.5)
+                    : Theme.of(context).dividerColor.withOpacity(0.05),
+                width: 1.5,
               ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned(
-                    right: -10,
-                    top: -10,
-                    child: Icon(
-                      icon,
-                      size: 60.sp,
-                      color: Colors.white.withOpacity(0.2),
-                    ),
+              boxShadow: [
+                BoxShadow(
+                  color: isHovered
+                      ? color.withOpacity(0.15)
+                      : Theme.of(context).shadowColor.withOpacity(0.03),
+                  blurRadius: isHovered ? 24 : 12,
+                  offset: Offset(0, isHovered ? 12 : 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
-                  Column(
+                  child: Icon(icon, size: 36.sp, color: color),
+                ),
+                SizedBox(width: 20.w),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(12.w),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(16.r),
-                            ),
-                            child: Icon(icon, size: 28.sp, color: Colors.white),
-                          ),
-                          Text(
-                            value.toString(),
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              shadows: const [
-                                Shadow(
-                                  color: Colors.black26,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10.h),
                       Text(
                         title,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14.sp,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        value.toString(),
+                        style: TextStyle(
+                          fontSize: 28.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          height: 1.0,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: isHovered ? 1.0 : 0.0,
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: color.withOpacity(0.5),
+                    size: 16.sp,
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -424,7 +417,7 @@ class AdminDashboardState extends State<AdminDashboard> {
         ResponsiveLayout.isTablet(context);
 
     return BaseLayout(
-      title: "Task Mate",
+      title: "Dashboard",
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
         child: isLoadingSummary
@@ -449,24 +442,24 @@ class AdminDashboardState extends State<AdminDashboard> {
                             child: _summaryCard(
                               title: "Total Employees",
                               value: totalEmployees,
-                              icon: Icons.people,
-                              color: Colors.blueAccent,
+                              icon: Icons.people_alt_rounded,
+                              color: const Color(0xFF3B82F6), // Blue
                             ),
                           ),
                           Expanded(
                             child: _summaryCard(
                               title: "Total Projects",
                               value: totalProjects,
-                              icon: Icons.library_books,
-                              color: Colors.greenAccent.shade700,
+                              icon: Icons.layers_rounded,
+                              color: const Color(0xFF10B981), // Emerald Green
                             ),
                           ),
                           Expanded(
                             child: _summaryCard(
                               title: "Total Tasks",
                               value: totalTasks,
-                              icon: Icons.task_alt,
-                              color: Colors.orangeAccent.shade700,
+                              icon: Icons.task_alt_rounded,
+                              color: const Color(0xFFF59E0B), // Amber
                             ),
                           ),
                         ],
@@ -477,20 +470,20 @@ class AdminDashboardState extends State<AdminDashboard> {
                           _summaryCard(
                             title: "Total Employees",
                             value: totalEmployees,
-                            icon: Icons.people,
-                            color: Colors.blueAccent,
+                            icon: Icons.people_alt_rounded,
+                            color: const Color(0xFF3B82F6),
                           ),
                           _summaryCard(
                             title: "Total Projects",
                             value: totalProjects,
-                            icon: Icons.library_books,
-                            color: Colors.greenAccent.shade700,
+                            icon: Icons.layers_rounded,
+                            color: const Color(0xFF10B981),
                           ),
                           _summaryCard(
                             title: "Total Tasks",
                             value: totalTasks,
-                            icon: Icons.task_alt,
-                            color: Colors.orangeAccent.shade700,
+                            icon: Icons.task_alt_rounded,
+                            color: const Color(0xFFF59E0B),
                           ),
                         ],
                       ),
@@ -565,98 +558,80 @@ class _ModernCardState extends State<_ModernCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primaryColor = widget.item.gradient[0];
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: widget.item.onTap,
-        child: AnimatedScale(
-          scale: _isHovered ? 1.05 : 1.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutBack,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: _isHovered
-                    ? widget.item.gradient
-                    : [theme.colorScheme.surface, theme.colorScheme.surface],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: _isHovered
-                    ? Colors.transparent
-                    : theme.colorScheme.outlineVariant.withOpacity(0.3),
-                width: 1,
-              ),
-              boxShadow: _isHovered
-                  ? [
-                      BoxShadow(
-                        color: widget.item.gradient[0].withOpacity(0.3),
-                        blurRadius: 12,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: theme.colorScheme.shadow.withOpacity(0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()
+            ..translate(0.0, _isHovered ? -8.0 : 0.0),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              color: _isHovered
+                  ? primaryColor.withOpacity(0.5)
+                  : theme.dividerColor.withOpacity(0.05),
+              width: _isHovered ? 2 : 1,
             ),
-            child: Stack(
+            boxShadow: [
+              BoxShadow(
+                color: _isHovered
+                    ? primaryColor.withOpacity(0.2)
+                    : theme.shadowColor.withOpacity(0.03),
+                blurRadius: _isHovered ? 20 : 10,
+                offset: Offset(0, _isHovered ? 10 : 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (_isHovered)
-                  Positioned(
-                    right: -20,
-                    top: -20,
-                    child: Icon(
-                      widget.item.icon,
-                      size: 100.sp,
-                      color: Colors.white.withOpacity(0.2),
-                    ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: _isHovered
+                        ? primaryColor
+                        : primaryColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                    boxShadow: _isHovered
+                        ? [
+                            BoxShadow(
+                              color: primaryColor.withOpacity(0.4),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
                   ),
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: EdgeInsets.all(12.w),
-                        decoration: BoxDecoration(
-                          color: _isHovered
-                              ? Colors.white.withOpacity(0.2)
-                              : widget.item.gradient[0].withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          widget.item.icon,
-                          size: 28.sp,
-                          color: _isHovered
-                              ? Colors.white
-                              : widget.item.gradient[0],
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        widget.item.title,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13.sp,
-                          color: _isHovered
-                              ? Colors.white
-                              : theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
+                  child: Icon(
+                    widget.item.icon,
+                    size: 28.sp,
+                    color: _isHovered ? Colors.white : primaryColor,
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  widget.item.title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.sp,
+                    color: _isHovered
+                        ? primaryColor
+                        : theme.colorScheme.onSurface,
                   ),
                 ),
               ],

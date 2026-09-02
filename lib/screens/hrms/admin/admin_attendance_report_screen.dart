@@ -6,6 +6,7 @@ import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/page_loader.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class AdminAttendanceReportScreen extends StatefulWidget {
   const AdminAttendanceReportScreen({super.key});
@@ -139,9 +140,10 @@ class _AdminAttendanceReportScreenState
                 );
               }
 
-              return ListView.builder(
+              return ResponsiveGridListWrapper(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 itemCount: controller.adminAttendanceReport.length,
+                desktopChildAspectRatio: 3.5,
                 itemBuilder: (context, index) {
                   final record = controller.adminAttendanceReport[index];
                   return _buildEmployeeCard(record, context);

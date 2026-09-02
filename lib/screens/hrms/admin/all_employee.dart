@@ -8,6 +8,7 @@ import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/page_loader.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 import 'package:intl/intl.dart';
 
 class AllLeavesReport extends StatefulWidget {
@@ -163,7 +164,9 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                                   leave.leaveTypeName,
                                   style: TextStyle(
                                     fontSize: 10.sp,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -225,8 +228,9 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                 return const NoTasksWidget(message: "No Leaves Found");
               }
 
-              return ListView.builder(
+              return ResponsiveGridListWrapper(
                 itemCount: leaves.length,
+                desktopChildAspectRatio: 3.5,
                 itemBuilder: (context, index) {
                   return _buildLeaveCard(leaves[index]);
                 },

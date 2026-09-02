@@ -9,6 +9,7 @@ import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class RegularizationRequestScreen extends StatefulWidget {
   const RegularizationRequestScreen({super.key});
@@ -43,8 +44,12 @@ class _RegularizationRequestScreenState
       builder: (ctx) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            return Container(
-              padding: EdgeInsets.only(
+            return ResponsiveFormWrapper(
+              maxWidth: 600,
+              padding: EdgeInsets.zero,
+              wrapInCardOnDesktop: false,
+              child: Container(
+                padding: EdgeInsets.only(
                 top: 16.h,
                 left: 20.w,
                 right: 20.w,
@@ -216,7 +221,7 @@ class _RegularizationRequestScreenState
                   ),
                 ],
               ),
-            );
+            ));
           },
         );
       },
@@ -329,9 +334,10 @@ class _RegularizationRequestScreenState
           );
         }
 
-        return ListView.builder(
+        return ResponsiveGridListWrapper(
           padding: EdgeInsets.all(16.w),
           itemCount: controller.myRegularizations.length,
+          desktopChildAspectRatio: 3.5,
           itemBuilder: (context, index) {
             final item = controller.myRegularizations[index];
             return _buildHistoryCard(item, context);

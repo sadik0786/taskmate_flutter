@@ -7,6 +7,7 @@ import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/page_loader.dart';
 import 'package:task_mate/widgets/no_data.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class AdminRegularizationRequestsScreen extends StatefulWidget {
   const AdminRegularizationRequestsScreen({super.key});
@@ -18,7 +19,9 @@ class AdminRegularizationRequestsScreen extends StatefulWidget {
 
 class _AdminRegularizationRequestsScreenState
     extends State<AdminRegularizationRequestsScreen> {
-  final RegularizationController controller = Get.put(RegularizationController());
+  final RegularizationController controller = Get.put(
+    RegularizationController(),
+  );
 
   @override
   void initState() {
@@ -34,7 +37,9 @@ class _AdminRegularizationRequestsScreenState
       builder: (context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
           title: Text(
             "$action Request",
             style: TextStyle(
@@ -66,7 +71,12 @@ class _AdminRegularizationRequestsScreenState
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -81,12 +91,17 @@ class _AdminRegularizationRequestsScreenState
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: action == "Approve" ? ThemeClass.successColor : ThemeClass.errorColor,
+                backgroundColor: action == "Approve"
+                    ? ThemeClass.successColor
+                    : ThemeClass.errorColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
-              child: Text("Confirm", style: const TextStyle(color: Colors.white)),
+              child: Text(
+                "Confirm",
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -109,9 +124,10 @@ class _AdminRegularizationRequestsScreenState
           return const NoTasksWidget(message: "No pending requests found.");
         }
 
-        return ListView.builder(
+        return ResponsiveGridListWrapper(
           padding: EdgeInsets.all(16.w),
           itemCount: controller.pendingRegularizations.length,
+          desktopChildAspectRatio: 3.5,
           itemBuilder: (context, index) {
             final item = controller.pendingRegularizations[index];
             return _buildRequestCard(item, context);
@@ -123,7 +139,9 @@ class _AdminRegularizationRequestsScreenState
 
   Widget _buildRequestCard(dynamic item, BuildContext context) {
     final date = DateTime.tryParse(item["TargetDate"] ?? "");
-    final dateStr = date != null ? DateFormat('EEEE, dd MMM yyyy').format(date) : "Unknown Date";
+    final dateStr = date != null
+        ? DateFormat('EEEE, dd MMM yyyy').format(date)
+        : "Unknown Date";
 
     String reqIn = "--:--";
     if (item["RequestedCheckInTime"] != null) {
@@ -187,7 +205,11 @@ class _AdminRegularizationRequestsScreenState
           SizedBox(height: 12.h),
           Row(
             children: [
-              Icon(Icons.calendar_today, size: 14.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.calendar_today,
+                size: 14.sp,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               SizedBox(width: 6.w),
               Text(
                 dateStr,
@@ -203,17 +225,33 @@ class _AdminRegularizationRequestsScreenState
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withOpacity(0.1),
+              ),
             ),
             child: Row(
               children: [
                 Expanded(
-                  child: _buildTimeCol("Req In", reqIn, Icons.login, Colors.blue, context),
+                  child: _buildTimeCol(
+                    "Req In",
+                    reqIn,
+                    Icons.login,
+                    Colors.blue,
+                    context,
+                  ),
                 ),
                 Expanded(
-                  child: _buildTimeCol("Req Out", reqOut, Icons.logout, Colors.orange, context),
+                  child: _buildTimeCol(
+                    "Req Out",
+                    reqOut,
+                    Icons.logout,
+                    Colors.orange,
+                    context,
+                  ),
                 ),
               ],
             ),
@@ -261,7 +299,10 @@ class _AdminRegularizationRequestsScreenState
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
-                  child: const Text("Approve", style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    "Approve",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -271,7 +312,13 @@ class _AdminRegularizationRequestsScreenState
     );
   }
 
-  Widget _buildTimeCol(String label, String time, IconData icon, Color color, BuildContext context) {
+  Widget _buildTimeCol(
+    String label,
+    String time,
+    IconData icon,
+    Color color,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

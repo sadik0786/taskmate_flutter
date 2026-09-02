@@ -9,6 +9,7 @@ import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/responsive_layout.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -36,131 +37,128 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
       ],
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                children: [
-                  Obx(
-                    () => Card(
-                      color: Theme.of(context).cardColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                      elevation: 4,
-                      shadowColor: Theme.of(
-                        context,
-                      ).shadowColor.withOpacity(0.1),
+      child: ResponsiveFormWrapper(
+        maxWidth: 700,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              children: [
+                Obx(
+                  () => Card(
+                    color: Theme.of(context).cardColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    elevation: 4,
+                    shadowColor: Theme.of(context).shadowColor.withOpacity(0.1),
 
-                      child: Padding(
-                        padding: EdgeInsets.all(12.w),
-                        child: Row(
+                    child: Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Icon(Icons.person, color: ThemeClass.lightBgColor),
+                          // SizedBox(width: 15.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                registerController.userName.value.toUpperCase(),
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Text(
+                                "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
+                                    ? "HR / Accountant / Manager"
+                                    : registerController.currentUserRole.value.toLowerCase() == "hr"
+                                    ? "Admin / Employees"
+                                    : "No permission"}",
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withOpacity(0.7),
+                                      fontWeight: FontWeight.w400,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: 16.h),
+                      if (ResponsiveLayout.isDesktop(context))
+                        Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Icon(Icons.person, color: ThemeClass.lightBgColor),
-                            // SizedBox(width: 15.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  registerController.userName.value
-                                      .toUpperCase(),
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
-                                ),
-                                Text(
-                                  "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
-                                      ? "HR / Accountant / Manager"
-                                      : registerController.currentUserRole.value.toLowerCase() == "hr"
-                                      ? "Admin / Employees"
-                                      : "No permission"}",
-                                  style: Theme.of(context).textTheme.titleSmall
-                                      ?.copyWith(
-                                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
-                                        fontWeight: FontWeight.w400,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                ),
-                              ],
-                            ),
+                            Expanded(child: _buildRoleDropdown()),
+                            SizedBox(width: 16.w),
+                            Expanded(child: _buildAssignDropdown()),
                           ],
+                        )
+                      else ...[
+                        _buildRoleDropdown(),
+                        SizedBox(height: 10.h),
+                        _buildAssignDropdown(),
+                      ],
+                      SizedBox(height: 10.h),
+                      if (ResponsiveLayout.isDesktop(context))
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildNameField()),
+                            SizedBox(width: 16.w),
+                            Expanded(child: _buildEmailField()),
+                          ],
+                        )
+                      else ...[
+                        _buildNameField(),
+                        SizedBox(height: 10.h),
+                        _buildEmailField(),
+                      ],
+                      SizedBox(height: 10.h),
+                      if (ResponsiveLayout.isDesktop(context))
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildMobileField()),
+                            SizedBox(width: 16.w),
+                            Expanded(child: _buildPasswordField()),
+                          ],
+                        )
+                      else ...[
+                        _buildMobileField(),
+                        SizedBox(height: 10.h),
+                        _buildPasswordField(),
+                      ],
+                      SizedBox(height: 20.h),
+                      Obx(
+                        () => CustomButton(
+                          text: "Submit",
+                          onPressed: () =>
+                              registerController.register(_formKey),
+                          isLoading: registerController.loading.value,
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(height: 16.h),
-                        if (ResponsiveLayout.isDesktop(context))
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: _buildRoleDropdown()),
-                              SizedBox(width: 16.w),
-                              Expanded(child: _buildAssignDropdown()),
-                            ],
-                          )
-                        else ...[
-                          _buildRoleDropdown(),
-                          SizedBox(height: 10.h),
-                          _buildAssignDropdown(),
-                        ],
-                        SizedBox(height: 10.h),
-                        if (ResponsiveLayout.isDesktop(context))
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: _buildNameField()),
-                              SizedBox(width: 16.w),
-                              Expanded(child: _buildEmailField()),
-                            ],
-                          )
-                        else ...[
-                          _buildNameField(),
-                          SizedBox(height: 10.h),
-                          _buildEmailField(),
-                        ],
-                        SizedBox(height: 10.h),
-                        if (ResponsiveLayout.isDesktop(context))
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: _buildMobileField()),
-                              SizedBox(width: 16.w),
-                              Expanded(child: _buildPasswordField()),
-                            ],
-                          )
-                        else ...[
-                          _buildMobileField(),
-                          SizedBox(height: 10.h),
-                          _buildPasswordField(),
-                        ],
-                        SizedBox(height: 20.h),
-                        Obx(
-                          () => CustomButton(
-                            text: "Submit",
-                            onPressed: () =>
-                                registerController.register(_formKey),
-                            isLoading: registerController.loading.value,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -325,7 +323,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: CircularProgressIndicator(strokeWidth: 2.w),
             ),
             SizedBox(width: 12.h),
-            Text("Loading roles...", style: Theme.of(context).textTheme.bodyLarge),
+            Text(
+              "Loading roles...",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
           ],
         ),
       );

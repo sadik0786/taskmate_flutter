@@ -16,6 +16,7 @@ import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/widgets/base_layout.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key});
@@ -167,135 +168,140 @@ class _ProjectScreenState extends State<ProjectScreen> {
         ),
       ],
       child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 10.h),
-                if (userRole == "admin") ...[
-                  CustomTextField(
-                    labelText: "Project Name",
-                    isRequired: true,
-                    hintText: "Enter project name",
-                    prefixIcon: Icons.library_add,
-                    controller: _name,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Project cannot be empty";
-                      }
-                      return null;
-                    },
+        child: ResponsiveFormWrapper(
+          maxWidth: 800,
+          child: Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 10.h),
+                  if (userRole == "admin") ...[
+                    CustomTextField(
+                      labelText: "Project Name",
+                      isRequired: true,
+                      hintText: "Enter project name",
+                      prefixIcon: Icons.library_add,
+                      controller: _name,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Project cannot be empty";
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20.h),
+                    CustomButton(
+                      text: "Add Project",
+                      onPressed: _addProject,
+                      isLoading: _loading,
+                    ),
+                    SizedBox(height: 20.h),
+                  ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "All Projects",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _showAddSubProjectBottomSheet,
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ),
+                            side: BorderSide(
+                              color: ThemeClass.warningColor,
+                              width: 1,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            minimumSize: const Size(0, 32),
+                          ),
+                          icon: Icon(
+                            Icons.add,
+                            size: 16.sp,
+                            color: ThemeClass.textWhite,
+                          ),
+                          label: Text(
+                            "SubProject",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 20.h),
-                  CustomButton(
-                    text: "Add Project",
-                    onPressed: _addProject,
-                    isLoading: _loading,
+                  SizedBox(height: 10.h),
+                  Expanded(
+                    child: _loadingProjects
+                        ? const PageLoader()
+                        : _projects.isEmpty
+                        ? Center(
+                            child: NoTasksWidget(message: "No project added!"),
+                          )
+                        : ListView.separated(
+                            itemCount: _projects.length,
+                            separatorBuilder: (_, _) => Divider(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            itemBuilder: (context, index) {
+                              final project = _projects[index];
+                              final creatorName =
+                                  project["creatorName"] ?? "Unknown";
+                              final createdAt = project["createdAt"] != null
+                                  ? DateFormat('dd/MM/yyyy hh:mm a').format(
+                                      DateTime.parse(project["createdAt"]),
+                                    )
+                                  : "";
+                              return ListTile(
+                                dense: true,
+                                minTileHeight: 10.0.h,
+                                minVerticalPadding: 0,
+                                leading: Icon(
+                                  Icons.folder,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                title: Text(
+                                  "Project: ${project["ProjectName"].toString().toUpperCase()}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(color: ThemeClass.textWhite),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Created by: $creatorName",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                            color: ThemeClass.warningColor,
+                                          ),
+                                    ),
+                                    Text(
+                                      "Date: $createdAt",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(color: ThemeClass.darkBlue),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                   ),
-                  SizedBox(height: 20.h),
                 ],
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "All Projects",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: _showAddSubProjectBottomSheet,
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 4.h,
-                          ),
-                          side: BorderSide(
-                            color: ThemeClass.warningColor,
-                            width: 1,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          minimumSize: const Size(0, 32),
-                        ),
-                        icon: Icon(
-                          Icons.add,
-                          size: 16.sp,
-                          color: ThemeClass.textWhite,
-                        ),
-                        label: Text(
-                          "SubProject",
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.h),
-                Expanded(
-                  child: _loadingProjects
-                      ? const PageLoader()
-                      : _projects.isEmpty
-                      ? Center(
-                          child: NoTasksWidget(message: "No project added!"),
-                        )
-                      : ListView.separated(
-                          itemCount: _projects.length,
-                          separatorBuilder: (_, _) => Divider(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          itemBuilder: (context, index) {
-                            final project = _projects[index];
-                            final creatorName =
-                                project["creatorName"] ?? "Unknown";
-                            final createdAt = project["createdAt"] != null
-                                ? DateFormat(
-                                    'dd/MM/yyyy hh:mm a',
-                                  ).format(DateTime.parse(project["createdAt"]))
-                                : "";
-                            return ListTile(
-                              dense: true,
-                              minTileHeight: 10.0.h,
-                              minVerticalPadding: 0,
-                              leading: Icon(
-                                Icons.folder,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              title: Text(
-                                "Project: ${project["ProjectName"].toString().toUpperCase()}",
-                                style: Theme.of(context).textTheme.titleMedium!
-                                    .copyWith(color: ThemeClass.textWhite),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Created by: $creatorName",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                          color: ThemeClass.warningColor,
-                                        ),
-                                  ),
-                                  Text(
-                                    "Date: $createdAt",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(color: ThemeClass.darkBlue),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

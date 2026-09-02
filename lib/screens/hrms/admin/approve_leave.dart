@@ -11,6 +11,7 @@ import 'package:task_mate/utils/common_fn.dart';
 import 'package:task_mate/widgets/custom_button.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class ApproveLeave extends StatefulWidget {
   const ApproveLeave({super.key});
@@ -42,8 +43,9 @@ class _ApproveLeaveState extends State<ApproveLeave> {
             return NoTasksWidget(message: "No pending leave requests");
           }
 
-          return ListView.builder(
+          return ResponsiveGridListWrapper(
             itemCount: pendingLeaves.length,
+            desktopChildAspectRatio: 3.5,
             itemBuilder: (context, index) {
               return _approvalCard(pendingLeaves[index]);
             },

@@ -29,12 +29,17 @@ class BaseLayout extends StatefulWidget {
 }
 
 class _BaseLayoutState extends State<BaseLayout> {
+  static String? _cachedUserName;
+  static String? _cachedRole;
+
   String? userName;
   String role = "employee";
 
   @override
   void initState() {
     super.initState();
+    userName = _cachedUserName;
+    role = _cachedRole ?? "employee";
     _loadUser();
   }
 
@@ -43,6 +48,8 @@ class _BaseLayoutState extends State<BaseLayout> {
     setState(() {
       userName = prefs.getString("name");
       role = prefs.getString("role")?.toLowerCase() ?? "employee";
+      _cachedUserName = userName;
+      _cachedRole = role;
     });
   }
 
@@ -73,15 +80,20 @@ class _BaseLayoutState extends State<BaseLayout> {
                     customActions: widget.customActions,
                   ),
                   Expanded(
-                    child: Center(
+                    child: Align(
+                      alignment: Alignment.topCenter,
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 1200),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 48.0,
-                            vertical: 32.0,
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14.0,
+                              vertical: 12.0,
+                            ),
+                            child: widget.child,
                           ),
-                          child: widget.child,
                         ),
                       ),
                     ),

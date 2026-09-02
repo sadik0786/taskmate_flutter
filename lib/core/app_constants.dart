@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_mate/core/theme.dart';
 
-import 'package:flutter/foundation.dart';
-
 class AppConstants {
-  static const int transitionDuration = kIsWeb ? 0 : 320;
-  static const Transition transition = kIsWeb
+  static int get transitionDuration =>
+      (GetPlatform.isWeb || GetPlatform.isDesktop) ? 0 : 320;
+  static Transition get transition =>
+      (GetPlatform.isWeb || GetPlatform.isDesktop)
       ? Transition.noTransition
       : Transition.rightToLeft;
 

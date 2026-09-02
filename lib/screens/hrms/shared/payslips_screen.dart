@@ -5,6 +5,7 @@ import 'package:task_mate/controllers/hrms/leave_controller.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/widgets/no_data.dart';
 import 'package:task_mate/widgets/page_loader.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class PayslipsScreen extends StatefulWidget {
   const PayslipsScreen({super.key});
@@ -62,8 +63,9 @@ class _PayslipsScreenState extends State<PayslipsScreen> {
               if (leaveController.myPayslips.isEmpty) {
                 return NoTasksWidget(message: "No Payslips Found");
               }
-              return ListView.builder(
+              return ResponsiveGridListWrapper(
                 itemCount: leaveController.myPayslips.length,
+                desktopChildAspectRatio: 4.0,
                 itemBuilder: (context, index) {
                   final payslip = leaveController.myPayslips[index];
                   return Container(
@@ -91,7 +93,9 @@ class _PayslipsScreenState extends State<PayslipsScreen> {
                         Container(
                           padding: EdgeInsets.all(12.w),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor.withOpacity(0.1),
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(

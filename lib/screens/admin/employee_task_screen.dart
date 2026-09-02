@@ -15,6 +15,7 @@ import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'package:task_mate/widgets/custom_dropdown_field.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class EmployeeTaskScreen extends StatefulWidget {
   const EmployeeTaskScreen({super.key});
@@ -210,7 +211,9 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                               style: TextStyle(
                                 color: isFutureMonth
                                     ? Theme.of(context).disabledColor
-                                    : Theme.of(context).textTheme.bodyMedium?.color,
+                                    : Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.color,
                                 fontWeight: tempMonth == month
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -221,10 +224,16 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                 ? null
                                 : (_) =>
                                       setDialogState(() => tempMonth = month),
-                            selectedColor: ThemeClass.successColor.withOpacity(0.8),
+                            selectedColor: ThemeClass.successColor.withOpacity(
+                              0.8,
+                            ),
                             backgroundColor: isFutureMonth
-                                ? Theme.of(context).disabledColor.withOpacity(0.2)
-                                : Theme.of(context).disabledColor.withOpacity(0.1),
+                                ? Theme.of(
+                                    context,
+                                  ).disabledColor.withOpacity(0.2)
+                                : Theme.of(
+                                    context,
+                                  ).disabledColor.withOpacity(0.1),
                           );
                         },
                       ),
@@ -504,9 +513,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                       ? const PageLoader()
                       : tasks.isEmpty
                       ? const NoTasksWidget()
-                      : ListView.builder(
+                      : ResponsiveGridListWrapper(
                           shrinkWrap: true,
                           itemCount: tasks.length,
+                          desktopChildAspectRatio: 2.0,
                           itemBuilder: (context, index) {
                             final t = tasks[index];
                             final createdAt = t["startTime"];
@@ -692,8 +702,10 @@ class _EmployeeTaskScreenState extends State<EmployeeTaskScreen> {
                                                   .copyWith(
                                                     color:
                                                         t["status"] == "Working"
-                                                        ? ThemeClass.warningColor
-                                                        : ThemeClass.successColor,
+                                                        ? ThemeClass
+                                                              .warningColor
+                                                        : ThemeClass
+                                                              .successColor,
                                                   ),
                                             ),
                                           ],

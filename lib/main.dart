@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
               title: 'Task Mate | 5nance',
               theme: ThemeClass.lightTheme,
               darkTheme: ThemeClass.darkTheme,
+              themeMode: _themeController.isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
               initialRoute: Routes.initialRoute,
               initialBinding: AllBinding(),
               getPages: appPages(),

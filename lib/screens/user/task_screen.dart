@@ -12,6 +12,7 @@ import 'package:task_mate/services/user/task_service.dart';
 import 'package:task_mate/widgets/base_layout.dart';
 import 'package:task_mate/widgets/custom_choice_chip.dart';
 import 'package:task_mate/screens/admin/add_task_screen.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
@@ -177,7 +178,9 @@ class _TaskScreenState extends State<TaskScreen> {
                               style: TextStyle(
                                 color: isFutureMonth
                                     ? Theme.of(context).disabledColor
-                                    : Theme.of(context).textTheme.bodyMedium?.color,
+                                    : Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.color,
                                 fontWeight: tempMonth == month
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -188,10 +191,16 @@ class _TaskScreenState extends State<TaskScreen> {
                                 ? null
                                 : (_) =>
                                       setDialogState(() => tempMonth = month),
-                            selectedColor: ThemeClass.successColor.withOpacity(0.8),
+                            selectedColor: ThemeClass.successColor.withOpacity(
+                              0.8,
+                            ),
                             backgroundColor: isFutureMonth
-                                ? Theme.of(context).disabledColor.withOpacity(0.2)
-                                : Theme.of(context).disabledColor.withOpacity(0.1),
+                                ? Theme.of(
+                                    context,
+                                  ).disabledColor.withOpacity(0.2)
+                                : Theme.of(
+                                    context,
+                                  ).disabledColor.withOpacity(0.1),
                           );
                         },
                       ),
@@ -406,9 +415,10 @@ class _TaskScreenState extends State<TaskScreen> {
                         ? PageLoader()
                         : tasks.isEmpty
                         ? NoTasksWidget()
-                        : ListView.builder(
+                        : ResponsiveGridListWrapper(
                             shrinkWrap: true,
                             itemCount: tasks.length,
+                            desktopChildAspectRatio: 2.0,
                             itemBuilder: (context, index) {
                               final t = tasks[index];
                               final createdAt = t["startTime"];
@@ -476,7 +486,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                                 child: Icon(
                                                   Icons.edit,
                                                   size: 20.sp,
-                                                  color: Theme.of(context).primaryColor,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).primaryColor,
                                                 ),
                                               ),
                                               SizedBox(width: 30.w),
@@ -520,7 +532,8 @@ class _TaskScreenState extends State<TaskScreen> {
                                                           child: const Text(
                                                             "Delete",
                                                             style: TextStyle(
-                                                              color: ThemeClass.errorColor,
+                                                              color: ThemeClass
+                                                                  .errorColor,
                                                             ),
                                                           ),
                                                         ),
@@ -541,8 +554,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                                         "Error",
                                                         "Invalid task ID",
                                                         backgroundColor:
-                                                            ThemeClass.errorColor,
-                                                        colorText: ThemeClass.textWhite,
+                                                            ThemeClass
+                                                                .errorColor,
+                                                        colorText: ThemeClass
+                                                            .textWhite,
                                                       );
                                                       return;
                                                     }
@@ -574,9 +589,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                                           "Success",
                                                           "Task deleted successfully",
                                                           backgroundColor:
-                                                              ThemeClass.successColor,
-                                                          colorText:
-                                                              ThemeClass.textWhite,
+                                                              ThemeClass
+                                                                  .successColor,
+                                                          colorText: ThemeClass
+                                                              .textWhite,
                                                           snackPosition:
                                                               SnackPosition
                                                                   .BOTTOM,
@@ -588,9 +604,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                                           result["error"] ??
                                                               "Failed to delete task",
                                                           backgroundColor:
-                                                              ThemeClass.errorColor,
-                                                          colorText:
-                                                              ThemeClass.textWhite,
+                                                              ThemeClass
+                                                                  .errorColor,
+                                                          colorText: ThemeClass
+                                                              .textWhite,
                                                           snackPosition:
                                                               SnackPosition
                                                                   .BOTTOM,
@@ -602,8 +619,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                                         "Error",
                                                         "Network error: ${e.toString()}",
                                                         backgroundColor:
-                                                            ThemeClass.errorColor,
-                                                        colorText: ThemeClass.textWhite,
+                                                            ThemeClass
+                                                                .errorColor,
+                                                        colorText: ThemeClass
+                                                            .textWhite,
                                                         snackPosition:
                                                             SnackPosition
                                                                 .BOTTOM,
@@ -748,8 +767,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                                       color:
                                                           t["status"] ==
                                                               "Working"
-                                                          ? ThemeClass.warningColor
-                                                          : ThemeClass.successColor,
+                                                          ? ThemeClass
+                                                                .warningColor
+                                                          : ThemeClass
+                                                                .successColor,
                                                     ),
                                               ),
                                             ],

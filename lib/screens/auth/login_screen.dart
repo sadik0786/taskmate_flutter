@@ -20,96 +20,215 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 500,
-            ), // Ensures login card doesn't stretch on wide screens
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(6.sp),
-              child: Column(
-                children: [
-                  SizedBox(height: 50.h),
-                  // Animated Logo
-                  SlideTransition(
-                    position: loginController.slideAnimation,
-                    child: FadeTransition(
-                      opacity: loginController.fadeAnimation,
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.assignment_turned_in_outlined,
-                            size: 40.sp,
-                            color: Theme.of(context).primaryColor,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth >= 600) {
+              return _buildDesktopLayout(context);
+            } else {
+              return _buildMobileLayout(context);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 500,
+        ), // Ensures login card doesn't stretch on wide screens
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(6.sp),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 50.h),
+              _buildAnimatedLogo(context),
+              const SizedBox(height: 20),
+              _buildLoginForm(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context) {
+    return Row(
+      children: [
+        // Left Branding Panel
+        Expanded(
+          flex: 1,
+          child: Container(
+            color: Theme.of(context).primaryColor,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.assignment_turned_in_outlined,
+                      size: 100.sp,
+                      color: Colors.white,
+                    ),
+                    SizedBox(height: 20.h),
+                    Text(
+                      "Task Mate",
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
-                          SizedBox(height: 10.h),
-                          Text(
-                            "Task Mate",
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Text(
-                            "Smart Attendance & Leave Manager",
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ],
+                    ),
+                    SizedBox(height: 10.h),
+                    Text(
+                      "Smart Attendance & Leave Manager",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.white.withOpacity(0.9),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Login Card
-                  Card(
-                    margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                    color: Theme.of(context).cardColor,
-                    elevation: 16,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
-                      side: BorderSide(
-                        color: Theme.of(context).dividerColor.withOpacity(0.1),
-                      ),
+                    SizedBox(height: 40.h),
+                    _buildFeatureItem(Icons.touch_app, "Easy Clock In/Out"),
+                    SizedBox(height: 15.h),
+                    _buildFeatureItem(
+                      Icons.date_range,
+                      "Manage Leaves Seamlessly",
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(14.w),
-                      child: Form(
-                        key: loginController.formKey,
-                        child: Column(
-                          children: [
-                            SizedBox(height: 10.h),
-                            CustomTextField(
-                              isEnabled: true,
-                              labelText: "Email ID",
-                              isRequired: true,
-                              hintText: "Enter username Id",
-                              prefixIcon: Icons.email,
-                              keyboardType: TextInputType.emailAddress,
-                              controller: loginController.email.value,
-                              validator: loginController.validateEmail,
-                            ),
-                            SizedBox(height: 20.h),
-                            CustomTextField(
-                              labelText: "Password",
-                              isRequired: true,
-                              hintText: "Enter password",
-                              prefixIcon: Icons.lock,
-                              controller: loginController.password.value,
-                              isObscure: true,
-                              validator: loginController.validatePassword,
-                            ),
-                            SizedBox(height: 30.h),
-                            //  Login Button
-                            CustomButton(
-                              text: "Login",
-                              onPressed: loginController.login,
-                              isLoading: loginController.loading.value,
-                            ),
-                            SizedBox(height: 20.h),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                    SizedBox(height: 15.h),
+                    _buildFeatureItem(Icons.insert_chart, "Real-time Reports"),
+                  ],
+                ),
               ),
             ),
+          ),
+        ),
+        // Right Form Panel
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Welcome Back",
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Please sign in to continue",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).hintColor,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    _buildLoginForm(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String text) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, color: Colors.white70, size: 24.sp),
+        SizedBox(width: 10.w),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAnimatedLogo(BuildContext context) {
+    return SlideTransition(
+      position: loginController.slideAnimation,
+      child: FadeTransition(
+        opacity: loginController.fadeAnimation,
+        child: Column(
+          children: [
+            Icon(
+              Icons.assignment_turned_in_outlined,
+              size: 40.sp,
+              color: Theme.of(context).primaryColor,
+            ),
+            SizedBox(height: 10.h),
+            Text("Task Mate", style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              "Smart Attendance & Leave Manager",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 10.w),
+      color: Theme.of(context).cardColor,
+      elevation: 16,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.r),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(14.w),
+        child: Form(
+          key: loginController.formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 10.h),
+              CustomTextField(
+                isEnabled: true,
+                labelText: "Email ID",
+                isRequired: true,
+                hintText: "Enter username Id",
+                prefixIcon: Icons.email,
+                keyboardType: TextInputType.emailAddress,
+                controller: loginController.email.value,
+                validator: loginController.validateEmail,
+              ),
+              SizedBox(height: 20.h),
+              CustomTextField(
+                labelText: "Password",
+                isRequired: true,
+                hintText: "Enter password",
+                prefixIcon: Icons.lock,
+                controller: loginController.password.value,
+                isObscure: true,
+                validator: loginController.validatePassword,
+              ),
+              SizedBox(height: 30.h),
+              // Login Button
+              CustomButton(
+                text: "Login",
+                onPressed: loginController.login,
+                isLoading: loginController.loading.value,
+              ),
+              SizedBox(height: 20.h),
+            ],
           ),
         ),
       ),

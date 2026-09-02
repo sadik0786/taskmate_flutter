@@ -7,6 +7,7 @@ import 'package:task_mate/services/auth/auth_service.dart';
 import 'package:task_mate/controllers/theme_controller.dart';
 import 'package:task_mate/widgets/custom_appbar.dart';
 import 'package:get/get.dart';
+import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -152,25 +153,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ],
       ),
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 450),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Header Section
-                  _buildHeaderSection(),
-                  SizedBox(height: 40.h),
-                  // Progress Indicator
-                  _buildProgressIndicator(),
-                  SizedBox(height: 40.h),
-                  // Content based on step
-                  if (!_emailVerified) _buildEmailVerificationStep(),
-                  if (_emailVerified) _buildPasswordResetStep(),
-                ],
-              ),
+        child: ResponsiveFormWrapper(
+          maxWidth: 500,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Header Section
+                _buildHeaderSection(),
+                SizedBox(height: 40.h),
+                // Progress Indicator
+                _buildProgressIndicator(),
+                SizedBox(height: 40.h),
+                // Content based on step
+                if (!_emailVerified) _buildEmailVerificationStep(),
+                if (_emailVerified) _buildPasswordResetStep(),
+              ],
             ),
           ),
         ),
