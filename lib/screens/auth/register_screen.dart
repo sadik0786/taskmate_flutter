@@ -38,10 +38,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ],
       child: ResponsiveFormWrapper(
-        maxWidth: 700,
         title: "Add Employee",
         subtitle: "Register a new team member and assign their role.",
         icon: Icons.person_add_alt_1_rounded,
+
+        maxWidth: 700,
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -97,7 +98,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(height: 16.h),
+                    SizedBox(
+                      height: ResponsiveLayout.isDesktop(context) ? 24.h : 16.h,
+                    ),
                     if (ResponsiveLayout.isDesktop(context))
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,

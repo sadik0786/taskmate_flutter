@@ -254,7 +254,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
                 : MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: ResponsiveLayout.isDesktop(context) ? 600.w : 300.w,
+                width: ResponsiveLayout.isDesktop(context) ? 550.w : 300.w,
                 child: CustomButton(
                   icon: Icons.save,
                   text: "Apply Leave",

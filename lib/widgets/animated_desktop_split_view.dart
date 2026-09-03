@@ -54,7 +54,7 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
         final isDark = theme.brightness == Brightness.dark;
 
         final leftSide = Container(
-          margin: EdgeInsets.only(
+          margin: const EdgeInsets.only(
             left: 24.0,
             top: 24.0,
             bottom: 24.0,
@@ -127,15 +127,26 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
 
         if (constraints.maxHeight == double.infinity) {
           // Parent is unbounded (e.g. inside a SingleChildScrollView).
-          // Size to intrinsic height so we don't crash.
-          return IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(flex: 6, child: leftSide),
-                Expanded(flex: 5, child: widget.child),
-              ],
-            ),
+          // We use Table instead of IntrinsicHeight to prevent crashes when
+          // children use LayoutBuilder (like CustomDropdownField).
+          return Table(
+            columnWidths: const {0: FlexColumnWidth(5), 1: FlexColumnWidth(5)},
+            children: [
+              TableRow(
+                children: [
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.fill,
+                    child: leftSide,
+                  ),
+                  TableCell(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: widget.child,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           );
         } else {
           // Parent is bounded (e.g. profile screen).
@@ -144,8 +155,15 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
             height: constraints.maxHeight,
             child: Row(
               children: [
-                Expanded(flex: 6, child: leftSide),
-                Expanded(flex: 5, child: SizedBox.expand(child: widget.child)),
+                Expanded(flex: 4, child: leftSide),
+                Expanded(
+                  flex: 5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [Flexible(child: widget.child)],
+                  ),
+                ),
               ],
             ),
           );
