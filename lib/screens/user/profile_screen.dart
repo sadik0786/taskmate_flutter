@@ -361,6 +361,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: _isLoading
             ? const Center(child: PageLoader())
             : ResponsiveFormWrapper(
+                title: "Profile",
+                subtitle: "View and edit your details",
                 maxWidth: 800,
                 padding: EdgeInsets.zero,
                 wrapInCardOnDesktop: false,

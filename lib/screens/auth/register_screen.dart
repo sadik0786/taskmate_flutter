@@ -52,42 +52,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14.r),
                   ),
-                  elevation: 4,
-                  shadowColor: Theme.of(context).shadowColor.withOpacity(0.1),
+                  elevation: 12,
+                  shadowColor: Theme.of(context).shadowColor.withOpacity(0.5),
 
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            registerController.userName.value.toUpperCase(),
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Text(
-                            "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
-                                ? "HR / Accountant / Manager"
-                                : registerController.currentUserRole.value.toLowerCase() == "hr"
-                                ? "Admin / Employees"
-                                : "No permission"}",
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color
-                                      ?.withOpacity(0.7),
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                          ),
-                        ],
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 16.h,
+                          horizontal: 16.w,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Logged in as: ${registerController.currentUserRole.value.toUpperCase()}",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "You can add: ${registerController.currentUserRole.value.toLowerCase() == "ceo"
+                                  ? "HR / Accountant / Manager"
+                                  : registerController.currentUserRole.value.toLowerCase() == "hr"
+                                  ? "Admin / Employees"
+                                  : "No permission"}",
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color
+                                        ?.withOpacity(0.7),
+                                    fontWeight: FontWeight.w400,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -99,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      height: ResponsiveLayout.isDesktop(context) ? 24.h : 16.h,
+                      height: ResponsiveLayout.isDesktop(context) ? 30.h : 16.h,
                     ),
                     if (ResponsiveLayout.isDesktop(context))
                       Row(
@@ -115,7 +117,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(height: 10.h),
                       _buildAssignDropdown(),
                     ],
-                    SizedBox(height: 10.h),
+                    SizedBox(
+                      height: ResponsiveLayout.isDesktop(context) ? 24.h : 10.h,
+                    ),
                     if (ResponsiveLayout.isDesktop(context))
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +134,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(height: 10.h),
                       _buildEmailField(),
                     ],
-                    SizedBox(height: 10.h),
+                    SizedBox(
+                      height: ResponsiveLayout.isDesktop(context) ? 24.h : 10.h,
+                    ),
                     if (ResponsiveLayout.isDesktop(context))
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +151,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(height: 10.h),
                       _buildPasswordField(),
                     ],
-                    SizedBox(height: 20.h),
+                    SizedBox(
+                      height: ResponsiveLayout.isDesktop(context) ? 40.h : 20.h,
+                    ),
                     Obx(
                       () => CustomButton(
                         text: "Submit",
