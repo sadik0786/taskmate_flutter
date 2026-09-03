@@ -79,7 +79,7 @@ class _AppDrawerState extends State<AppDrawer> {
             padding: EdgeInsets.symmetric(
               horizontal: 20.w,
               vertical: 30.h,
-            ).copyWith(top: isDesktop ? 20.h : 60.h),
+            ).copyWith(top: isDesktop ? 15.h : 60.h),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isDark
@@ -116,20 +116,9 @@ class _AppDrawerState extends State<AppDrawer> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          "5nance.com",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
+                        Image.asset(
+                          "assets/5nance-logo-white.png",
+                          height: 40.h,
                         ),
                       ],
                     ),

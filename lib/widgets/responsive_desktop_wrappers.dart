@@ -8,6 +8,9 @@ class ResponsiveFormWrapper extends StatelessWidget {
   final double maxWidth;
   final bool wrapInCardOnDesktop;
   final EdgeInsetsGeometry? padding;
+  final String? title;
+  final String? subtitle;
+  final IconData? icon;
 
   const ResponsiveFormWrapper({
     super.key,
@@ -15,16 +18,23 @@ class ResponsiveFormWrapper extends StatelessWidget {
     this.maxWidth = 600,
     this.wrapInCardOnDesktop = true,
     this.padding,
+    this.title,
+    this.subtitle,
+    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = ResponsiveLayout.isDesktop(context) ||
+    final bool isDesktop =
+        ResponsiveLayout.isDesktop(context) ||
         ResponsiveLayout.isTablet(context);
 
     if (isDesktop) {
       return Center(
         child: AnimatedDesktopSplitView(
+          title: title,
+          subtitle: subtitle,
+          icon: icon,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxWidth),
             child: wrapInCardOnDesktop
@@ -65,6 +75,7 @@ class ResponsiveGridListWrapper extends StatelessWidget {
   final double desktopChildAspectRatio;
   final int Function(double width)? customCrossAxisCount;
   final bool allowDynamicHeight;
+  final double? desktopMainAxisExtent;
 
   const ResponsiveGridListWrapper({
     super.key,
@@ -76,6 +87,7 @@ class ResponsiveGridListWrapper extends StatelessWidget {
     this.desktopChildAspectRatio = 1.0,
     this.customCrossAxisCount,
     this.allowDynamicHeight = false,
+    this.desktopMainAxisExtent,
   });
 
   @override
@@ -100,8 +112,10 @@ class ResponsiveGridListWrapper extends StatelessWidget {
 
           if (allowDynamicHeight) {
             final double spacing = 16.0;
-            final double itemWidth = (constraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
-            
+            final double itemWidth =
+                (constraints.maxWidth - ((crossAxisCount - 1) * spacing)) /
+                crossAxisCount;
+
             Widget wrap = Wrap(
               spacing: spacing,
               runSpacing: spacing,
@@ -121,10 +135,7 @@ class ResponsiveGridListWrapper extends StatelessWidget {
                 child: wrap,
               );
             } else {
-              return Padding(
-                padding: padding ?? EdgeInsets.zero,
-                child: wrap,
-              );
+              return Padding(padding: padding ?? EdgeInsets.zero, child: wrap);
             }
           }
 
@@ -135,6 +146,7 @@ class ResponsiveGridListWrapper extends StatelessWidget {
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
               childAspectRatio: desktopChildAspectRatio,
+              mainAxisExtent: desktopMainAxisExtent,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
             ),

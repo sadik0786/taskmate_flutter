@@ -363,8 +363,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                     ),
                                     clipBehavior: Clip.antiAlias,
                                     child: Stack(
+                                      alignment: Alignment.topCenter,
                                       children: [
                                         ListTile(
+                                          isThreeLine: true,
                                           contentPadding: EdgeInsets.symmetric(
                                             horizontal: 12.w,
                                             vertical: 4.h,
@@ -525,7 +527,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   vertical: 8.h,
                                 ),
                                 itemCount: filteredEmployees.length,
-                                desktopChildAspectRatio: 4.0,
+                                desktopMainAxisExtent: 110.h,
                                 itemBuilder: (context, index) =>
                                     buildCard(index),
                               );

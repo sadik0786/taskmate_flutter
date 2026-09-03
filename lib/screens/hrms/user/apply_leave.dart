@@ -13,6 +13,7 @@ import 'package:task_mate/widgets/custom_snackbar.dart';
 import 'package:task_mate/widgets/custom_text_field.dart';
 import 'package:task_mate/services/hrms/leave_service.dart';
 import 'package:task_mate/widgets/responsive_desktop_wrappers.dart';
+import 'package:task_mate/widgets/responsive_layout.dart';
 
 class ApplyLeave extends StatefulWidget {
   const ApplyLeave({super.key});
@@ -153,86 +154,93 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-        child: ResponsiveFormWrapper(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (selected != null)
-                  leaveCard(
-                    leaveName: selected["LeaveName"],
-                    leaveBalance: selected["LeaveCount"]?.toDouble(),
-                    isTotalDay: true,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
+          child: ResponsiveFormWrapper(
+            title: "Apply Leave",
+            subtitle: "Submit and track your leave requests easily.",
+            icon: Icons.event_available_rounded,
+            child: Padding(
+              padding: EdgeInsets.only(right: 15.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (selected != null) ...[
+                    leaveCard(
+                      leaveName: selected["LeaveName"],
+                      leaveBalance: selected["LeaveCount"]?.toDouble(),
+                      isTotalDay: true,
+                    ),
+                    SizedBox(height: 16.h),
+                  ],
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CustomDropdownField<int>(
+                          labelText: "Leave Type",
+                          isRequired: true,
+                          hintText: "Select leave type",
+                          prefixIcon: Icons.event_note,
+                          items: leaveTypes.map((p) {
+                            return {"id": p["Id"], "name": p["LeaveName"]};
+                          }).toList(),
+                          valueKey: "id",
+                          labelKey: "name",
+                          value: selectedLeaveTypeId,
+                          isEnabled: true,
+                          onChanged: onLeaveTypeChanged,
+                        ),
+                        SizedBox(height: 10.h),
+                        CustomDateField(
+                          labelText: "From Date",
+                          isRequired: true,
+                          selectedDate: fromDate,
+                          hintText: "Select from date",
+                          prefixIcon: Icons.calendar_today,
+                          onTap: () => _pickDate(true),
+                        ),
+                        SizedBox(height: 10.h),
+                        CustomDateField(
+                          labelText: "To Date",
+                          isRequired: true,
+                          selectedDate: toDate,
+                          hintText: "Select to date",
+                          prefixIcon: Icons.calendar_today,
+                          onTap: () => _pickDate(false),
+                        ),
+                        SizedBox(height: 10.h),
+                        CustomDropdownField<int>(
+                          labelText: "Leave Session",
+                          isRequired: true,
+                          hintText: "Select session",
+                          prefixIcon: Icons.access_time,
+                          items: leaveSessions,
+                          valueKey: "id",
+                          labelKey: "name",
+                          value: selectedSessionId,
+                          isEnabled: true,
+                          onChanged: (val) {
+                            setState(() {
+                              selectedSessionId = val;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 10.h),
+                        CustomTextField(
+                          labelText: "Reason",
+                          hintText: "Type your reason",
+                          controller: reasonCtrl,
+                          prefixIcon: Icons.description,
+                        ),
+                      ],
+                    ),
                   ),
-                SizedBox(height: 20.h),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CustomDropdownField<int>(
-                        labelText: "Leave Type",
-                        isRequired: true,
-                        hintText: "Select leave type",
-                        prefixIcon: Icons.event_note,
-                        items: leaveTypes.map((p) {
-                          return {"id": p["Id"], "name": p["LeaveName"]};
-                        }).toList(),
-                        valueKey: "id",
-                        labelKey: "name",
-                        value: selectedLeaveTypeId,
-                        isEnabled: true,
-                        onChanged: onLeaveTypeChanged,
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomDateField(
-                        labelText: "From Date",
-                        isRequired: true,
-                        selectedDate: fromDate,
-                        hintText: "Select from date",
-                        prefixIcon: Icons.calendar_today,
-                        onTap: () => _pickDate(true),
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomDateField(
-                        labelText: "To Date",
-                        isRequired: true,
-                        selectedDate: toDate,
-                        hintText: "Select to date",
-                        prefixIcon: Icons.calendar_today,
-                        onTap: () => _pickDate(false),
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomDropdownField<int>(
-                        labelText: "Leave Session",
-                        isRequired: true,
-                        hintText: "Select session",
-                        prefixIcon: Icons.access_time,
-                        items: leaveSessions,
-                        valueKey: "id",
-                        labelKey: "name",
-                        value: selectedSessionId,
-                        isEnabled: true,
-                        onChanged: (val) {
-                          setState(() {
-                            selectedSessionId = val;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomTextField(
-                        labelText: "Reason",
-                        hintText: "Type your reason",
-                        controller: reasonCtrl,
-                        prefixIcon: Icons.description,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -240,10 +248,20 @@ class _ApplyLeaveState extends State<ApplyLeave> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16.w),
-          child: CustomButton(
-            icon: Icons.save,
-            text: "Apply Leave",
-            onPressed: onSubmit,
+          child: Row(
+            mainAxisAlignment: ResponsiveLayout.isDesktop(context)
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: ResponsiveLayout.isDesktop(context) ? 600.w : 300.w,
+                child: CustomButton(
+                  icon: Icons.save,
+                  text: "Apply Leave",
+                  onPressed: onSubmit,
+                ),
+              ),
+            ],
           ),
         ),
       ),

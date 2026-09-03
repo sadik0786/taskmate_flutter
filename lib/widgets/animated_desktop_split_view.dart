@@ -5,7 +5,17 @@ import 'dart:math' as math;
 
 class AnimatedDesktopSplitView extends StatefulWidget {
   final Widget child;
-  const AnimatedDesktopSplitView({super.key, required this.child});
+  final String? title;
+  final String? subtitle;
+  final IconData? icon;
+
+  const AnimatedDesktopSplitView({
+    super.key,
+    required this.child,
+    this.title,
+    this.subtitle,
+    this.icon,
+  });
 
   @override
   State<AnimatedDesktopSplitView> createState() =>
@@ -38,36 +48,44 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
     }
 
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 5,
-          child: Container(
-            margin: EdgeInsets.only(right: 24.w),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? theme.colorScheme.surfaceContainer
-                  : theme.primaryColor.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(24.r),
-              border: Border.all(
-                color: theme.primaryColor.withOpacity(0.1),
-                width: 1,
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDark = theme.brightness == Brightness.dark;
+
+        final leftSide = Container(
+          margin: EdgeInsets.only(
+            left: 24.0,
+            top: 24.0,
+            bottom: 24.0,
+            right: 12.0,
+          ),
+          decoration: BoxDecoration(
+            color: isDark
+                ? theme.colorScheme.surfaceContainer
+                : theme.primaryColor.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(24.r),
+            border: Border.all(
+              color: theme.primaryColor.withOpacity(0.1),
+              width: 1,
             ),
-            child: Center(
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(
-                        0, 15 * math.sin(_controller.value * 2 * math.pi)),
-                    child: child,
-                  );
-                },
+          ),
+          child: Center(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(
+                    0,
+                    15 * math.sin(_controller.value * 2 * math.pi),
+                  ),
+                  child: child,
+                );
+              },
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
@@ -77,37 +95,62 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.auto_awesome,
+                        widget.icon ?? Icons.auto_awesome,
                         size: 80.sp,
                         color: theme.primaryColor,
                       ),
                     ),
                     SizedBox(height: 32.h),
                     Text(
-                      "Task Mate",
+                      widget.title ?? "Task Mate",
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.primaryColor,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 12.h),
                     Text(
-                      "Simplify your workflow intelligently.",
+                      widget.subtitle ??
+                          "Simplify your workflow intelligently.",
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          flex: 6,
-          child: widget.child,
-        ),
-      ],
+        );
+
+        if (constraints.maxHeight == double.infinity) {
+          // Parent is unbounded (e.g. inside a SingleChildScrollView).
+          // Size to intrinsic height so we don't crash.
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(flex: 6, child: leftSide),
+                Expanded(flex: 5, child: widget.child),
+              ],
+            ),
+          );
+        } else {
+          // Parent is bounded (e.g. profile screen).
+          // Take full height so internal ScrollViews can scroll.
+          return SizedBox(
+            height: constraints.maxHeight,
+            child: Row(
+              children: [
+                Expanded(flex: 6, child: leftSide),
+                Expanded(flex: 5, child: SizedBox.expand(child: widget.child)),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }
