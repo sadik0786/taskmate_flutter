@@ -8,6 +8,7 @@ class AnimatedDesktopSplitView extends StatefulWidget {
   final String? title;
   final String? subtitle;
   final IconData? icon;
+  final bool imageOnRight;
 
   const AnimatedDesktopSplitView({
     super.key,
@@ -15,6 +16,7 @@ class AnimatedDesktopSplitView extends StatefulWidget {
     this.title,
     this.subtitle,
     this.icon,
+    this.imageOnRight = false,
   });
 
   @override
@@ -53,12 +55,12 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
       builder: (context, constraints) {
         final isDark = theme.brightness == Brightness.dark;
 
-        final leftSide = Container(
-          margin: const EdgeInsets.only(
-            left: 24.0,
+        final animatedSide = Container(
+          margin: EdgeInsets.only(
+            left: widget.imageOnRight ? 12.0 : 24.0,
             top: 24.0,
             bottom: 24.0,
-            right: 12.0,
+            right: widget.imageOnRight ? 24.0 : 12.0,
           ),
           decoration: BoxDecoration(
             color: isDark
@@ -133,18 +135,31 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
             columnWidths: const {0: FlexColumnWidth(5), 1: FlexColumnWidth(5)},
             children: [
               TableRow(
-                children: [
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.fill,
-                    child: leftSide,
-                  ),
-                  TableCell(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: widget.child,
-                    ),
-                  ),
-                ],
+                children: widget.imageOnRight
+                    ? [
+                        TableCell(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: widget.child,
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.fill,
+                          child: animatedSide,
+                        ),
+                      ]
+                    : [
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.fill,
+                          child: animatedSide,
+                        ),
+                        TableCell(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: widget.child,
+                          ),
+                        ),
+                      ],
               ),
             ],
           );
@@ -154,17 +169,29 @@ class _AnimatedDesktopSplitViewState extends State<AnimatedDesktopSplitView>
           return SizedBox(
             height: constraints.maxHeight,
             child: Row(
-              children: [
-                Expanded(flex: 4, child: leftSide),
-                Expanded(
-                  flex: 5,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [Flexible(child: widget.child)],
-                  ),
-                ),
-              ],
+              children: widget.imageOnRight
+                  ? [
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [Flexible(child: widget.child)],
+                        ),
+                      ),
+                      Expanded(flex: 4, child: animatedSide),
+                    ]
+                  : [
+                      Expanded(flex: 4, child: animatedSide),
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [Flexible(child: widget.child)],
+                        ),
+                      ),
+                    ],
             ),
           );
         }

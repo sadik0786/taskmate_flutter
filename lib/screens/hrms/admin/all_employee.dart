@@ -47,54 +47,6 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 12.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Obx(() {
-                if (controller.financialYears.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                return Container(
-                  height: 35.h,
-                  padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(
-                      color: ThemeClass.primaryGreen.withOpacity(0.3),
-                    ),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<int>(
-                      value: controller.selectedFinancialYearId.value,
-                      isDense: true,
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: ThemeClass.primaryGreen,
-                      ),
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      items: controller.financialYears.map((year) {
-                        return DropdownMenuItem<int>(
-                          value: year["Id"],
-                          child: Text(year["YearString"]),
-                        );
-                      }).toList(),
-                      onChanged: (int? newValue) {
-                        if (newValue != null) {
-                          controller.changeFinancialYear(newValue);
-                        }
-                      },
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-          SizedBox(height: 12.h),
           // Who is on leave today
           Obx(() {
             if (controller.todayLeaves.isEmpty) {
@@ -231,6 +183,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
               return ResponsiveGridListWrapper(
                 itemCount: leaves.length,
                 desktopChildAspectRatio: 3.5,
+                allowDynamicHeight: true,
                 itemBuilder: (context, index) {
                   return _buildLeaveCard(leaves[index]);
                 },
@@ -319,7 +272,7 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                 ),
               ),
               subtitle: Text(
-                "${leave.employeeRole} | ${leave.leaveTypeName}",
+                "${leave.leaveTypeName} • ${leave.totalDays} Days",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 12.sp,
@@ -343,12 +296,14 @@ class _AllLeavesReportState extends State<AllLeavesReport> {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     SizedBox(width: 6.w),
-                    Text(
-                      "${formatDate(leave.fromDate)} to ${formatDate(leave.toDate)} (${leave.totalDays} Days)",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12.sp,
+                    Expanded(
+                      child: Text(
+                        "${formatDate(leave.fromDate)} to ${formatDate(leave.toDate)}",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12.sp,
+                        ),
                       ),
                     ),
                   ],

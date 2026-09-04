@@ -6,6 +6,7 @@ import 'package:task_mate/model/financial_year_model.dart';
 import 'package:task_mate/services/hrms/leave_service.dart';
 import 'package:task_mate/services/hrms/misc_service.dart';
 import 'package:task_mate/widgets/custom_snackbar.dart';
+import 'package:task_mate/controllers/hrms/admin_hrms_controller.dart';
 
 class LeaveController extends GetxController {
   RxList<LeaveTypeModel> leaveTypes = <LeaveTypeModel>[].obs;
@@ -60,6 +61,11 @@ class LeaveController extends GetxController {
     selectedFinancialYearId.value = id;
     fetchLeaveTypes();
     fetchMyLeaves();
+    
+    // Sync the global change to AdminHrmsController if it exists
+    if (Get.isRegistered<AdminHrmsController>()) {
+      Get.find<AdminHrmsController>().changeFinancialYear(id);
+    }
   }
 
   Future<void> fetchLeaveTypes() async {

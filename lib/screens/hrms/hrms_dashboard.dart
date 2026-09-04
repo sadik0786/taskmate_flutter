@@ -242,30 +242,43 @@ class _HrmsDashboardState extends State<HrmsDashboard> {
               ),
             ),
             SizedBox(width: 16.w),
-            SizedBox(
-              width: 250.w,
-              child: Obx(
-                () => CustomDropdownField<int>(
-                  hintText: "Financial Year",
-                  prefixIcon: Icons.calendar_today_rounded,
-                  items: leaveController.financialYears
-                      .map(
-                        (year) => {
-                          'id': year.id,
-                          'year': year.yearString ?? "",
-                        },
-                      )
-                      .toList(),
-                  valueKey: 'id',
-                  labelKey: 'year',
-                  value: leaveController.selectedFinancialYearId.value,
-                  onChanged: (int? newValue) {
-                    if (newValue != null) {
-                      leaveController.changeFinancialYear(newValue);
-                    }
-                  },
+            Row(
+              children: [
+                Text(
+                  "Financial Year: ",
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
+                SizedBox(width: 8.w),
+                SizedBox(
+                  width: 250.w,
+                  child: Obx(
+                    () => CustomDropdownField<int>(
+                      hintText: "Financial Year",
+                      prefixIcon: Icons.calendar_today_rounded,
+                      items: leaveController.financialYears
+                          .map(
+                            (year) => {
+                              'id': year.id,
+                              'year': year.yearString ?? "",
+                            },
+                          )
+                          .toList(),
+                      valueKey: 'id',
+                      labelKey: 'year',
+                      value: leaveController.selectedFinancialYearId.value,
+                      onChanged: (int? newValue) {
+                        if (newValue != null) {
+                          leaveController.changeFinancialYear(newValue);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
