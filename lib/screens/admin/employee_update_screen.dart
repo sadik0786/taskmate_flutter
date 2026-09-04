@@ -31,6 +31,7 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
   final _emergencyCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _departmentCtrl = TextEditingController();
+  final _designationCtrl = TextEditingController();
   final _dojCtrl = TextEditingController();
   final _empTypeCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
@@ -72,6 +73,7 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
       dep = employee["RoleName"];
     }
     _departmentCtrl.text = dep;
+    _designationCtrl.text = employee["Designation"] ?? "";
 
     if (employee["DateOfJoining"] != null &&
         employee["DateOfJoining"].toString().isNotEmpty) {
@@ -84,7 +86,10 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
     }
 
     _empTypeCtrl.text = employee["EmploymentType"] ?? "";
-    _locationCtrl.text = employee["OfficeLocation"] ?? "";
+    final String loc = employee["OfficeLocation"]?.toString() ?? "";
+    _locationCtrl.text = loc.isNotEmpty 
+        ? loc 
+        : "B 603, Eureka Towers, Mind Space, Malad (West) Mumbai - 400064";
     _salaryCtrl.text = employee["Salary"]?.toString() ?? "";
     _aadhaarCtrl.text = employee["AadhaarNumber"] ?? "";
     _panCtrl.text = employee["PANNumber"] ?? "";
@@ -101,6 +106,7 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
     _emergencyCtrl.dispose();
     _addressCtrl.dispose();
     _departmentCtrl.dispose();
+    _designationCtrl.dispose();
     _dojCtrl.dispose();
     _empTypeCtrl.dispose();
     _locationCtrl.dispose();
@@ -137,6 +143,7 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
       "EmergencyContact": _emergencyCtrl.text.trim(),
       "Address": _addressCtrl.text.trim(),
       "Department": _departmentCtrl.text.trim(),
+      "Designation": _designationCtrl.text.trim(),
       "DateOfJoining": formatForBackend(_dojCtrl.text.trim()),
       "EmploymentType": _empTypeCtrl.text.trim(),
       "OfficeLocation": _locationCtrl.text.trim(),
@@ -223,6 +230,7 @@ class _EmployeeUpdateScreenState extends State<EmployeeUpdateScreen> {
                       SizedBox(height: 16.h),
                       _buildSection("Professional Details", [
                         _buildTextField("Department", _departmentCtrl),
+                        _buildTextField("Designation", _designationCtrl),
                         _buildDateField(
                           "Date of Joining (dd-MMM-yyyy)",
                           _dojCtrl,

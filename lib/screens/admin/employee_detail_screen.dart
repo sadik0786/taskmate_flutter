@@ -64,12 +64,15 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     final String address = e["Address"]?.toString() ?? "Not specified";
 
     final String department = e["Department"]?.toString() ?? "Not specified";
-    final String designation = role; // using RoleName for Designation
+    final String designation = e["Designation"]?.toString().isNotEmpty == true
+        ? e["Designation"].toString()
+        : role; // fallback to RoleName if Designation is empty
     final String doj = formatDate(e["DateOfJoining"]?.toString());
     final String employmentType =
         e["EmploymentType"]?.toString() ?? "Full-time";
-    final String officeLocation =
-        e["OfficeLocation"]?.toString() ?? "Head Office";
+    final String officeLocation = e["OfficeLocation"]?.toString().isNotEmpty == true
+        ? e["OfficeLocation"].toString()
+        : "B 603, Eureka Towers, Mind Space, Malad (West) Mumbai - 400064";
 
     final String aadhaar = e["AadhaarNumber"]?.toString() ?? "Not specified";
     final String pan = e["PANNumber"]?.toString() ?? "Not specified";
@@ -236,19 +239,19 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
               const Divider(height: 16),
               _buildCompactRow(
                 context,
-                "Date of Joining",
-                doj,
+                "Designation",
+                designation,
                 "Employment Type",
                 employmentType,
               ),
               const Divider(height: 16),
               _buildCompactRow(
                 context,
+                "Date of Joining",
+                doj,
                 "Office Location",
                 officeLocation,
-                "",
-                "",
-              ), // empty field for alignment
+              ),
             ]),
             SizedBox(height: 16.h),
 
