@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     // Delay a little to show splash nicely
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 3000), () {
       if (mounted) {
         _checkAuthAndNavigate();
       }
@@ -103,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
         case "hr":
           Get.offNamed(Routes.adminDashboard);
           break;
-        case "superadmin":
+        case "manager":
         case "admin":
         case "employee":
           Get.offNamed(Routes.homeScreen);
@@ -134,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Container(
@@ -192,7 +192,9 @@ class _SplashScreenState extends State<SplashScreen>
                         Text(
                           "Task Mate",
                           style: theme.textTheme.displayMedium?.copyWith(
-                            color: isDark ? ThemeClass.textWhite : ThemeClass.textBlack,
+                            color: isDark
+                                ? ThemeClass.textWhite
+                                : ThemeClass.textBlack,
                             letterSpacing: 1.5,
                           ),
                         ),
@@ -200,7 +202,11 @@ class _SplashScreenState extends State<SplashScreen>
                         Text(
                           "Employee Task Management System",
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: (isDark ? ThemeClass.textWhite : ThemeClass.textBlack).withOpacity(0.7),
+                            color:
+                                (isDark
+                                        ? ThemeClass.textWhite
+                                        : ThemeClass.textBlack)
+                                    .withOpacity(0.7),
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -241,7 +247,9 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Text(
                     "Loading...",
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: (isDark ? ThemeClass.textWhite : ThemeClass.textBlack).withOpacity(0.7),
+                      color:
+                          (isDark ? ThemeClass.textWhite : ThemeClass.textBlack)
+                              .withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -310,10 +318,11 @@ class _SplashScreenState extends State<SplashScreen>
                         cursorHeight: 30.sp,
                         cursorWidth: 2,
                         cursorColor: ThemeClass.primaryGreen,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontSize: 30.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontSize: 30.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                         decoration: InputDecoration(
                           counterText: "",
                           border: OutlineInputBorder(
@@ -357,7 +366,10 @@ class _SplashScreenState extends State<SplashScreen>
                       },
                       child: Text(
                         "Reset PIN?",
-                        style: TextStyle(color: ThemeClass.errorColor, fontSize: 16.sp),
+                        style: TextStyle(
+                          color: ThemeClass.errorColor,
+                          fontSize: 16.sp,
+                        ),
                       ),
                     ),
                     ElevatedButton(
@@ -378,7 +390,10 @@ class _SplashScreenState extends State<SplashScreen>
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 24.w),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 14.h,
+                          horizontal: 24.w,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),

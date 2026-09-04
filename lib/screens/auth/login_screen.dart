@@ -92,14 +92,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    _buildFeatureItem(Icons.touch_app, "Easy Clock In/Out"),
+                    _buildFeatureItem(
+                      Icon(Icons.touch_app, color: Colors.white70, size: 24.sp),
+                      "Easy Clock In/Out",
+                    ),
                     SizedBox(height: 15.h),
                     _buildFeatureItem(
-                      Icons.date_range,
+                      Icon(
+                        Icons.date_range,
+                        color: Colors.white70,
+                        size: 24.sp,
+                      ),
                       "Manage Leaves Seamlessly",
                     ),
                     SizedBox(height: 15.h),
-                    _buildFeatureItem(Icons.insert_chart, "Real-time Reports"),
+                    _buildFeatureItem(
+                      Icon(
+                        Icons.insert_chart,
+                        color: Colors.white70,
+                        size: 24.sp,
+                      ),
+                      "Real-time Reports",
+                    ),
                   ],
                 ),
               ),
@@ -140,11 +154,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildFeatureItem(IconData icon, String text) {
+  Widget _buildFeatureItem(Widget iconWidget, String text) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: Colors.white70, size: 24.sp),
+        iconWidget,
         SizedBox(width: 10.w),
         Text(
           text,
