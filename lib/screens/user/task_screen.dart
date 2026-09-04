@@ -116,13 +116,14 @@ class _TaskScreenState extends State<TaskScreen> {
             return Dialog(
               insetPadding: const EdgeInsets.all(15),
               child: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
                 width: double.infinity,
                 height: 400,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     const Text(
-                      "Select Month & Year",
+                      "Select Month & Year ddd",
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
@@ -351,441 +352,463 @@ class _TaskScreenState extends State<TaskScreen> {
           tooltip: "Export to Excel",
           onPressed: _exportToExcel,
         ),
-        IconButton(
-          icon: const Icon(Icons.home),
-          onPressed: () {
-            Get.back();
-          },
-        ),
       ],
       child: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                children: [
-                  SizedBox(height: 8.h),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: Row(
-                      children: [
-                        CustomChoiceChip(
-                          label: "All",
-                          selected: selectedFilter == "all",
-                          onSelected: () {
-                            setState(() => selectedFilter = "all");
-                            _applyFilter();
-                          },
-                        ),
-                        SizedBox(width: 8.w),
-                        CustomChoiceChip(
-                          label: "Today",
-                          selected: selectedFilter == "today",
-                          onSelected: () {
-                            setState(() => selectedFilter = "today");
-                            _applyFilter();
-                          },
-                        ),
-                        SizedBox(width: 8.w),
-                        CustomChoiceChip(
-                          label: "Week",
-                          selected: selectedFilter == "week",
-                          onSelected: () {
-                            setState(() => selectedFilter = "week");
-                            _applyFilter();
-                          },
-                        ),
-                        SizedBox(width: 8.w),
-                        CustomChoiceChip(
-                          label: monthLabel,
-                          selected: selectedFilter == "month",
-                          onSelected: () {
-                            _pickMonthYear();
-                          },
-                        ),
-                      ],
-                    ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 8.h),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: Row(
+                    children: [
+                      CustomChoiceChip(
+                        label: "All",
+                        selected: selectedFilter == "all",
+                        onSelected: () {
+                          setState(() => selectedFilter = "all");
+                          _applyFilter();
+                        },
+                      ),
+                      SizedBox(width: 8.w),
+                      CustomChoiceChip(
+                        label: "Today",
+                        selected: selectedFilter == "today",
+                        onSelected: () {
+                          setState(() => selectedFilter = "today");
+                          _applyFilter();
+                        },
+                      ),
+                      SizedBox(width: 8.w),
+                      CustomChoiceChip(
+                        label: "Week",
+                        selected: selectedFilter == "week",
+                        onSelected: () {
+                          setState(() => selectedFilter = "week");
+                          _applyFilter();
+                        },
+                      ),
+                      SizedBox(width: 8.w),
+                      CustomChoiceChip(
+                        label: monthLabel,
+                        selected: selectedFilter == "month",
+                        onSelected: () {
+                          _pickMonthYear();
+                        },
+                      ),
+                    ],
                   ),
-                  Divider(),
-                  Expanded(
-                    child: isLoading
-                        ? PageLoader()
-                        : tasks.isEmpty
-                        ? NoTasksWidget()
-                        : ResponsiveGridListWrapper(
-                            shrinkWrap: true,
-                            itemCount: tasks.length,
-                            desktopChildAspectRatio: 2.0,
-                            itemBuilder: (context, index) {
-                              final t = tasks[index];
-                              final createdAt = t["startTime"];
-                              final dateStr = createdAt != null
-                                  ? DateFormat(
-                                      "dd/MM/yyyy",
-                                    ).format(DateTime.parse(createdAt))
-                                  : "";
-                              return Card(
-                                elevation: 0,
-                                margin: EdgeInsets.symmetric(
-                                  vertical: 6.h,
-                                  horizontal: 2.w,
+                ),
+                Divider(),
+                Expanded(
+                  child: isLoading
+                      ? PageLoader()
+                      : tasks.isEmpty
+                      ? NoTasksWidget()
+                      : ResponsiveGridListWrapper(
+                          shrinkWrap: true,
+                          itemCount: tasks.length,
+                          allowDynamicHeight: true,
+                          itemBuilder: (context, index) {
+                            final t = tasks[index];
+                            final createdAt = t["startTime"];
+                            final dateStr = createdAt != null
+                                ? DateFormat(
+                                    "dd/MM/yyyy",
+                                  ).format(DateTime.parse(createdAt))
+                                : "";
+                            return Card(
+                              elevation: 0,
+                              margin: EdgeInsets.symmetric(
+                                vertical: 6.h,
+                                horizontal: 2.w,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.r),
+                                side: BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outlineVariant,
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16.r),
-                                  side: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.outlineVariant,
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Theme(
+                                data: Theme.of(
+                                  context,
+                                ).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  tilePadding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 8.h,
                                   ),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0.w),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  title: Row(
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Task : ${index + 1},",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
+                                      Expanded(
+                                        child: Text(
+                                          t["title"] != null &&
+                                                  t["title"]
+                                                      .toString()
+                                                      .isNotEmpty
+                                              ? t["title"]
+                                              : "Task ${index + 1}",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                              SizedBox(width: 5.w),
-                                              Text(
-                                                "Mode : ${t["mode"]}",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          AddTaskScreen(
-                                                            task: t,
-                                                          ),
-                                                    ),
-                                                  );
-                                                  _loadTasks();
-                                                },
-                                                child: Icon(
-                                                  Icons.edit,
-                                                  size: 20.sp,
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                                ),
-                                              ),
-                                              SizedBox(width: 30.w),
-                                              GestureDetector(
-                                                child: Icon(
-                                                  Icons.delete,
-                                                  size: 20.sp,
-                                                  color: ThemeClass.errorColor,
-                                                ),
-                                                onTap: () async {
-                                                  final confirm = await showDialog<bool>(
-                                                    context: context,
-                                                    builder: (ctx) => AlertDialog(
-                                                      title: const Text(
-                                                        "Delete Task",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      content: const Text(
-                                                        "Are you sure you want to delete this task?",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                ctx,
-                                                                false,
-                                                              ),
-                                                          child: const Text(
-                                                            "Cancel",
-                                                          ),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                ctx,
-                                                                true,
-                                                              ),
-                                                          child: const Text(
-                                                            "Delete",
-                                                            style: TextStyle(
-                                                              color: ThemeClass
-                                                                  .errorColor,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-
-                                                  if (confirm == true) {
-                                                    final taskId =
-                                                        t["id"] is int
-                                                        ? t["id"] as int
-                                                        : int.tryParse(
-                                                            t["id"].toString(),
-                                                          );
-
-                                                    if (taskId == null) {
-                                                      Get.snackbar(
-                                                        "Error",
-                                                        "Invalid task ID",
-                                                        backgroundColor:
-                                                            ThemeClass
-                                                                .errorColor,
-                                                        colorText: ThemeClass
-                                                            .textWhite,
-                                                      );
-                                                      return;
-                                                    }
-
-                                                    // Show loading
-                                                    Get.dialog(
-                                                      const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
-                                                      ),
-                                                      barrierDismissible: false,
-                                                    );
-
-                                                    try {
-                                                      final result =
-                                                          await TaskService.deleteTask(
-                                                            taskId,
-                                                          );
-
-                                                      Get.back();
-
-                                                      if (result["success"] ==
-                                                          true) {
-                                                        setState(() {
-                                                          tasks.removeAt(index);
-                                                        });
-
-                                                        Get.snackbar(
-                                                          "Success",
-                                                          "Task deleted successfully",
-                                                          backgroundColor:
-                                                              ThemeClass
-                                                                  .successColor,
-                                                          colorText: ThemeClass
-                                                              .textWhite,
-                                                          snackPosition:
-                                                              SnackPosition
-                                                                  .BOTTOM,
-                                                        );
-                                                        _loadTasks();
-                                                      } else {
-                                                        Get.snackbar(
-                                                          "Error",
-                                                          result["error"] ??
-                                                              "Failed to delete task",
-                                                          backgroundColor:
-                                                              ThemeClass
-                                                                  .errorColor,
-                                                          colorText: ThemeClass
-                                                              .textWhite,
-                                                          snackPosition:
-                                                              SnackPosition
-                                                                  .BOTTOM,
-                                                        );
-                                                      }
-                                                    } catch (e) {
-                                                      Get.back();
-                                                      Get.snackbar(
-                                                        "Error",
-                                                        "Network error: ${e.toString()}",
-                                                        backgroundColor:
-                                                            ThemeClass
-                                                                .errorColor,
-                                                        colorText: ThemeClass
-                                                            .textWhite,
-                                                        snackPosition:
-                                                            SnackPosition
-                                                                .BOTTOM,
-                                                      );
-                                                    }
-                                                  }
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                      Divider(height: 24.h),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Project : ",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
+                                    ],
+                                  ),
+                                  subtitle: Padding(
+                                    padding: EdgeInsets.only(top: 4.h),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "Status: ${t["status"] ?? ""}",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: t["status"] == "Working"
+                                                    ? ThemeClass.warningColor
+                                                    : ThemeClass.successColor,
+                                                fontWeight: FontWeight.w600,
                                               ),
-                                              Text(
-                                                "${t["project"] ?? ""}",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "Sub Project : ",
+                                        ),
+                                        Text(
+                                          "  •  $dateStr",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  childrenPadding: EdgeInsets.all(
+                                    16.w,
+                                  ).copyWith(top: 0),
+                                  expandedCrossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Divider(height: 16.h),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Project : ",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "${t["project"] ?? ""}",
                                             style: Theme.of(
                                               context,
                                             ).textTheme.titleMedium,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          Text(
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Sub Project : ",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                        Expanded(
+                                          child: Text(
                                             "${t["subProject"] ?? ""}",
                                             style: Theme.of(
                                               context,
                                             ).textTheme.titleMedium,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Mode : ",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "${t["mode"] ?? ""}",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Details : ",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "${t["description"] ?? ""}",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (t["taskAssignToName"] != null &&
+                                        t["taskAssignToName"]
+                                            .toString()
+                                            .isNotEmpty) ...[
                                       SizedBox(height: 4.h),
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Title :",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                              Text(
-                                                " ${t["title"] ?? ""}",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                            ],
+                                          Text(
+                                            "Assign To : ",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
                                           ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Details :",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                              Text(
-                                                " ${t["description"] ?? ""}",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Divider(height: 24.h),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "$dateStr |",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                              SizedBox(width: 4.w),
-                                              Text(
-                                                _calculateDuration(
-                                                  t["startTime"],
-                                                  t["endTime"],
-                                                ),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium!
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Status :",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
-                                              ),
-                                              Text(
-                                                " ${t["status"] ?? ""}",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium!
-                                                    .copyWith(
-                                                      color:
-                                                          t["status"] ==
-                                                              "Working"
-                                                          ? ThemeClass
-                                                                .warningColor
-                                                          : ThemeClass
-                                                                .successColor,
-                                                    ),
-                                              ),
-                                            ],
+                                          Expanded(
+                                            child: Text(
+                                              "${t["taskAssignToName"]}",
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ],
-                                  ),
+                                    SizedBox(height: 4.h),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Duration : ",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            _calculateDuration(
+                                              t["startTime"],
+                                              t["endTime"],
+                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Divider(height: 24.h),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton.icon(
+                                          onPressed: () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    AddTaskScreen(task: t),
+                                              ),
+                                            );
+                                            _loadTasks();
+                                          },
+                                          icon: Icon(
+                                            Icons.edit,
+                                            size: 20.sp,
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
+                                          ),
+                                          label: Text(
+                                            "Edit",
+                                            style: TextStyle(
+                                              color: Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 16.w),
+                                        TextButton.icon(
+                                          onPressed: () async {
+                                            final confirm = await showDialog<bool>(
+                                              context: context,
+                                              builder: (ctx) => AlertDialog(
+                                                title: const Text(
+                                                  "Delete Task",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                content: const Text(
+                                                  "Are you sure you want to delete this task?",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          ctx,
+                                                          false,
+                                                        ),
+                                                    child: const Text("Cancel"),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          ctx,
+                                                          true,
+                                                        ),
+                                                    child: const Text(
+                                                      "Delete",
+                                                      style: TextStyle(
+                                                        color: ThemeClass
+                                                            .errorColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+
+                                            if (confirm == true) {
+                                              final taskId = t["id"] is int
+                                                  ? t["id"] as int
+                                                  : int.tryParse(
+                                                      t["id"].toString(),
+                                                    );
+                                              if (taskId == null) {
+                                                Get.snackbar(
+                                                  "Error",
+                                                  "Invalid task ID",
+                                                  backgroundColor:
+                                                      ThemeClass.errorColor,
+                                                  colorText:
+                                                      ThemeClass.textWhite,
+                                                );
+                                                return;
+                                              }
+
+                                              Get.dialog(
+                                                const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                                barrierDismissible: false,
+                                              );
+                                              try {
+                                                final result =
+                                                    await TaskService.deleteTask(
+                                                      taskId,
+                                                    );
+                                                Get.back();
+                                                if (result["success"] == true) {
+                                                  setState(
+                                                    () => tasks.removeAt(index),
+                                                  );
+                                                  Get.snackbar(
+                                                    "Success",
+                                                    "Task deleted successfully",
+                                                    backgroundColor:
+                                                        ThemeClass.successColor,
+                                                    colorText:
+                                                        ThemeClass.textWhite,
+                                                    snackPosition:
+                                                        SnackPosition.BOTTOM,
+                                                  );
+                                                  _loadTasks();
+                                                } else {
+                                                  Get.snackbar(
+                                                    "Error",
+                                                    result["error"] ??
+                                                        "Failed to delete task",
+                                                    backgroundColor:
+                                                        ThemeClass.errorColor,
+                                                    colorText:
+                                                        ThemeClass.textWhite,
+                                                    snackPosition:
+                                                        SnackPosition.BOTTOM,
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                Get.back();
+                                                Get.snackbar(
+                                                  "Error",
+                                                  "Network error: ${e.toString()}",
+                                                  backgroundColor:
+                                                      ThemeClass.errorColor,
+                                                  colorText:
+                                                      ThemeClass.textWhite,
+                                                  snackPosition:
+                                                      SnackPosition.BOTTOM,
+                                                );
+                                              }
+                                            }
+                                          },
+                                          icon: Icon(
+                                            Icons.delete,
+                                            size: 20.sp,
+                                            color: ThemeClass.errorColor,
+                                          ),
+                                          label: Text(
+                                            "Delete",
+                                            style: TextStyle(
+                                              color: ThemeClass.errorColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
           ),
         ),

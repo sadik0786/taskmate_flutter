@@ -79,22 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       _DashboardItem(
-        title: 'My Profile',
-        icon: Icons.manage_accounts,
-        gradient: standardGradient,
-        onTap: () {
-          Get.toNamed(Routes.profileScreen);
-        },
-      ),
-      _DashboardItem(
-        title: 'Manage Leave',
-        icon: Icons.manage_history,
-        gradient: standardGradient,
-        onTap: () {
-          Get.toNamed(Routes.hrmsDashboard);
-        },
-      ),
-      _DashboardItem(
         title: 'Company Holidays',
         icon: Icons.celebration,
         gradient: standardGradient,
@@ -113,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return BaseLayout(
-      title: "Task Mate",
+      title: "Dashboard",
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
         child: Column(

@@ -6,6 +6,7 @@ import 'package:task_mate/screens/user/task_screen.dart';
 import 'package:task_mate/services/base_api_service.dart';
 import 'package:task_mate/services/user/task_service.dart';
 import 'package:task_mate/services/admin/project_service.dart';
+import 'package:task_mate/services/admin/user_service.dart';
 import 'package:task_mate/widgets/custom_date_field.dart';
 import 'package:task_mate/widgets/custom_time_field.dart';
 import 'package:task_mate/widgets/custom_button.dart';
@@ -35,6 +36,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
   // Map<String, dynamic>? _selectedSubProject;
   int? _selectedProjectId;
   int? _selectedSubProjectId;
+  int? _selectedAssignTo;
   String? _selectedMode;
   String? _selectedStatus;
   DateTime? _selectedDate;
@@ -44,15 +46,17 @@ class AddTaskScreenState extends State<AddTaskScreen> {
   final List<Map<String, dynamic>> _projects = [];
   final List<Map<String, dynamic>> _allSubprojects = [];
   List<Map<String, dynamic>> _filteredSubprojects = [];
+  final List<Map<String, dynamic>> _employees = [];
 
   final List<String> _modes = ["API", "Database", "UI", "Backend", "Others"];
-  final List<String> _statuses = ["Working", "Complete"];
+  final List<String> _statuses = ["Working", "Pending", "Complete"];
 
   @override
   void initState() {
     super.initState();
     _loadProjects();
     loadAllSubProjects();
+    _loadEmployees();
     if (widget.task != null) _prefillTask();
   }
 
@@ -62,6 +66,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     _desc.text = task["description"] ?? "";
     _selectedProjectId = task["projectId"];
     _selectedSubProjectId = task["subProjectId"];
+    _selectedAssignTo = task["taskAssignTo"];
     _selectedMode = task["mode"];
     _selectedStatus = task["status"];
 
@@ -100,20 +105,22 @@ class AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  // Future<void> _loadAllSubProjects() async {
-  //   try {
-  //     final res = await ProjectService.fetchSubProjects();
-  //     setState(() {
-  //       _allSubprojects.clear();
-  //       _allSubprojects.addAll(res.map((sp) => Map<String, dynamic>.from(sp)));
-  //       _filterSubprojects(); // filter based on selected project
-  //     });
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       Get.context!,
-  //     ).showSnackBar(SnackBar(content: Text("Failed to load subprojects: $e")));
-  //   }
-  // }
+  Future<void> _loadEmployees() async {
+    try {
+      final res = await UserService.fetchEmployees();
+      if (!mounted) return;
+      setState(() {
+        _employees.clear();
+        final itEmployees = res.where((e) {
+          final dept = e["Department"]?.toString().toLowerCase() ?? "";
+          return dept == "it" || dept.contains("it ");
+        });
+        _employees.addAll(itEmployees.map((e) => Map<String, dynamic>.from(e)));
+      });
+    } catch (e) {
+      CustomSnackBar.info("Failed to load employees: $e");
+    }
+  }
 
   Future<void> loadAllSubProjects() async {
     try {
@@ -167,6 +174,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
         // _selectedSubProjectId == null ||
         _selectedMode == null ||
         _selectedStatus == null ||
+        _selectedAssignTo == null ||
         _selectedDate == null ||
         _startTime == null ||
         _endTime == null) {
@@ -213,6 +221,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
         startDate: startDateTimeUTC.toIso8601String(),
         endDate: endDateTimeUTC.toIso8601String(),
         createdBy: userId,
+        taskAssignTo: _selectedAssignTo,
       );
     } else {
       // Update existing task
@@ -227,6 +236,7 @@ class AddTaskScreenState extends State<AddTaskScreen> {
         status: _selectedStatus!,
         startDate: startDateTimeUTC.toIso8601String(),
         endDate: endDateTimeUTC.toIso8601String(),
+        taskAssignTo: _selectedAssignTo,
       );
     }
 
@@ -279,14 +289,12 @@ class AddTaskScreenState extends State<AddTaskScreen> {
             Get.toNamed(Routes.projectScreen);
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.home),
-          onPressed: () {
-            Get.back();
-          },
-        ),
       ],
       child: ResponsiveFormWrapper(
+        title: widget.task == null ? "Create Task" : "Edit Task",
+        subtitle:
+            "Log your daily tasks and track your productivity effectively.",
+        icon: Icons.task_alt,
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.w),
           child: Column(
@@ -333,6 +341,21 @@ class AddTaskScreenState extends State<AddTaskScreen> {
                 value: _selectedSubProjectId,
                 isEnabled: _selectedProjectId != null,
                 onChanged: _onSubProjectChanged,
+              ),
+              SizedBox(height: 10.h),
+              CustomDropdownField<int>(
+                labelText: "Assign To",
+                isRequired: true,
+                hintText: "Select Employee",
+                prefixIcon: Icons.person,
+                items: _employees
+                    .map((e) => {"ID": e["ID"], "Name": e["Name"] ?? "Unknown"})
+                    .toList(),
+                valueKey: "ID",
+                labelKey: "Name",
+                value: _selectedAssignTo,
+                isEnabled: true,
+                onChanged: (v) => setState(() => _selectedAssignTo = v),
               ),
               SizedBox(height: 10.h),
               CustomDropdownField<String>(
@@ -432,7 +455,11 @@ class AddTaskScreenState extends State<AddTaskScreen> {
                 ],
               ),
               SizedBox(height: 24.h),
-              CustomButton(icon: Icons.save, text: "Save Task", onPressed: _save),
+              CustomButton(
+                icon: Icons.save,
+                text: "Save Task",
+                onPressed: _save,
+              ),
             ],
           ),
         ),

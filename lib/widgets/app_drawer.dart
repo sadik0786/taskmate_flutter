@@ -229,16 +229,13 @@ class _AppDrawerState extends State<AppDrawer> {
   List<Widget> _buildMenuItems() {
     if (widget.role == "ceo" ||
         widget.role == "hr" ||
-        widget.role == "manager" ||
-        widget.role == "superadmin") {
+        widget.role == "manager") {
       final List<Widget> items = [];
       items.add(
         _buildDrawerItem(Icons.dashboard, "Dashboard", Routes.adminDashboard),
       );
 
-      if (widget.role == "ceo" ||
-          widget.role == "hr" ||
-          widget.role == "superadmin") {
+      if (widget.role == "ceo" || widget.role == "hr") {
         items.add(
           _buildDrawerItem(
             Icons.person_add,
@@ -292,12 +289,7 @@ class _AppDrawerState extends State<AppDrawer> {
       return items;
     } else if (widget.role == "admin") {
       return [
-        _buildDrawerItem(Icons.dashboard, "Dashboard", Routes.adminDashboard),
-        _buildDrawerItem(
-          Icons.person_add,
-          "Add Employee",
-          Routes.registerScreen,
-        ),
+        _buildDrawerItem(Icons.dashboard, "Dashboard", Routes.homeScreen),
         _buildDrawerItem(Icons.people, "Employees", Routes.employeeScreen),
         _buildDrawerItem(
           Icons.library_add,

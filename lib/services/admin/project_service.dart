@@ -52,7 +52,14 @@ class ProjectService {
         "subProjectName": subProjectName,
       }),
     );
-    return jsonDecode(res.body);
+    try {
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {
+        "success": false,
+        "error": "Server error: ${res.statusCode} ${res.body}",
+      };
+    }
   }
 
   // Get all sub projects

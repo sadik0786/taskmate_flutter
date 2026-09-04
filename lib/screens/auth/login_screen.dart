@@ -69,15 +69,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.assignment_turned_in_outlined,
-                      size: 100.sp,
-                      color: Colors.white,
-                    ),
-                    SizedBox(height: 20.h),
+                    Image.asset("assets/5nance-logo-white.png", height: 50.h),
+                    SizedBox(height: 30.h),
                     Text(
                       "Task Mate",
-                      style: Theme.of(context).textTheme.headlineMedium
+                      style: Theme.of(context).textTheme.headlineLarge
                           ?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -126,13 +122,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Center(
             child: SingleChildScrollView(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
+                constraints: const BoxConstraints(maxWidth: 600),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "Welcome Back",
-                      style: Theme.of(context).textTheme.headlineSmall
+                      style: Theme.of(context).textTheme.headlineLarge
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
@@ -197,6 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginForm(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 600;
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 10.w),
       color: Theme.of(context).cardColor,
@@ -208,12 +205,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(14.w),
+        padding: EdgeInsets.all(isDesktop ? 40.w : 14.w),
         child: Form(
           key: loginController.formKey,
           child: Column(
             children: [
-              SizedBox(height: 10.h),
               CustomTextField(
                 isEnabled: true,
                 labelText: "Email ID",
@@ -224,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: loginController.email.value,
                 validator: loginController.validateEmail,
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: isDesktop ? 40.h : 20.h),
               CustomTextField(
                 labelText: "Password",
                 isRequired: true,
@@ -234,14 +230,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 isObscure: true,
                 validator: loginController.validatePassword,
               ),
-              SizedBox(height: 30.h),
-              // Login Button
-              CustomButton(
+              SizedBox(height: isDesktop ? 50.h : 30.h),
+              Obx(() => CustomButton(
                 text: "Login",
                 onPressed: loginController.login,
                 isLoading: loginController.loading.value,
-              ),
-              SizedBox(height: 20.h),
+                padding: EdgeInsets.symmetric(vertical: 24.h),
+              )),
             ],
           ),
         ),

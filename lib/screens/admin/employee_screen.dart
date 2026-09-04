@@ -76,17 +76,17 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Widget build(BuildContext context) {
     return BaseLayout(
       title: "Employees",
-      customActions: [
-        IconButton(
-          icon: const Icon(Icons.home),
-          onPressed: () {
-            Get.until(
-              (route) =>
-                  route.settings.name == Routes.adminDashboard || route.isFirst,
-            );
-          },
-        ),
-      ],
+      // customActions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.home),
+      //     onPressed: () {
+      //       Get.until(
+      //         (route) =>
+      //             route.settings.name == Routes.adminDashboard || route.isFirst,
+      //       );
+      //     },
+      //   ),
+      // ],
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: loading

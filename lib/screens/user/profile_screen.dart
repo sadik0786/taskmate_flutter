@@ -61,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     switch (role) {
-      case 'superadmin':
+      case 'manager':
         Get.until(
           (route) =>
               route.settings.name == Routes.adminDashboard || route.isFirst,
@@ -348,14 +348,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return BaseLayout(
       title: "My Profile",
-      customActions: [
-        IconButton(
-          icon: const Icon(Icons.home),
-          onPressed: () async {
-            _checkAuthAndNavigate();
-          },
-        ),
-      ],
+      // customActions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.home),
+      //     onPressed: () async {
+      //       _checkAuthAndNavigate();
+      //     },
+      //   ),
+      // ],
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: _isLoading

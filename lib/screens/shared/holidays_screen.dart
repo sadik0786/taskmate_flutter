@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mate/controllers/hrms/leave_controller.dart';
-import 'package:task_mate/core/routes.dart';
 import 'package:task_mate/core/theme.dart';
 import 'package:task_mate/utils/common_fn.dart';
 import 'package:task_mate/widgets/no_data.dart';
@@ -30,31 +28,24 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return BaseLayout(
       title: "Company Holidays",
       showBackButton: true,
-      customActions: [
-        IconButton(
-          icon: const Icon(Icons.home),
-          onPressed: () async {
-            final prefs = await SharedPreferences.getInstance();
-            final role = prefs.getString("role")?.toLowerCase() ?? "employee";
-            final adminRoles = [
-              "superadmin",
-              "admin",
-              "hr",
-              "ceo",
-              "manager",
-            ];
-            if (adminRoles.contains(role)) {
-              Get.offAllNamed(Routes.adminDashboard);
-            } else {
-              Get.offAllNamed(Routes.homeScreen);
-            }
-          },
-        ),
-      ],
+      // customActions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.home),
+      //     onPressed: () async {
+      //       final prefs = await SharedPreferences.getInstance();
+      //       final role = prefs.getString("role")?.toLowerCase() ?? "employee";
+      //       final adminRoles = ["admin", "hr", "ceo", "manager"];
+      //       if (adminRoles.contains(role)) {
+      //         Get.offAllNamed(Routes.adminDashboard);
+      //       } else {
+      //         Get.offAllNamed(Routes.homeScreen);
+      //       }
+      //     },
+      //   ),
+      // ],
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         child: Column(
@@ -81,12 +72,16 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16.r),
                         border: Border.all(
-                          color: Theme.of(context).dividerColor.withOpacity(0.1),
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.1),
                           width: 1,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context).shadowColor.withOpacity(0.05),
+                            color: Theme.of(
+                              context,
+                            ).shadowColor.withOpacity(0.05),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -116,7 +111,9 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                                 SizedBox(height: 4.h),
@@ -124,7 +121,9 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
                                   "${holiday["DayOfWeek"]} • ${CommonFn.formatDate(holiday["HolidayDate"] ?? "")}",
                                   style: TextStyle(
                                     fontSize: 13.sp,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),

@@ -20,7 +20,6 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-  late Animation<Color?> _colorAnimation;
 
   @override
   void initState() {
@@ -39,10 +38,6 @@ class _SplashScreenState extends State<SplashScreen>
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
-    _colorAnimation = ColorTween(
-      begin: ThemeClass.primaryGreen,
-      end: ThemeClass.textWhite,
-    ).animate(_controller);
 
     _controller.forward();
 
@@ -160,25 +155,17 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _fadeAnimation.value,
                     child: Container(
                       padding: EdgeInsets.all(20.w),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ThemeClass.primaryGreen.withOpacity(0.5),
-                          width: 2,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.work_outline,
-                        size: 80.sp,
-                        color: _colorAnimation.value ?? ThemeClass.textWhite,
+                      decoration: BoxDecoration(color: Colors.transparent),
+                      child: Image.asset(
+                        "assets/5nance-logo.png",
+                        height: 50.h,
                       ),
                     ),
                   ),
                 ),
               ),
 
-              SizedBox(height: 30.h),
+              SizedBox(height: 50.h),
 
               // App Name
               AnimatedBuilder(
@@ -200,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          "Employee Task Management System",
+                          "Employee Management System",
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color:
                                 (isDark

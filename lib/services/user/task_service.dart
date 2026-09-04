@@ -47,6 +47,7 @@ class TaskService {
     required String startDate,
     required String endDate,
     required int createdBy,
+    int? taskAssignTo,
   }) async {
     try {
       final token = await BaseApiService.getToken();
@@ -64,6 +65,7 @@ class TaskService {
         "startDate": startDate,
         "endDate": endDate,
         "CreatedBy": createdBy,
+        "taskAssignTo": taskAssignTo,
       };
 
       final res = await http.post(
@@ -92,6 +94,7 @@ class TaskService {
     required String status,
     required String startDate,
     required String endDate,
+    int? taskAssignTo,
   }) async {
     try {
       final token = await BaseApiService.getToken();
@@ -107,6 +110,7 @@ class TaskService {
         "status": status,
         "startDate": startDate,
         "endDate": endDate,
+        "taskAssignTo": taskAssignTo,
       };
       final url = Uri.parse(
         "${BaseApiService.baseUrl}/task/updateTask/$taskId",
@@ -196,6 +200,8 @@ class TaskService {
             "userId": task["userId"],
             "userName": task["userName"]?.toString() ?? "",
             "userEmail": task["userEmail"]?.toString() ?? "",
+            "taskAssignTo": task["taskAssignTo"],
+            "taskAssignToName": task["taskAssignToName"]?.toString() ?? "",
           };
         }).toList();
       } else {

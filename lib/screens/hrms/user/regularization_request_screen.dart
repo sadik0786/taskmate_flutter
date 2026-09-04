@@ -21,7 +21,9 @@ class RegularizationRequestScreen extends StatefulWidget {
 
 class _RegularizationRequestScreenState
     extends State<RegularizationRequestScreen> {
-  final RegularizationController controller = Get.put(RegularizationController());
+  final RegularizationController controller = Get.put(
+    RegularizationController(),
+  );
 
   @override
   void initState() {
@@ -44,12 +46,8 @@ class _RegularizationRequestScreenState
       builder: (ctx) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            return ResponsiveFormWrapper(
-              maxWidth: 600,
-              padding: EdgeInsets.zero,
-              wrapInCardOnDesktop: false,
-              child: Container(
-                padding: EdgeInsets.only(
+            return Container(
+              padding: EdgeInsets.only(
                 top: 16.h,
                 left: 20.w,
                 right: 20.w,
@@ -199,11 +197,11 @@ class _RegularizationRequestScreenState
 
                         final navigator = Navigator.of(ctx);
                         final success = await controller.applyRegularization(
-                              targetDate: targetDateStr,
-                              reason: reasonController.text,
-                              reqIn: checkInStr,
-                              reqOut: checkOutStr,
-                            );
+                          targetDate: targetDateStr,
+                          reason: reasonController.text,
+                          reqIn: checkInStr,
+                          reqOut: checkOutStr,
+                        );
 
                         if (success) {
                           navigator.pop();
@@ -221,7 +219,7 @@ class _RegularizationRequestScreenState
                   ),
                 ],
               ),
-            ));
+            );
           },
         );
       },
@@ -239,7 +237,9 @@ class _RegularizationRequestScreenState
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.2),
+          ),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -256,7 +256,11 @@ class _RegularizationRequestScreenState
                     : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            Icon(Icons.calendar_today, size: 18.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.calendar_today,
+              size: 18.sp,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ],
         ),
       ),
@@ -274,7 +278,9 @@ class _RegularizationRequestScreenState
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.2),
+          ),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -289,7 +295,11 @@ class _RegularizationRequestScreenState
                     : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            Icon(Icons.access_time, size: 18.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.access_time,
+              size: 18.sp,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ],
         ),
       ),
@@ -301,21 +311,25 @@ class _RegularizationRequestScreenState
     return BaseLayout(
       title: "My Regularizations",
       showBackButton: true,
-      customActions: [
-        IconButton(
-          icon: Icon(Icons.home, color: Theme.of(context).appBarTheme.iconTheme?.color ?? Colors.white),
-          onPressed: () async {
-            final prefs = await SharedPreferences.getInstance();
-            final role = prefs.getString("role")?.toLowerCase() ?? "employee";
-            final adminRoles = ["superadmin", "admin", "hr", "ceo", "manager"];
-            if (adminRoles.contains(role)) {
-              Get.offAllNamed(Routes.adminDashboard);
-            } else {
-              Get.offAllNamed(Routes.homeScreen);
-            }
-          },
-        ),
-      ],
+      // customActions: [
+      //   IconButton(
+      //     icon: Icon(
+      //       Icons.home,
+      //       color:
+      //           Theme.of(context).appBarTheme.iconTheme?.color ?? Colors.white,
+      //     ),
+      //     onPressed: () async {
+      //       final prefs = await SharedPreferences.getInstance();
+      //       final role = prefs.getString("role")?.toLowerCase() ?? "employee";
+      //       final adminRoles = ["superadmin", "admin", "hr", "ceo", "manager"];
+      //       if (adminRoles.contains(role)) {
+      //         Get.offAllNamed(Routes.adminDashboard);
+      //       } else {
+      //         Get.offAllNamed(Routes.homeScreen);
+      //       }
+      //     },
+      //   ),
+      // ],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showApplyModal,
         backgroundColor: ThemeClass.primaryGreen,
@@ -376,7 +390,9 @@ class _RegularizationRequestScreenState
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,7 +429,13 @@ class _RegularizationRequestScreenState
           Row(
             children: [
               Expanded(
-                child: _buildTimeCol("Req In", reqIn, Icons.login, Colors.blue, context),
+                child: _buildTimeCol(
+                  "Req In",
+                  reqIn,
+                  Icons.login,
+                  Colors.blue,
+                  context,
+                ),
               ),
               Expanded(
                 child: _buildTimeCol(
@@ -438,7 +460,10 @@ class _RegularizationRequestScreenState
           SizedBox(height: 4.h),
           Text(
             item["Reason"] ?? "-",
-            style: TextStyle(fontSize: 13.sp, color: Theme.of(context).colorScheme.onSurface),
+            style: TextStyle(
+              fontSize: 13.sp,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           if (item["HrReason"] != null &&
               item["HrReason"].toString().isNotEmpty) ...[
@@ -462,7 +487,13 @@ class _RegularizationRequestScreenState
     );
   }
 
-  Widget _buildTimeCol(String label, String time, IconData icon, Color color, BuildContext context) {
+  Widget _buildTimeCol(
+    String label,
+    String time,
+    IconData icon,
+    Color color,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -89,33 +89,6 @@ class AdminDashboardState extends State<AdminDashboard> {
     if (role == "ceo" || role == "hr") {
       return [
         _DashboardItem(
-          title: 'Add Employee',
-          icon: Icons.person_add_rounded,
-          gradient: _getGradient(const Color(0xFF8B5CF6)), // Purple
-          onTap: () async {
-            await Get.toNamed(Routes.registerScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
-          title: 'Employee',
-          icon: Icons.people_rounded,
-          gradient: _getGradient(const Color(0xFF3B82F6)), // Blue
-          onTap: () async {
-            await Get.toNamed(Routes.employeeScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
-          title: 'My Profile',
-          icon: Icons.account_circle_rounded,
-          gradient: _getGradient(const Color(0xFF14B8A6)), // Teal
-          onTap: () async {
-            await Get.toNamed(Routes.profileScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
           title: 'Holidays',
           icon: Icons.celebration_rounded,
           gradient: _getGradient(const Color(0xFFF59E0B)), // Amber
@@ -133,26 +106,8 @@ class AdminDashboardState extends State<AdminDashboard> {
         ),
       ];
     }
-    if (role == "superadmin") {
+    if (role == "manager") {
       return [
-        _DashboardItem(
-          title: 'Add Employee',
-          icon: Icons.person_add_rounded,
-          gradient: _getGradient(const Color(0xFF8B5CF6)),
-          onTap: () async {
-            await Get.toNamed(Routes.registerScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
-          title: 'Employee',
-          icon: Icons.people_rounded,
-          gradient: _getGradient(const Color(0xFF3B82F6)),
-          onTap: () async {
-            await Get.toNamed(Routes.employeeScreen);
-            loadSummaryData();
-          },
-        ),
         _DashboardItem(
           title: 'Task Details',
           icon: Icons.task_rounded,
@@ -172,24 +127,6 @@ class AdminDashboardState extends State<AdminDashboard> {
           },
         ),
         _DashboardItem(
-          title: 'My Profile',
-          icon: Icons.account_circle_rounded,
-          gradient: _getGradient(const Color(0xFF14B8A6)),
-          onTap: () async {
-            await Get.toNamed(Routes.profileScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
-          title: 'Manage Leave',
-          icon: Icons.manage_history_rounded,
-          gradient: _getGradient(const Color(0xFF06B6D4)), // Cyan
-          onTap: () async {
-            await Get.toNamed(Routes.hrmsDashboard);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
           title: 'Attendance Report',
           icon: Icons.assignment_ind_rounded,
           gradient: _getGradient(const Color(0xFF8B5CF6)),
@@ -197,14 +134,7 @@ class AdminDashboardState extends State<AdminDashboard> {
             Get.toNamed(Routes.adminAttendanceReport);
           },
         ),
-        _DashboardItem(
-          title: 'Regularization',
-          icon: Icons.edit_calendar_rounded,
-          gradient: _getGradient(const Color(0xFFF43F5E)), // Rose
-          onTap: () {
-            Get.toNamed(Routes.adminRegularizationRequests);
-          },
-        ),
+
         _DashboardItem(
           title: 'Company Holidays',
           icon: Icons.celebration_rounded,
@@ -224,40 +154,6 @@ class AdminDashboardState extends State<AdminDashboard> {
       ];
     } else if (role == "admin") {
       return [
-        _DashboardItem(
-          title: 'Add Employee',
-          icon: Icons.person_add_rounded,
-          gradient: _getGradient(const Color(0xFF8B5CF6)),
-          onTap: () async {
-            await Get.toNamed(Routes.registerScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
-          title: 'Attendance Report',
-          icon: Icons.assignment_ind_rounded,
-          gradient: _getGradient(const Color(0xFF8B5CF6)),
-          onTap: () {
-            Get.toNamed(Routes.adminAttendanceReport);
-          },
-        ),
-        _DashboardItem(
-          title: 'Regularization',
-          icon: Icons.edit_calendar_rounded,
-          gradient: _getGradient(const Color(0xFFF43F5E)),
-          onTap: () {
-            Get.toNamed(Routes.adminRegularizationRequests);
-          },
-        ),
-        _DashboardItem(
-          title: 'Employee',
-          icon: Icons.people_rounded,
-          gradient: _getGradient(const Color(0xFF3B82F6)),
-          onTap: () async {
-            await Get.toNamed(Routes.employeeScreen);
-            loadSummaryData();
-          },
-        ),
         _DashboardItem(
           title: 'Add Project',
           icon: Icons.library_add_rounded,
@@ -282,15 +178,6 @@ class AdminDashboardState extends State<AdminDashboard> {
           gradient: _getGradient(const Color(0xFF10B981)),
           onTap: () async {
             await Get.toNamed(Routes.taskScreen);
-            loadSummaryData();
-          },
-        ),
-        _DashboardItem(
-          title: 'My Profile',
-          icon: Icons.account_circle_rounded,
-          gradient: _getGradient(const Color(0xFF14B8A6)),
-          onTap: () async {
-            await Get.toNamed(Routes.profileScreen);
             loadSummaryData();
           },
         ),

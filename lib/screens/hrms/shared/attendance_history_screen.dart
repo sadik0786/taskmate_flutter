@@ -223,17 +223,10 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
           onPressed: () {
             Get.toNamed(Routes.regularizationRequest);
           },
-          icon: Icon(
-            Icons.edit_calendar,
-            color: Theme.of(context).primaryColor,
-            size: 18,
-          ),
-          label: Text(
+          icon: const Icon(Icons.edit_calendar, color: Colors.white, size: 18),
+          label: const Text(
             "Regularize",
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ),
       ],
