@@ -30,6 +30,7 @@ class AdminDashboardState extends State<AdminDashboard> {
   int totalProjects = 0;
   int totalTasks = 0;
   bool isLoadingSummary = true;
+  bool isITDepartment = false;
 
   @override
   void initState() {
@@ -46,7 +47,27 @@ class AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> loadSummaryData() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString("email") ?? "";
       final employees = await UserService.fetchEmployees();
+
+      bool isItUser = false;
+      for (var emp in employees) {
+        if (emp["email"] == email &&
+            emp["departmentName"]?.toString().toLowerCase() == "it") {
+          isItUser = true;
+          break;
+        }
+      }
+
+      // Get all IT department employee IDs
+      final itEmployeeIds = employees
+          .where(
+            (emp) => emp["departmentName"]?.toString().toLowerCase() == "it",
+          )
+          .map((e) => e["id"].toString())
+          .toSet();
+
       final projects = await ProjectService.fetchProjects();
       List tasks = [];
       try {
@@ -55,11 +76,18 @@ class AdminDashboardState extends State<AdminDashboard> {
         // Not all admins have access to all admin tasks
       }
 
+      // Filter tasks to only include those assigned to IT department
+      final itTasks = tasks.where((t) {
+        final assignTo = t["taskAssignTo"]?.toString();
+        return assignTo != null && itEmployeeIds.contains(assignTo);
+      }).toList();
+
       if (mounted) {
         setState(() {
           totalEmployees = employees.length;
           totalProjects = projects.length;
-          totalTasks = tasks.length;
+          totalTasks = itTasks.length;
+          isITDepartment = isItUser;
           isLoadingSummary = false;
         });
       }
@@ -333,22 +361,24 @@ class AdminDashboardState extends State<AdminDashboard> {
                               color: const Color(0xFF3B82F6), // Blue
                             ),
                           ),
-                          Expanded(
-                            child: _summaryCard(
-                              title: "Total Projects",
-                              value: totalProjects,
-                              icon: Icons.layers_rounded,
-                              color: const Color(0xFF10B981), // Emerald Green
+                          if (isITDepartment) ...[
+                            Expanded(
+                              child: _summaryCard(
+                                title: "Total Projects",
+                                value: totalProjects,
+                                icon: Icons.layers_rounded,
+                                color: const Color(0xFF10B981), // Emerald Green
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: _summaryCard(
-                              title: "Total Tasks",
-                              value: totalTasks,
-                              icon: Icons.task_alt_rounded,
-                              color: const Color(0xFFF59E0B), // Amber
+                            Expanded(
+                              child: _summaryCard(
+                                title: "Total Tasks",
+                                value: totalTasks,
+                                icon: Icons.task_alt_rounded,
+                                color: const Color(0xFFF59E0B), // Amber
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       )
                     else
@@ -360,18 +390,20 @@ class AdminDashboardState extends State<AdminDashboard> {
                             icon: Icons.people_alt_rounded,
                             color: const Color(0xFF3B82F6),
                           ),
-                          _summaryCard(
-                            title: "Total Projects",
-                            value: totalProjects,
-                            icon: Icons.layers_rounded,
-                            color: const Color(0xFF10B981),
-                          ),
-                          _summaryCard(
-                            title: "Total Tasks",
-                            value: totalTasks,
-                            icon: Icons.task_alt_rounded,
-                            color: const Color(0xFFF59E0B),
-                          ),
+                          if (isITDepartment) ...[
+                            _summaryCard(
+                              title: "Total Projects",
+                              value: totalProjects,
+                              icon: Icons.layers_rounded,
+                              color: const Color(0xFF10B981),
+                            ),
+                            _summaryCard(
+                              title: "Total Tasks",
+                              value: totalTasks,
+                              icon: Icons.task_alt_rounded,
+                              color: const Color(0xFFF59E0B),
+                            ),
+                          ],
                         ],
                       ),
                     SizedBox(height: 32.h),
